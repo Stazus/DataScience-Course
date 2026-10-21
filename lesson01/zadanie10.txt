@@ -1,0 +1,190 @@
+# Zadanie 10 – Analiza trade-off: dokładność vs energia
+
+## 1. Cel zadania
+
+Celem jest porównanie czterech modeli klasyfikacji obrazów pod względem dokładności (accuracy) oraz zużycia energii.
+
+Trade-off oznacza kompromis między dwoma parametrami. W tym przypadku analizujemy, czy wzrost dokładności modelu uzasadnia dodatkowe zużycie energii.
+
+Dane pochodzą z treści zadania i służą do analizy porównawczej.
+
+## 2. Dane wejściowe
+
+| Model | Accuracy | Energia |
+|---|---:|---:|
+| Logistic Regression | 75% | 0,5 Wh |
+| Random Forest | 85% | 5 Wh |
+| ResNet50 | 92% | 500 Wh |
+| EfficientNet | 90% | 50 Wh |
+
+## 3. Obliczenie efficiency ratio
+
+Efficiency ratio = Accuracy (%) / Zużycie energii (Wh)
+
+Wskaźnik pokazuje, ile punktów procentowych accuracy przypada na jedną watogodzinę energii.
+
+### Model 1 – Logistic Regression
+
+Efficiency ratio = 75 / 0,5 = 150 pkt proc./Wh
+
+### Model 2 – Random Forest
+
+Efficiency ratio = 85 / 5 = 17 pkt proc./Wh
+
+### Model 3 – ResNet50
+
+Efficiency ratio = 92 / 500 = 0,184 pkt proc./Wh
+
+### Model 4 – EfficientNet
+
+Efficiency ratio = 90 / 50 = 1,8 pkt proc./Wh
+
+### Porównanie wyników
+
+| Model | Accuracy | Energia | Efficiency ratio |
+|---|---:|---:|---:|
+| Logistic Regression | 75% | 0,5 Wh | 150 |
+| Random Forest | 85% | 5 Wh | 17 |
+| EfficientNet | 90% | 50 Wh | 1,8 |
+| ResNet50 | 92% | 500 Wh | 0,184 |
+
+Najwyższy efficiency ratio osiąga Logistic Regression.
+
+Najwyższą dokładność osiąga ResNet50.
+
+Wskaźnik efficiency ratio jest jednak uproszczony. Nie uwzględnia znaczenia błędów, czasu predykcji ani rodzaju sprzętu.
+
+## 4. Wykres koncepcyjny trade-off
+
+Wykres powinien przedstawiać:
+
+- Oś X: zużycie energii w Wh.
+- Oś Y: dokładność modelu w procentach.
+- Każdy model jako osobny punkt.
+
+Współrzędne punktów:
+
+- Logistic Regression: (0,5 Wh; 75%).
+- Random Forest: (5 Wh; 85%).
+- EfficientNet: (50 Wh; 90%).
+- ResNet50: (500 Wh; 92%).
+
+Na osi X warto zastosować skalę logarytmiczną, ponieważ zużycie energii różni się nawet tysiąckrotnie.
+
+Interpretacja:
+
+Przejście z Logistic Regression na Random Forest zwiększa dokładność o 10 punktów procentowych, ale wymaga 10 razy więcej energii.
+
+Przejście z Random Forest na EfficientNet zwiększa dokładność o 5 punktów procentowych, ale również wymaga 10 razy więcej energii.
+
+Przejście z EfficientNet na ResNet50 zwiększa dokładność tylko o 2 punkty procentowe, podczas gdy zużycie energii rośnie dziesięciokrotnie.
+
+Wszystkie cztery modele znajdują się na froncie Pareto względem tych dwóch parametrów: każdy dokładniejszy model zużywa więcej energii.
+
+Nie ma więc jednego modelu najlepszego pod każdym względem.
+
+## 5. W jakich przypadkach każdy model jest najlepszy?
+
+### Logistic Regression
+
+Najlepszy wybór, gdy:
+
+- Najważniejsze jest minimalne zużycie energii.
+- Wystarcza dokładność 75%.
+- Dysponujemy ograniczonymi zasobami obliczeniowymi.
+- Zależy nam na prostocie i interpretowalności modelu.
+
+Ograniczenie: stosunkowo niska dokładność.
+
+### Random Forest
+
+Najlepszy wybór, gdy:
+
+- Potrzebujemy kompromisu między dokładnością a zużyciem energii.
+- Dokładność 85% jest wystarczająca.
+- Chcemy ograniczyć koszt obliczeń.
+- Dysponujemy odpowiednio przygotowanymi cechami obrazów.
+
+Ograniczenie: może wymagać dodatkowego przetwarzania obrazów.
+
+### EfficientNet
+
+Najlepszy wybór, gdy:
+
+- Potrzebujemy wysokiej dokładności.
+- Chcemy ograniczyć zużycie energii w porównaniu z ResNet50.
+- System ma analizować duże ilości obrazów.
+- Dysponujemy sprzętem umożliwiającym efektywne uruchomienie modelu.
+
+Ograniczenie: większa złożoność niż w przypadku prostszych modeli.
+
+### ResNet50
+
+Najlepszy wybór, gdy:
+
+- Najważniejsza jest maksymalna dokładność spośród porównywanych modeli.
+- Dodatkowe 2 punkty procentowe dokładności mają istotne znaczenie.
+- Dostępne są odpowiednie zasoby obliczeniowe.
+- Wyższe zużycie energii jest uzasadnione korzyściami.
+
+Ograniczenie: zdecydowanie najwyższe zużycie energii w podanym zestawieniu.
+
+## 6. Który model wybrać dla aplikacji mobilnej?
+
+Wstępnie wybrałbym EfficientNet, ponieważ zapewnia wysoką dokładność 90% przy dziesięciokrotnie mniejszym zużyciu energii niż ResNet50 w przedstawionych danych.
+
+Jednak zużycie energii podane w zadaniu nie musi odpowiadać zużyciu energii podczas wykonywania predykcji na smartfonie.
+
+Przed wdrożeniem należy sprawdzić:
+
+- Rozmiar modelu.
+- Zużycie pamięci RAM.
+- Czas pojedynczej predykcji.
+- Zużycie baterii podczas działania aplikacji.
+- Obsługę modelu przez procesor mobilny lub akcelerator AI.
+
+Można także zastosować kwantyzację modelu, aby zmniejszyć jego rozmiar i wymagania obliczeniowe.
+
+Jeśli najważniejsza byłaby oszczędność baterii, a dokładność 85% byłaby wystarczająca, warto rozważyć Random Forest.
+
+Ostateczny wybór powinien wynikać z testów na rzeczywistych urządzeniach mobilnych.
+
+## 7. Który model wybrać dla systemu bezpieczeństwa elektrowni jądrowej?
+
+Wstępnie wskazałbym ResNet50, ponieważ w przedstawionych danych osiąga najwyższą dokładność – 92%.
+
+W systemie bezpieczeństwa dodatkowa poprawa skuteczności może mieć duże znaczenie.
+
+Jednak sama accuracy nie wystarcza do podjęcia decyzji o zastosowaniu modelu w systemie krytycznym.
+
+Należy sprawdzić przede wszystkim:
+
+- Recall dla zdarzeń niebezpiecznych.
+- Liczbę fałszywych alarmów.
+- Liczbę niewykrytych zagrożeń.
+- Odporność modelu na nietypowe obrazy.
+- Stabilność działania.
+- Czas reakcji.
+- Możliwość niezależnej walidacji.
+- Niezawodność i bezpieczeństwo całego systemu.
+
+Przykładowo model o accuracy 92% może być nieodpowiedni, jeśli często nie wykrywa rzadkich, ale bardzo niebezpiecznych zdarzeń.
+
+Dlatego ResNet50 byłby jedynie kandydatem do dalszych testów, a nie automatycznie zatwierdzonym rozwiązaniem.
+
+W rzeczywistym systemie bezpieczeństwa elektrowni jądrowej model ML nie powinien samodzielnie podejmować decyzji krytycznych bez odpowiednich zabezpieczeń, niezależnej weryfikacji i wymaganej certyfikacji.
+
+## 8. Wnioski
+
+1. Logistic Regression osiąga najwyższy efficiency ratio: 150 pkt proc./Wh.
+2. Random Forest oferuje korzystny kompromis przy accuracy 85% i zużyciu 5 Wh.
+3. EfficientNet osiąga accuracy 90% przy zużyciu 50 Wh.
+4. ResNet50 ma najwyższą accuracy – 92%, ale zużywa aż 500 Wh.
+5. Dla aplikacji mobilnej wstępnym kandydatem jest EfficientNet, po sprawdzeniu parametrów działania na urządzeniu.
+6. Dla systemu bezpieczeństwa elektrowni jądrowej ResNet50 może być kandydatem do dalszej walidacji, ale sama accuracy nie wystarcza do jego wyboru.
+
+Z perspektywy Green AI należy wybierać model, który zapewnia wymaganą skuteczność przy możliwie małym zużyciu energii.
+
+Przedstawione wartości energii traktujemy jako porównywalne dane z zadania. Nie wiadomo jednak, czy dotyczą treningu, predykcji czy całego procesu działania modelu.
+
+Dlatego nie należy na ich podstawie wyciągać ostatecznych wniosków o energooszczędności modeli podczas rzeczywistego wdrożenia.
