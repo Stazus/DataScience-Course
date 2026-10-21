@@ -1,0 +1,57 @@
+Zadanie 5 - Green AI: analiza zużycia energii
+
+Dane wejściowe:
+
+Model A:
+- Accuracy: 92%
+- Czas treningu: 10 minut
+- Sprzęt: CPU
+
+Model B:
+- Accuracy: 94%
+- Czas treningu: 12 godzin
+- Sprzęt: GPU
+
+**1. Który model wybierzesz i dlaczego?**
+
+Wybrałbym Model A, ponieważ osiąga wysoką dokładność 92%, a jego trening trwa zaledwie 10 minut na CPU.
+
+Model B zapewnia dokładność wyższą o 2 punkty procentowe, ale wymaga aż 12 godzin treningu na GPU, czyli 72 razy dłuższego czasu treningu.
+
+Model A jest korzystniejszy pod względem czasu trenowania, kosztów obliczeniowych i prawdopodobnie zużycia energii. Dokładnego zużycia energii nie można jednak określić bez informacji o poborze mocy CPU i GPU.
+
+Zgodnie z podejściem Green AI warto wybierać modele, które zapewniają odpowiednio wysoką skuteczność przy możliwie małym zużyciu zasobów.
+
+**2. W jakich sytuacjach warto wybrać Model B mimo większego zużycia energii?**
+
+Model B warto wybrać, gdy:
+
+- Każdy dodatkowy procent skuteczności ma duże znaczenie, np. w diagnostyce medycznej lub systemach bezpieczeństwa.
+- Błędy modelu mogą powodować poważne straty finansowe.
+- Model jest wykorzystywany w systemie obsługującym bardzo dużą liczbę użytkowników, a poprawa skuteczności przynosi wymierne korzyści.
+- Model będzie trenowany rzadko, ale wykorzystywany przez długi czas.
+- Dodatkowe 2 punkty procentowe dokładności rzeczywiście przekładają się na istotną poprawę wyników biznesowych.
+
+W takich przypadkach wyższy koszt treningu może być uzasadniony.
+
+**3. Jakie czynniki poza accuracy i energią warto rozważyć?**
+
+Przy wyborze modelu warto uwzględnić również:
+
+- Precision, recall i F1-score - szczególnie przy niezrównoważonych klasach.
+- Czas predykcji (inference time) - szybkość działania modelu po treningu.
+- Koszty infrastruktury - zakup lub wynajem CPU i GPU.
+- Zużycie pamięci RAM i VRAM.
+- Możliwość uruchomienia modelu na słabszym sprzęcie.
+- Skalowalność - obsługę rosnącej liczby użytkowników.
+- Stabilność i odporność modelu na nowe dane.
+- Łatwość wdrożenia, aktualizacji i utrzymania.
+- Interpretowalność - możliwość wyjaśnienia decyzji modelu.
+- Częstotliwość ponownego trenowania.
+- Łączny koszt działania modelu w całym okresie użytkowania.
+
+**Wniosek:**
+
+W przedstawionym przypadku wybrałbym Model A, ponieważ zapewnia bardzo dobrą dokładność przy znacznie krótszym treningu i mniejszych wymaganiach sprzętowych.
+
+Model B wybrałbym dopiero wtedy, gdy dodatkowe 2 punkty procentowe dokładności przynosiłyby korzyści uzasadniające większy koszt obliczeniowy i potencjalnie większe zużycie energii.
