@@ -1,0 +1,983 @@
+# Lekcja 1 – Zadanie 15
+## Reinforcement Learning Design – inteligentne zarządzanie energią w budynku
+
+### 1. Opis problemu
+
+Celem projektu jest zaprojektowanie agenta Reinforcement Learning (RL), który będzie automatycznie zarządzał zużyciem energii w inteligentnym budynku.
+
+Agent ma sterować:
+
+- ogrzewaniem,
+- klimatyzacją,
+- wentylacją,
+- oświetleniem.
+
+Podstawowym celem jest minimalizacja zużycia energii przy zachowaniu odpowiednich warunków dla mieszkańców.
+
+System powinien uwzględniać:
+
+1. Temperaturę wewnętrzną i zewnętrzną.
+2. Obecność mieszkańców.
+3. Porę dnia.
+4. Warunki pogodowe.
+5. Zapotrzebowanie na ogrzewanie i chłodzenie.
+6. Dostępność światła dziennego.
+7. Aktualne ceny energii.
+8. Preferencje mieszkańców.
+9. Ograniczenia techniczne i bezpieczeństwa.
+
+System powinien optymalizować zużycie energii w dłuższym horyzoncie, a nie wyłącznie w danej chwili.
+
+Przykład:
+
+Agent może rozpocząć ogrzewanie nieco wcześniej, jeżeli przewiduje, że mieszkańcy wkrótce wrócą do domu.
+
+Może to poprawić komfort, ale opłacalność energetyczna takiej decyzji zależy od charakterystyki budynku i systemu ogrzewania.
+
+### 2. Dlaczego Reinforcement Learning?
+
+Reinforcement Learning to uczenie przez wzmacnianie.
+
+W tym podejściu agent podejmuje działania w środowisku i otrzymuje informacje o ich skutkach w postaci nagród lub kar.
+
+W odróżnieniu od klasycznej klasyfikacji agent nie otrzymuje dla każdej sytuacji gotowej, poprawnej decyzji.
+
+Musi nauczyć się strategii działania.
+
+Przykład:
+
+Agent może zdecydować o zmniejszeniu ogrzewania, gdy pomieszczenie jest puste.
+
+W krótkim okresie ograniczy to zużycie energii.
+
+Jednak zbyt duże wychłodzenie pomieszczenia może później wymagać intensywnego ogrzewania i pogorszyć komfort mieszkańców.
+
+RL może uczyć się uwzględniać takie długoterminowe konsekwencje.
+
+### 3. Formalna definicja problemu RL
+
+Problem można przedstawić jako Markov Decision Process (MDP), czyli markowski proces decyzyjny.
+
+MDP opisuje pięć elementów:
+
+MDP = (S, A, P, R, gamma)
+
+Gdzie:
+
+- S – zbiór stanów środowiska.
+- A – zbiór dostępnych akcji.
+- P – funkcja przejścia między stanami.
+- R – funkcja nagrody.
+- gamma – współczynnik dyskontowania przyszłych nagród.
+
+Agent w chwili t:
+
+1. Obserwuje stan s_t.
+2. Wybiera akcję a_t.
+3. Środowisko reaguje na akcję.
+4. Powstaje nowy stan s_(t+1).
+5. Agent otrzymuje nagrodę r_t.
+6. Proces zostaje powtórzony.
+
+Celem agenta jest maksymalizacja oczekiwanej sumy zdyskontowanych nagród:
+
+J(pi) = E[ suma od t=0 do T z gamma^t * r_t ]
+
+Gdzie:
+
+- pi – polityka agenta, czyli strategia wyboru działań.
+- E – wartość oczekiwana.
+- T – horyzont czasowy.
+- gamma – współczynnik dyskontowania, zwykle od 0 do 1.
+
+Przykładowo można przyjąć gamma = 0,99.
+
+Dokładną wartość należy dobrać eksperymentalnie do długości epizodu i częstotliwości decyzji.
+
+W praktyce agent może nie obserwować wszystkich istotnych parametrów budynku, np. temperatury wewnątrz ścian.
+
+Dlatego rzeczywisty problem może być częściowo obserwowalny (POMDP).
+
+Można ograniczyć ten problem, wykorzystując historię pomiarów i prognozy.
+
+### 4. Agent – co kontroluje?
+
+Agent RL jest programem, który podejmuje decyzje dotyczące pracy urządzeń budynku.
+
+Kontrolowane elementy:
+
+A. Ogrzewanie
+
+- Wartość zadanej temperatury.
+- Włączanie lub ograniczanie ogrzewania.
+- Planowanie ogrzewania przed powrotem mieszkańców.
+
+B. Klimatyzacja
+
+- Wartość zadanej temperatury chłodzenia.
+- Włączanie i wyłączanie chłodzenia.
+- Dostosowywanie pracy do temperatury i obecności osób.
+
+C. Wentylacja
+
+- Dopuszczalne poziomy intensywności wentylacji.
+- Zwiększanie wentylacji w odpowiedzi na jakość powietrza i obecność osób.
+
+D. Oświetlenie
+
+- Włączanie i wyłączanie świateł.
+- Regulacja jasności.
+- Wykorzystanie światła dziennego.
+
+W projekcie zakładamy, że urządzenia udostępniają bezpieczne interfejsy sterowania.
+
+Agent nie powinien bezpośrednio sterować elementami zabezpieczającymi urządzenia ani omijać ograniczeń producenta.
+
+### 5. Environment – środowisko i stany
+
+Środowiskiem agenta jest inteligentny budynek wraz z jego instalacjami, mieszkańcami i warunkami zewnętrznymi.
+
+Stan środowiska można zapisać jako wektor:
+
+s_t = [
+    T_inside,
+    T_outside,
+    H_inside,
+    CO2_inside,
+    occupancy,
+    hour,
+    day_of_week,
+    daylight,
+    electricity_price,
+    HVAC_status,
+    lighting_status,
+    weather_forecast
+]
+
+Gdzie:
+
+T_inside – temperatura wewnętrzna.
+
+T_outside – temperatura zewnętrzna.
+
+H_inside – wilgotność wewnętrzna.
+
+CO2_inside – stężenie CO₂ w pomieszczeniach, wskaźnik jakości powietrza.
+
+occupancy – obecność mieszkańców.
+
+hour – godzina.
+
+day_of_week – dzień tygodnia.
+
+daylight – natężenie światła dziennego.
+
+electricity_price – cena energii.
+
+HVAC_status – stan instalacji ogrzewania, wentylacji i klimatyzacji.
+
+lighting_status – aktualny stan oświetlenia.
+
+weather_forecast – prognoza pogody.
+
+Dodatkowe informacje:
+
+- temperatura zadana przez mieszkańców,
+- aktualna moc urządzeń,
+- historia temperatur,
+- historia zużycia energii,
+- poziom naładowania magazynu energii, jeśli występuje,
+- produkcja z instalacji fotowoltaicznej, jeśli jest dostępna.
+
+Dla budynku z wieloma pomieszczeniami należy rozważyć oddzielne stany dla poszczególnych stref.
+
+### 6. Actions – dostępne akcje
+
+Agent podejmuje decyzje w ustalonych odstępach czasu.
+
+Przykładowo co 15 minut.
+
+#### A. Ogrzewanie
+
+Dostępne akcje:
+
+- zwiększ temperaturę zadaną o 0,5°C,
+- pozostaw bez zmian,
+- zmniejsz temperaturę zadaną o 0,5°C.
+
+#### B. Klimatyzacja
+
+Dostępne akcje:
+
+- zwiększ temperaturę zadaną o 0,5°C,
+- pozostaw bez zmian,
+- zmniejsz temperaturę zadaną o 0,5°C.
+
+#### C. Wentylacja
+
+Dostępne akcje:
+
+- tryb niski,
+- tryb standardowy,
+- tryb podwyższony.
+
+#### D. Oświetlenie
+
+Dostępne akcje:
+
+- wyłącz,
+- ustaw 50% jasności,
+- ustaw 100% jasności.
+
+W rzeczywistym systemie dopuszczalne wartości zależą od możliwości urządzeń i wymagań użytkowników.
+
+Aby uniknąć konfliktu między ogrzewaniem i klimatyzacją, należy zastosować odpowiednie blokady.
+
+Agent nie może jednocześnie wymuszać intensywnego ogrzewania i chłodzenia tej samej strefy.
+
+### 7. Ograniczenia akcji
+
+Nie wszystkie akcje są dozwolone w każdym stanie.
+
+Przykładowe ograniczenia:
+
+1. Temperatura musi pozostawać w ustalonym bezpiecznym zakresie.
+2. Wentylacja nie może spaść poniżej wymaganego poziomu.
+3. Urządzenia muszą przestrzegać ograniczeń producenta.
+4. Nie można zbyt często przełączać sprężarki klimatyzatora.
+5. Należy zapewnić ochronę instalacji przed zamarzaniem.
+6. Należy respektować ręczne ustawienia i polecenia mieszkańców.
+7. System nie może naruszać wymagań przeciwpożarowych.
+
+Przykładowe zakresy komfortu:
+
+- podczas obecności mieszkańców: 20–24°C,
+- podczas nieobecności: zakres może być szerszy,
+- poziom oświetlenia zależny od rodzaju pomieszczenia i wykonywanej czynności.
+
+Wartości te są jedynie przykładem projektowym.
+
+Rzeczywiste zakresy powinny wynikać z potrzeb mieszkańców, warunków technicznych oraz obowiązujących wymagań.
+
+Ważna zasada:
+
+Krytyczne ograniczenia bezpieczeństwa powinny być wymuszane przez niezależną warstwę sterowania, a nie jedynie przez ujemną nagrodę.
+
+### 8. Rewards – funkcja nagrody
+
+Najważniejszym elementem projektu jest funkcja nagrody.
+
+Agent powinien otrzymywać:
+
+- nagrodę za oszczędzanie energii,
+- karę za nadmierne zużycie energii,
+- karę za pogorszenie komfortu mieszkańców,
+- karę za niepotrzebne przełączanie urządzeń,
+- karę za przekroczenie dopuszczalnych parametrów.
+
+Proponowana funkcja:
+
+r_t = -(
+    w_E * E_norm
+    + w_C * D_comfort
+    + w_A * D_air
+    + w_S * N_switch
+)
+
+Gdzie:
+
+r_t – nagroda w kroku t.
+
+E_norm – znormalizowane zużycie energii w danym kroku.
+
+D_comfort – znormalizowana miara dyskomfortu cieplnego i świetlnego.
+
+D_air – kara za pogorszenie jakości powietrza.
+
+N_switch – znormalizowana liczba niepotrzebnych zmian ustawień.
+
+w_E, w_C, w_A, w_S – wagi poszczególnych składników.
+
+Im mniejsze zużycie energii i dyskomfort, tym wyższa nagroda.
+
+Ponieważ funkcja ma znak minus, mniejsze wartości kosztów oznaczają nagrodę bliższą zeru.
+
+### 9. Przykładowe wagi funkcji nagrody
+
+Na potrzeby demonstracji można przyjąć:
+
+- w_E = 0,40,
+- w_C = 0,40,
+- w_A = 0,15,
+- w_S = 0,05.
+
+Suma wag wynosi 1,00.
+
+Wagi są przykładowe i wymagają dostrojenia.
+
+Nie można ich interpretować jako uniwersalnych wartości dla każdego budynku.
+
+Przykład obliczenia:
+
+E_norm = 0,30.
+
+D_comfort = 0,10.
+
+D_air = 0,00.
+
+N_switch = 0,20.
+
+r_t = -(
+    0,40 * 0,30
+    + 0,40 * 0,10
+    + 0,15 * 0,00
+    + 0,05 * 0,20
+)
+
+r_t = -(0,12 + 0,04 + 0 + 0,01)
+
+r_t = -0,17.
+
+Dla porównania, przy gorszym stanie:
+
+E_norm = 0,60.
+
+D_comfort = 0,30.
+
+D_air = 0,20.
+
+N_switch = 0,40.
+
+r_t = -(
+    0,40 * 0,60
+    + 0,40 * 0,30
+    + 0,15 * 0,20
+    + 0,05 * 0,40
+)
+
+r_t = -(0,24 + 0,12 + 0,03 + 0,02)
+
+r_t = -0,41.
+
+Pierwsza sytuacja daje wyższą nagrodę:
+
+-0,17 > -0,41.
+
+Agent powinien zatem preferować pierwszy wariant, o ile obie sytuacje spełniają wymagania bezpieczeństwa.
+
+### 10. Jak obliczać dyskomfort mieszkańców?
+
+Można zdefiniować osobne miary dla temperatury, oświetlenia i jakości powietrza.
+
+Przykładowa kara za temperaturę:
+
+D_temp = max(0, abs(T_inside - T_target) - tolerance)
+
+Gdzie:
+
+T_inside – aktualna temperatura.
+
+T_target – temperatura preferowana.
+
+tolerance – akceptowane odchylenie.
+
+Przykład:
+
+Temperatura preferowana: 22°C.
+
+Tolerancja: 1°C.
+
+Aktualna temperatura: 25°C.
+
+D_temp = max(0, |25 - 22| - 1)
+
+D_temp = 2.
+
+Przy temperaturze 22,5°C:
+
+D_temp = max(0, |22,5 - 22| - 1)
+
+D_temp = 0.
+
+W praktyce wynik należy odpowiednio normalizować.
+
+Kara za dyskomfort powinna zależeć również od obecności mieszkańców.
+
+Podczas nieobecności można dopuścić większe odchylenia, o ile nie narusza to bezpieczeństwa budynku.
+
+### 11. Diagram Agent–Environment Loop
+
+Schemat działania systemu:
+
+             +--------------------------+
+             |       ŚRODOWISKO         |
+             |    INTELIGENTNY BUDYNEK  |
+             |                          |
+             | Temperatura, wilgotność  |
+             | Obecność mieszkańców     |
+             | Pogoda, ceny energii     |
+             | Zużycie energii          |
+             +------------+-------------+
+                          |
+                          | Stan s_t
+                          v
+             +--------------------------+
+             |        AGENT RL          |
+             |                          |
+             | Analiza stanu            |
+             | Wybór akcji              |
+             | Polityka pi(a|s)         |
+             +------------+-------------+
+                          |
+                          | Proponowana akcja a_t
+                          v
+             +--------------------------+
+             |   WARSTWA BEZPIECZEŃSTWA |
+             |                          |
+             | Sprawdzenie ograniczeń   |
+             | Odrzucenie akcji         |
+             | niedozwolonych           |
+             +------------+-------------+
+                          |
+                          | Akcja zatwierdzona
+                          v
+             +--------------------------+
+             |     STEROWANIE HVAC      |
+             |       I OŚWIETLENIEM     |
+             +------------+-------------+
+                          |
+                          v
+             +--------------------------+
+             |        ŚRODOWISKO        |
+             |                          |
+             | Nowy stan s_(t+1)        |
+             | Zużycie energii          |
+             | Komfort mieszkańców      |
+             +------------+-------------+
+                          |
+                          | Nagroda r_t
+                          | Nowy stan s_(t+1)
+                          v
+             +--------------------------+
+             |        AGENT RL          |
+             |                          |
+             | Aktualizacja polityki    |
+             | podczas treningu         |
+             +--------------------------+
+
+Cykl jest powtarzany w kolejnych krokach czasowych.
+
+Wdrożony agent może wykonywać predykcje bez aktualizowania parametrów modelu w czasie rzeczywistym.
+
+Uczenie i aktualizacje polityki powinny odbywać się w kontrolowanym procesie.
+
+### 12. Przykładowy scenariusz działania
+
+Godzina 07:00.
+
+Warunki:
+
+- temperatura w salonie: 21°C,
+- temperatura zewnętrzna: 5°C,
+- mieszkańcy są obecni,
+- temperatura preferowana: 22°C,
+- dostępne jest światło dzienne.
+
+Agent może:
+
+1. Utrzymać umiarkowane ogrzewanie.
+2. Ograniczyć sztuczne oświetlenie.
+3. Dostosować wentylację do jakości powietrza.
+
+Godzina 10:00.
+
+Mieszkańcy wychodzą.
+
+Agent może:
+
+1. Obniżyć temperaturę zadaną.
+2. Wyłączyć zbędne oświetlenie.
+3. Utrzymać minimalną wymaganą wentylację.
+
+Godzina 16:00.
+
+System przewiduje powrót mieszkańców o 17:00.
+
+Agent może:
+
+1. Rozpocząć przygotowanie temperatury w odpowiednim momencie.
+2. Uwzględnić aktualne ceny energii.
+3. Unikać niepotrzebnego przegrzewania pomieszczeń.
+
+Godzina 22:00.
+
+Mieszkańcy przygotowują się do snu.
+
+Agent może:
+
+1. Dostosować temperaturę do preferencji nocnych.
+2. Ograniczyć zbędne oświetlenie.
+3. Zmniejszyć niepotrzebne zużycie energii.
+
+Ostateczne decyzje zależą od charakterystyki budynku i indywidualnych ustawień mieszkańców.
+
+### 13. Jaki algorytm Reinforcement Learning wybrać?
+
+Możliwe rozwiązania:
+
+#### A. Q-Learning
+
+Zalety:
+
+- prosty algorytm,
+- łatwy do zrozumienia,
+- dobry do małych, dyskretnych przestrzeni stanów i akcji.
+
+Wady:
+
+- trudny do zastosowania przy dużej liczbie stanów,
+- wymaga dyskretyzacji zmiennych ciągłych.
+
+Q-Learning może służyć jako edukacyjny baseline.
+
+#### B. Deep Q-Network (DQN)
+
+Zalety:
+
+- wykorzystuje sieć neuronową do aproksymacji wartości Q,
+- obsługuje bardziej złożone stany.
+
+Wady:
+
+- standardowa wersja wymaga dyskretnych akcji,
+- duża liczba kombinacji akcji może utrudniać trening.
+
+#### C. Proximal Policy Optimization (PPO)
+
+Zalety:
+
+- może obsługiwać zarówno dyskretne, jak i ciągłe akcje,
+- nadaje się do złożonych problemów sterowania,
+- jest szeroko stosowany w eksperymentach RL.
+
+Wady:
+
+- wymaga starannego doboru parametrów,
+- może potrzebować wielu interakcji ze środowiskiem,
+- nie gwarantuje przestrzegania ograniczeń bezpieczeństwa bez dodatkowych mechanizmów.
+
+#### D. Soft Actor-Critic (SAC)
+
+Zalety:
+
+- nadaje się do ciągłych przestrzeni akcji,
+- może być efektywny pod względem wykorzystania doświadczeń.
+
+Wady:
+
+- większa złożoność,
+- konieczność starannego treningu i walidacji.
+
+### 14. Rekomendowany algorytm
+
+Rekomenduję PPO jako kandydata do pierwszego eksperymentu z bardziej zaawansowanym agentem RL.
+
+Uzasadnienie:
+
+1. Pozwala modelować złożone zależności.
+2. Może pracować z wieloma parametrami środowiska.
+3. Umożliwia optymalizację strategii w dłuższym horyzoncie.
+4. Może obsługiwać różne reprezentacje przestrzeni akcji.
+
+Jednocześnie PPO nie musi być najlepszym rozwiązaniem dla każdego budynku.
+
+W projekcie należy porównać go z prostszymi metodami sterowania oraz – jeżeli to możliwe – z Model Predictive Control (MPC).
+
+Wybór powinien zależeć od wyników, kosztów obliczeń i niezawodności.
+
+### 15. Jak trenować agenta?
+
+Agent nie powinien rozpoczynać uczenia metodą prób i błędów bezpośrednio w zamieszkanym budynku.
+
+Rekomenduję trening w symulatorze.
+
+Przykładowe narzędzia:
+
+- EnergyPlus – symulacja energetyczna budynków.
+- Gymnasium – interfejs środowiska RL.
+- Stable-Baselines3 – implementacje algorytmów RL.
+- Python – przygotowanie danych i analiza wyników.
+
+Proces:
+
+1. Zbudować model energetyczny budynku.
+2. Wprowadzić dane pogodowe i charakterystykę instalacji.
+3. Zasymulować obecność mieszkańców.
+4. Zdefiniować stany, akcje i funkcję nagrody.
+5. Zaimplementować ograniczenia bezpieczeństwa.
+6. Wytrenować agenta w wielu scenariuszach.
+7. Sprawdzić działanie na nowych warunkach pogodowych.
+8. Porównać wyniki z metodami bazowymi.
+9. Przeprowadzić testy w trybie obserwacyjnym.
+10. Dopiero po pozytywnej walidacji rozważyć kontrolowane wdrożenie.
+
+Symulator powinien być skalibrowany na podstawie danych rzeczywistego budynku.
+
+### 16. Czy można rozwiązać problem Supervised Learning?
+
+Tak, ale w inny sposób.
+
+Supervised Learning może służyć do:
+
+- prognozowania zużycia energii,
+- przewidywania temperatury w pomieszczeniach,
+- prognozowania obecności mieszkańców,
+- przewidywania zapotrzebowania na ogrzewanie,
+- naśladowania decyzji istniejącego sterownika.
+
+Przykład:
+
+Model regresyjny przewiduje zużycie energii na podstawie temperatury, godziny i liczby mieszkańców.
+
+Inny model może przewidywać temperaturę za godzinę.
+
+Jednak same prognozy nie wyznaczają automatycznie najlepszej sekwencji działań sterujących.
+
+Do optymalizacji można wykorzystać prognozy wraz z algorytmem optymalizacyjnym, np. MPC.
+
+Z tego powodu problem można rozwiązać również bez RL.
+
+### 17. Dlaczego RL może być lepsze?
+
+RL jest szczególnie interesujące wtedy, gdy:
+
+1. Decyzje mają konsekwencje w kolejnych godzinach.
+2. System musi uwzględniać opóźnienia cieplne budynku.
+3. Nie istnieją gotowe etykiety określające optymalną akcję w każdej sytuacji.
+4. Celem jest optymalizacja całej sekwencji działań.
+5. Środowisko zmienia się wraz z pogodą i obecnością mieszkańców.
+
+Przykład:
+
+Wyłączenie ogrzewania może dać oszczędność teraz, ale zwiększyć koszt późniejszego dogrzewania.
+
+RL może uczyć się kompromisu między obecnym i przyszłym zużyciem energii.
+
+Nie oznacza to, że RL zawsze przewyższa Supervised Learning połączone z optymalizacją.
+
+W wielu budynkach dobrze zaprojektowany MPC może być prostszy, bardziej przewidywalny i łatwiejszy do audytu.
+
+### 18. Porównanie RL z Supervised Learning
+
+| Kryterium | Supervised Learning | Reinforcement Learning |
+|---|---|---|
+| Główne zadanie | Predykcja lub klasyfikacja | Optymalizacja sekwencji decyzji |
+| Dane treningowe | Zwykle wymagane etykiety | Stany, akcje, nagrody i kolejne stany |
+| Podejmowanie decyzji | Wymaga dodatkowej logiki lub optymalizacji | Polityka bezpośrednio wybiera działania |
+| Horyzont czasowy | Zależny od celu predykcji | Naturalnie uwzględnia skutki długoterminowe |
+| Opóźnione skutki | Modeluje je przez prognozy | Uwzględnia je w procesie uczenia |
+| Koszt treningu | Często niższy | Może być znacznie wyższy |
+| Bezpieczeństwo | Zależy od systemu sterowania | Wymaga dodatkowych ograniczeń |
+| Interpretowalność | Zależna od modelu | Polityka może być trudna do wyjaśnienia |
+| Praktyczne zastosowanie | Prognozy energii i temperatur | Dobór działań sterujących |
+| Główne ograniczenie | Sama predykcja nie wystarcza do sterowania | Trudne i kosztowne uczenie bezpiecznej polityki |
+
+### 19. Porównanie z klasycznymi metodami sterowania
+
+W praktyce należy uwzględnić trzy podejścia.
+
+#### A. Sterowanie regułowe
+
+Przykład:
+
+Jeżeli temperatura spada poniżej 20°C, włącz ogrzewanie.
+
+Zalety:
+
+- proste,
+- tanie,
+- łatwe do wdrożenia.
+
+Wady:
+
+- ograniczona elastyczność,
+- brak zaawansowanego planowania.
+
+#### B. Model Predictive Control (MPC)
+
+MPC przewiduje przyszłe zachowanie budynku i optymalizuje sterowanie w określonym horyzoncie.
+
+Zalety:
+
+- uwzględnia prognozy,
+- może jawnie respektować ograniczenia,
+- dobrze nadaje się do problemów sterowania.
+
+Wady:
+
+- wymaga odpowiedniego modelu budynku,
+- może być kosztowny obliczeniowo.
+
+#### C. Reinforcement Learning
+
+Agent uczy się polityki na podstawie nagród i interakcji ze środowiskiem.
+
+Zalety:
+
+- może uwzględniać długoterminowe skutki,
+- może działać bez jawnego modelu dynamiki podczas podejmowania decyzji,
+- potencjalnie dostosowuje się do złożonych zależności.
+
+Wady:
+
+- kosztowny trening,
+- trudniejsza walidacja,
+- ryzyko błędnych decyzji poza warunkami treningowymi.
+
+### 20. Jak ocenić skuteczność systemu?
+
+Należy porównać:
+
+1. Sterowanie regułowe.
+2. Supervised Learning + MPC.
+3. Reinforcement Learning.
+
+Wszystkie warianty powinny być testowane w porównywalnych warunkach.
+
+#### Metryki biznesowe
+
+- Zużycie energii w kWh.
+- Koszt energii w zł.
+- Oszczędność procentowa względem baseline.
+- Liczba godzin dyskomfortu mieszkańców.
+- Średnie odchylenie temperatury od preferowanej.
+- Liczba ręcznych interwencji.
+- Satysfakcja mieszkańców.
+
+#### Metryki techniczne
+
+- Średnia nagroda na epizod.
+- Stabilność działania polityki.
+- Czas wyznaczania akcji.
+- Zużycie pamięci RAM.
+- Czas treningu.
+- Energia zużyta podczas treningu.
+- Liczba naruszeń ograniczeń bezpieczeństwa.
+- Skuteczność działania w nieznanych warunkach.
+
+Ważne:
+
+Nie należy uznawać rozwiązania za lepsze wyłącznie dlatego, że zużywa mniej energii.
+
+Porównanie musi uwzględniać również komfort i bezpieczeństwo.
+
+### 21. Przykładowe wyniki eksperymentu
+
+Poniższe liczby są hipotetyczne.
+
+Nie są wynikami rzeczywistego pomiaru.
+
+Załóżmy, że w tym samym okresie uzyskano:
+
+| Metoda | Energia | Godziny dyskomfortu | Oszczędność |
+|---|---:|---:|---:|
+| Reguły | 1 000 kWh | 20 h | 0% |
+| Supervised + MPC | 850 kWh | 12 h | 15% |
+| RL | 800 kWh | 10 h | 20% |
+
+Oszczędność RL względem reguł:
+
+(1000 - 800) / 1000 * 100% = 20%.
+
+Oszczędność RL względem MPC:
+
+(850 - 800) / 850 * 100% = około 5,88%.
+
+W przedstawionym przykładzie RL osiąga najniższe zużycie energii i najmniejszą liczbę godzin dyskomfortu.
+
+Wyniki te wymagają potwierdzenia eksperymentalnego.
+
+### 22. Green AI – czy sam agent jest energooszczędny?
+
+System powinien oszczędzać więcej energii, niż zużywa jego infrastruktura obliczeniowa.
+
+Należy uwzględnić:
+
+- energię trenowania agenta,
+- energię symulacji budynku,
+- energię działania serwera,
+- energię czujników i komunikacji,
+- energię dodatkowych urządzeń.
+
+Przykład hipotetyczny:
+
+Roczna oszczędność energii budynku: 2 000 kWh.
+
+Dodatkowe roczne zużycie energii systemu: 150 kWh.
+
+Korzyść energetyczna netto:
+
+2 000 - 150 = 1 850 kWh rocznie.
+
+Jeżeli trening agenta zużył dodatkowo 100 kWh, to w pierwszym roku:
+
+1 850 - 100 = 1 750 kWh.
+
+Oszczędność netto wynosi w tym przykładzie 1 750 kWh w pierwszym roku.
+
+W kolejnych latach bilans zależy od częstotliwości ponownego treningu, eksploatacji i zmian w budynku.
+
+Warto również uwzględnić emisje CO₂e związane z produkcją urządzeń oraz źródłem energii elektrycznej.
+
+### 23. Ryzyka i ograniczenia
+
+#### A. Nieprawidłowa polityka sterowania
+
+Agent może wybierać działania niekorzystne dla mieszkańców.
+
+Rozwiązanie:
+
+Symulacja, walidacja, ograniczenia akcji i bezpieczny tryb awaryjny.
+
+#### B. Błędy czujników
+
+Niepoprawne odczyty mogą prowadzić do złych decyzji.
+
+Rozwiązanie:
+
+Kontrola jakości danych, wykrywanie anomalii i redundancja czujników.
+
+#### C. Zmiana zachowań mieszkańców
+
+Model może gorzej działać, gdy zmieni się harmonogram obecności.
+
+Rozwiązanie:
+
+Monitoring, aktualizacja danych i kontrolowane dostosowywanie polityki.
+
+#### D. Nadmierna optymalizacja energii
+
+Agent może próbować oszczędzać energię kosztem komfortu.
+
+Rozwiązanie:
+
+Twarde ograniczenia komfortu oraz odpowiednie projektowanie funkcji nagrody.
+
+#### E. Cyberbezpieczeństwo
+
+Nieautoryzowany dostęp może umożliwić zmianę ustawień instalacji.
+
+Rozwiązanie:
+
+Uwierzytelnianie, szyfrowanie, segmentacja sieci i rejestrowanie decyzji.
+
+#### F. Prywatność
+
+Dane o obecności mieszkańców mogą ujawniać informacje o ich codziennych zwyczajach.
+
+Rozwiązanie:
+
+Minimalizacja danych, lokalne przetwarzanie i odpowiednie zabezpieczenia.
+
+### 24. Plan wdrożenia
+
+#### Etap 1 – Analiza budynku
+
+- Inwentaryzacja urządzeń.
+- Zdefiniowanie stref.
+- Zebranie danych historycznych.
+- Ustalenie preferencji mieszkańców.
+
+#### Etap 2 – Baseline
+
+- Implementacja sterowania regułowego.
+- Pomiar zużycia energii.
+- Pomiar komfortu.
+
+#### Etap 3 – Model budynku
+
+- Przygotowanie symulatora.
+- Kalibracja na danych historycznych.
+- Walidacja symulacji.
+
+#### Etap 4 – Trening RL
+
+- Implementacja środowiska.
+- Definicja stanów i akcji.
+- Definicja nagrody.
+- Trening PPO.
+- Strojenie parametrów.
+
+#### Etap 5 – Porównanie
+
+- Reguły.
+- Supervised Learning + MPC.
+- Reinforcement Learning.
+
+#### Etap 6 – Testy bezpieczeństwa
+
+- Awaria czujników.
+- Brak łączności.
+- Ekstremalne temperatury.
+- Nietypowe zachowania mieszkańców.
+- Nieprzewidziane stany urządzeń.
+
+#### Etap 7 – Pilotaż
+
+- Uruchomienie w trybie obserwacyjnym.
+- Porównanie decyzji agenta z istniejącym sterowaniem.
+- Ograniczony pilotaż pod nadzorem.
+- Monitoring wyników.
+
+#### Etap 8 – Eksploatacja
+
+- Stały monitoring.
+- Możliwość ręcznego sterowania.
+- Bezpieczny tryb awaryjny.
+- Okresowe aktualizacje modeli.
+
+### 25. Rekomendacja końcowa
+
+Rekomenduję zaprojektowanie agenta RL sterującego temperaturą, wentylacją i oświetleniem w inteligentnym budynku.
+
+Najważniejsze elementy:
+
+1. Stan środowiska obejmujący temperaturę, pogodę, obecność mieszkańców i ceny energii.
+2. Akcje umożliwiające zmianę ustawień urządzeń.
+3. Funkcja nagrody uwzględniająca energię, komfort, jakość powietrza i liczbę przełączeń.
+4. Trening w symulatorze zamiast eksperymentowania w zamieszkanym budynku.
+5. Niezależna warstwa bezpieczeństwa.
+6. Porównanie z regułami i Supervised Learning + MPC.
+7. Monitoring rzeczywistych oszczędności energetycznych.
+
+RL jest uzasadnionym kandydatem, ponieważ zarządzanie energią jest problemem sekwencyjnym, a obecne decyzje wpływają na przyszłe warunki.
+
+Nie należy jednak zakładać, że RL zawsze będzie lepsze od klasycznego sterowania.
+
+### 26. Podsumowanie
+
+Zarządzanie energią w inteligentnym budynku można przedstawić jako problem Reinforcement Learning.
+
+Agent:
+
+- obserwuje stan budynku,
+- wybiera akcje,
+- otrzymuje nagrody i kary,
+- uczy się strategii ograniczającej zużycie energii,
+- uwzględnia długoterminowe konsekwencje decyzji.
+
+Supervised Learning może wspierać prognozowanie temperatury i zużycia energii, natomiast RL służy bezpośredniej optymalizacji polityki sterowania.
+
+Najbardziej praktyczne rozwiązanie powinno łączyć:
+
+- modele predykcyjne,
+- bezpieczne sterowanie,
+- optymalizację,
+- nadzór mieszkańców,
+- monitoring energii i komfortu.
+
+Wniosek końcowy:
+
+Reinforcement Learning może pomóc ograniczyć zużycie energii w inteligentnym budynku, pod warunkiem odpowiedniego zaprojektowania funkcji nagrody, przestrzegania ograniczeń bezpieczeństwa i przeprowadzenia rzetelnej walidacji.
+
+Najważniejszym kryterium sukcesu nie jest sama oszczędność energii, lecz oszczędność osiągnięta bez pogorszenia komfortu i bezpieczeństwa mieszkańców.
