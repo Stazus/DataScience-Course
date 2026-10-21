@@ -1,0 +1,798 @@
+# Lekcja 1 – Zadanie 13
+## Design end-to-end: Smart City Traffic
+
+### 1. Cel i zakres projektu
+
+Celem projektu jest zaprojektowanie inteligentnego systemu zarządzania sygnalizacją świetlną w mieście z wykorzystaniem Data Science i Machine Learning.
+
+System powinien:
+
+1. Zmniejszać korki i średni czas podróży.
+2. Skracać czas oczekiwania na skrzyżowaniach.
+3. Ograniczać liczbę niepotrzebnych zatrzymań pojazdów.
+4. Zmniejszać emisję CO₂ związaną z ruchem drogowym.
+5. Usprawniać przejazd komunikacji miejskiej.
+6. Zachowywać bezpieczeństwo pieszych, rowerzystów i kierowców.
+7. Działać niezawodnie i energooszczędnie.
+
+Projekt obejmuje cały proces: pozyskanie danych, przygotowanie danych, trenowanie modeli, testy, wdrożenie, monitoring oraz okresową aktualizację systemu.
+
+### 2. Analiza problemu – jakie dane są potrzebne?
+
+#### A. Dane o natężeniu ruchu
+
+- Liczba pojazdów na poszczególnych pasach.
+- Liczba pojazdów przejeżdżających przez skrzyżowanie w jednostce czasu.
+- Długość kolejek.
+- Średnia prędkość ruchu.
+- Czas oczekiwania na zielone światło.
+- Liczba zatrzymań i ponownych ruszeń.
+- Kierunki skrętu pojazdów.
+
+Źródła:
+
+- pętle indukcyjne,
+- radary drogowe,
+- czujniki IoT,
+- kamery z analizą obrazu,
+- zagregowane dane o ruchu.
+
+#### B. Dane o sygnalizacji świetlnej
+
+- Aktualny stan sygnalizatorów.
+- Czas trwania poszczególnych faz.
+- Długość cyklu świateł.
+- Programy sterowania obowiązujące o różnych porach.
+- Minimalne i maksymalne czasy faz.
+- Ograniczenia bezpieczeństwa.
+
+#### C. Dane czasowe i kalendarzowe
+
+- Godzina.
+- Dzień tygodnia.
+- Dzień roboczy lub święto.
+- Okres wakacyjny.
+- Godziny szczytu.
+- Duże wydarzenia w mieście.
+
+#### D. Dane pogodowe
+
+- Opady deszczu i śniegu.
+- Temperatura.
+- Widoczność.
+- Oblodzenie.
+- Warunki wpływające na prędkość i bezpieczeństwo ruchu.
+
+#### E. Dane o infrastrukturze
+
+- Mapa skrzyżowań i dróg.
+- Liczba pasów.
+- Dopuszczalne kierunki jazdy.
+- Ograniczenia prędkości.
+- Przejścia dla pieszych.
+- Drogi rowerowe.
+- Przystanki i trasy komunikacji miejskiej.
+
+#### F. Dane o zdarzeniach drogowych
+
+- Wypadki.
+- Kolizje.
+- Roboty drogowe.
+- Zamknięcia ulic.
+- Awaryjne sytuacje na skrzyżowaniach.
+
+#### G. Dane środowiskowe
+
+- Szacowane zużycie paliwa.
+- Emisja CO₂.
+- Stężenia NO₂ i pyłów zawieszonych, jeżeli dostępne są pomiary.
+- Dane o strukturze floty pojazdów.
+- Informacje o rodzajach napędu i klasach emisji, jeżeli są dostępne w postaci zagregowanej.
+
+Nie należy utożsamiać pomiaru stężenia zanieczyszczeń z bezpośrednim pomiarem emisji CO₂.
+
+### 3. Przygotowanie i jakość danych
+
+Przed trenowaniem modeli należy:
+
+1. Ujednolicić formaty czasu i jednostki.
+2. Synchronizować dane pochodzące z różnych czujników.
+3. Usunąć duplikaty.
+4. Wykryć awarie i błędne wskazania urządzeń.
+5. Obsłużyć brakujące obserwacje.
+6. Zidentyfikować nietypowe zdarzenia drogowe.
+7. Zanonimizować lub zagregować dane, gdy istnieje ryzyko identyfikacji osób.
+8. Utworzyć cechy historyczne, np. średnie natężenie z ostatnich 5, 15 i 30 minut.
+9. Podzielić dane chronologicznie na zbiory treningowy, walidacyjny i testowy.
+
+Ważne:
+
+System może korzystać wyłącznie z informacji dostępnych w momencie podejmowania decyzji.
+
+Nie wolno wykorzystywać przyszłych obserwacji jako danych wejściowych do predykcji wykonywanej w czasie rzeczywistym.
+
+### 4. Jakie typy zadań Machine Learning będą potrzebne?
+
+Projekt może wykorzystywać kilka różnych rodzajów zadań ML.
+
+#### A. Regresja
+
+Zastosowanie:
+
+- prognozowanie liczby pojazdów,
+- przewidywanie średniego czasu przejazdu,
+- szacowanie długości kolejek,
+- prognozowanie opóźnień.
+
+Przykładowe modele:
+
+- Linear Regression,
+- Random Forest Regressor,
+- Gradient Boosting,
+- modele szeregów czasowych.
+
+#### B. Klasyfikacja
+
+Zastosowanie:
+
+- wykrywanie ryzyka powstania korka,
+- identyfikowanie nietypowych sytuacji,
+- rozpoznawanie stanu ruchu: płynny, spowolniony, zakorkowany.
+
+Przykładowe modele:
+
+- Logistic Regression,
+- Random Forest,
+- Gradient Boosting.
+
+#### C. Klasteryzacja
+
+Zastosowanie:
+
+- grupowanie skrzyżowań o podobnym charakterze ruchu,
+- identyfikacja podobnych wzorców natężenia ruchu,
+- analiza różnic między dzielnicami.
+
+Przykładowy algorytm:
+
+- K-Means.
+
+#### D. Computer Vision
+
+Zastosowanie:
+
+- wykrywanie i liczenie pojazdów,
+- rozpoznawanie kolejek,
+- wykrywanie pieszych i rowerzystów,
+- analiza zajętości pasów.
+
+Wykorzystanie analizy obrazu powinno być ograniczone do sytuacji, w których prostsze czujniki nie zapewniają wystarczających informacji.
+
+#### E. Reinforcement Learning
+
+Zastosowanie:
+
+Uczenie strategii sterowania sygnalizacją świetlną na podstawie obserwacji ruchu i wyników podejmowanych decyzji.
+
+Agent RL może proponować np. zmianę długości zielonego światła w ramach dopuszczonych ograniczeń.
+
+Funkcja nagrody może uwzględniać:
+
+- czas oczekiwania,
+- długość kolejek,
+- liczbę zatrzymań,
+- szacowaną emisję CO₂,
+- opóźnienia komunikacji miejskiej.
+
+Bezpieczeństwo ruchu jest twardym ograniczeniem, a nie jedynie składnikiem nagrody, który można wymienić na krótszy czas przejazdu.
+
+### 5. Jakie podejścia do uczenia zastosować?
+
+#### A. Supervised Learning
+
+Uczenie nadzorowane do prognozowania ruchu i wykrywania zatorów.
+
+Dane treningowe zawierają obserwacje oraz znane wartości docelowe.
+
+Przykład:
+
+Dane z poprzednich 30 minut służą do przewidywania natężenia ruchu za 15 minut.
+
+#### B. Unsupervised Learning
+
+Uczenie nienadzorowane do wykrywania podobnych wzorców ruchu.
+
+Przykład:
+
+Grupowanie skrzyżowań na podstawie profilu ruchu w ciągu doby.
+
+#### C. Reinforcement Learning
+
+Uczenie przez wzmacnianie do optymalizacji sterowania sygnalizacją.
+
+Początkowe trenowanie powinno odbywać się w symulatorze ruchu drogowego.
+
+Przykładowe środowisko:
+
+SUMO – Simulation of Urban MObility.
+
+Model nie powinien samodzielnie eksperymentować z niezweryfikowanymi strategiami na rzeczywistych skrzyżowaniach.
+
+#### D. Podejście hybrydowe
+
+Rekomenduję połączenie:
+
+- prognozowania natężenia ruchu,
+- wykrywania anomalii,
+- algorytmu optymalizacji sygnalizacji,
+- bezpiecznych reguł sterowania,
+- opcjonalnie reinforcement learning.
+
+W pierwszej wersji projektu można zastosować prognozowanie ruchu i optymalizację opartą na ograniczeniach, a RL wprowadzić dopiero po uzyskaniu wiarygodnych wyników w symulacji.
+
+### 6. Architektura systemu end-to-end
+
+Proponowane komponenty:
+
+A. Warstwa pozyskiwania danych
+
+Odbiera informacje z czujników, sterowników sygnalizacji, systemów transportowych i innych źródeł.
+
+B. Warstwa przesyłania danych
+
+Przekazuje obserwacje do systemu przetwarzania strumieniowego.
+
+Przykładowa technologia:
+
+Apache Kafka lub inne rozwiązanie obsługujące strumienie zdarzeń.
+
+C. Warstwa przetwarzania danych
+
+- Walidacja.
+- Czyszczenie.
+- Synchronizacja.
+- Agregacja.
+- Wyznaczanie cech.
+
+D. Warstwa przechowywania
+
+- Baza danych historycznych.
+- Baza bieżących obserwacji.
+- Repozytorium modeli i wersji danych.
+
+E. Warstwa modeli ML
+
+- Prognozowanie ruchu.
+- Wykrywanie anomalii.
+- Ocena przewidywanych skutków decyzji.
+
+F. Warstwa optymalizacji
+
+Wyznacza propozycje sterowania sygnalizacją w granicach dopuszczonych parametrów.
+
+G. Warstwa bezpieczeństwa
+
+Sprawdza ograniczenia techniczne i zasady bezpieczeństwa.
+
+H. Warstwa wykonawcza
+
+Przekazuje zatwierdzone decyzje do kompatybilnych sterowników sygnalizacji.
+
+I. Warstwa monitoringu
+
+Kontroluje ruch, jakość danych, skuteczność modeli, zużycie energii i stan urządzeń.
+
+### 7. Diagram przepływu danych
+
+CZUJNIKI RUCHU     DANE POGODOWE     SYSTEMY DROGOWE
+       |                |                  |
+       +----------------+------------------+
+                        |
+                        v
+              POBIERANIE DANYCH
+                        |
+                        v
+            WALIDACJA I CZYSZCZENIE
+                        |
+                        v
+           AGREGACJA I TWORZENIE CECH
+                        |
+            +-----------+-----------+
+            |                       |
+            v                       v
+      BAZA DANYCH             MODELE ML
+      HISTORYCZNYCH                |
+            |                       v
+            |               PROGNOZA RUCHU
+            |                       |
+            |                       v
+            |               MODUŁ OPTYMALIZACJI
+            |                       |
+            |                       v
+            |               KONTROLA BEZPIECZEŃSTWA
+            |                       |
+            |                       v
+            |               STEROWNIKI SYGNALIZACJI
+            |                       |
+            |                       v
+            +-------------- MONITORING
+                                    |
+                                    v
+                         INFORMACJA ZWROTNA
+                                    |
+                                    v
+                         AKTUALIZACJA MODELI
+
+Informacja zwrotna pozwala ocenić skutki decyzji i ulepszać modele w kolejnych cyklach uczenia.
+
+Aktualizacja modelu powinna odbywać się w kontrolowanym procesie, a nie automatycznie bez walidacji.
+
+### 8. Metryki biznesowe – jak zmierzyć sukces projektu?
+
+#### A. Średni czas podróży
+
+Cel:
+
+Skrócenie czasu przejazdu przez analizowany obszar.
+
+#### B. Średni czas oczekiwania
+
+Cel:
+
+Zmniejszenie czasu oczekiwania na skrzyżowaniach.
+
+#### C. Długość kolejek
+
+Cel:
+
+Ograniczenie zatorów drogowych.
+
+#### D. Liczba zatrzymań
+
+Cel:
+
+Zmniejszenie liczby niepotrzebnych zatrzymań i ponownych ruszeń.
+
+#### E. Punktualność komunikacji miejskiej
+
+Cel:
+
+Ograniczenie opóźnień autobusów i tramwajów.
+
+#### F. Satysfakcja mieszkańców
+
+Można ją mierzyć za pomocą ankiet i analizy zgłoszeń dotyczących organizacji ruchu.
+
+Przykładowe, wstępne cele pilotażu:
+
+- zmniejszenie średniego czasu oczekiwania o 10%,
+- zmniejszenie średniej długości kolejek o 15%,
+- zmniejszenie liczby zatrzymań o 10%.
+
+Są to proponowane cele projektowe, a nie gwarantowane rezultaty.
+
+Ostateczne wartości należy ustalić po zbadaniu ruchu w wybranej lokalizacji.
+
+### 9. Metryki techniczne
+
+#### A. Jakość prognoz
+
+- MAE – Mean Absolute Error.
+- RMSE – Root Mean Squared Error.
+- MAPE lub sMAPE, jeżeli są odpowiednie do charakteru danych.
+
+MAE i RMSE pozwalają ocenić błędy prognoz natężenia ruchu.
+
+#### B. Jakość klasyfikacji
+
+- Precision.
+- Recall.
+- F1-score.
+- Confusion matrix.
+
+Przykład:
+
+Ocena modelu przewidującego wystąpienie zatoru drogowego.
+
+#### C. Wydajność systemu
+
+- Opóźnienie przetwarzania danych.
+- Czas wyznaczania decyzji.
+- Liczba obsługiwanych skrzyżowań.
+- Dostępność systemu.
+- Liczba utraconych komunikatów.
+- Częstotliwość awarii.
+
+#### D. Bezpieczeństwo sterowania
+
+- Liczba naruszeń ograniczeń bezpieczeństwa: docelowo zero.
+- Poprawność przejść między fazami.
+- Skuteczność przełączenia na tryb awaryjny.
+- Liczba interwencji operatorów.
+
+#### E. Efektywność energetyczna
+
+- Wh na 1000 decyzji sterujących.
+- Zużycie energii na skrzyżowanie na dobę.
+- Wykorzystanie CPU i GPU.
+- Zużycie pamięci.
+- Koszt obliczeń na jednostkę czasu.
+
+### 10. Jak rzetelnie ocenić wpływ systemu?
+
+Nie wystarczy porównać jednego dnia przed wdrożeniem i jednego dnia po wdrożeniu.
+
+Na wyniki wpływają:
+
+- pogoda,
+- dzień tygodnia,
+- sezon,
+- wydarzenia miejskie,
+- roboty drogowe,
+- zmiany liczby pojazdów.
+
+Proponuję następujący proces:
+
+1. Zebrać dane bazowe przed wdrożeniem.
+2. Przeprowadzić symulacje różnych strategii.
+3. Wybrać grupę skrzyżowań pilotażowych.
+4. Porównać wyniki z podobnymi skrzyżowaniami kontrolnymi.
+5. Uwzględnić zmiany natężenia ruchu i warunków zewnętrznych.
+6. Monitorować efekty w dłuższym okresie.
+7. Sprawdzić, czy poprawa na jednym skrzyżowaniu nie pogarsza sytuacji na sąsiednich ulicach.
+
+Można zastosować metodę difference-in-differences, jeżeli spełnione są odpowiednie założenia.
+
+Wyniki należy analizować również dla pieszych, rowerzystów i komunikacji miejskiej, a nie tylko samochodów osobowych.
+
+### 11. Green AI – jak ograniczyć zużycie energii?
+
+System powinien być energooszczędny na każdym etapie.
+
+#### A. Dobór odpowiednich modeli
+
+Najpierw należy przetestować proste modele, np. regresję liniową lub Gradient Boosting.
+
+Duże sieci neuronowe powinny być stosowane tylko wtedy, gdy zapewniają uzasadnioną poprawę jakości.
+
+#### B. Przetwarzanie lokalne – Edge Computing
+
+Część danych może być analizowana blisko skrzyżowania.
+
+Zalety:
+
+- ograniczenie przesyłania dużych ilości danych,
+- krótszy czas reakcji,
+- możliwość działania przy problemach z łącznością.
+
+Nie zawsze jednak przetwarzanie lokalne zużywa mniej energii – wymaga to pomiarów.
+
+#### C. Ograniczenie analizy obrazu
+
+Jeżeli dane z pętli indukcyjnych i radarów są wystarczające, nie trzeba analizować pełnego obrazu wideo.
+
+#### D. Optymalizacja częstotliwości predykcji
+
+Nie każda decyzja musi wymagać ponownego uruchomienia wszystkich modeli.
+
+Częstotliwość obliczeń można dopasować do dynamiki ruchu i wymagań bezpieczeństwa.
+
+#### E. Aktualizacje przyrostowe
+
+Można aktualizować wybrane statystyki ruchu bez ponownego przetwarzania całej historii.
+
+#### F. Optymalizacja trenowania
+
+- Ograniczenie niepotrzebnych eksperymentów.
+- Wykorzystanie walidacji i early stopping.
+- Dobór parametrów z uwzględnieniem kosztów obliczeniowych.
+- Ponowne trenowanie wtedy, gdy uzasadniają to dane.
+
+#### G. Monitoring energii
+
+Należy osobno mierzyć:
+
+- energię zużywaną przez czujniki,
+- energię infrastruktury sieciowej,
+- energię obliczeń,
+- energię trenowania modeli,
+- energię infrastruktury serwerowej.
+
+Celem jest ograniczenie całkowitego śladu środowiskowego, a nie tylko zużycia energii przez sam model ML.
+
+### 12. Analiza wpływu środowiskowego
+
+#### A. Potencjalne korzyści
+
+Lepsza organizacja ruchu może:
+
+- skrócić czas pracy silników na biegu jałowym,
+- zmniejszyć liczbę zatrzymań i przyspieszeń,
+- ograniczyć zużycie paliwa,
+- zmniejszyć emisję CO₂,
+- poprawić punktualność transportu zbiorowego.
+
+#### B. Potencjalne koszty środowiskowe
+
+System wymaga:
+
+- produkcji i eksploatacji czujników,
+- urządzeń sieciowych,
+- serwerów i komputerów,
+- energii elektrycznej,
+- konserwacji i wymiany sprzętu.
+
+Należy również uwzględnić emisje związane z produkcją urządzeń oraz ich utylizacją.
+
+#### C. Bilans środowiskowy
+
+Bilans netto należy obliczyć jako:
+
+Uniknięte emisje transportowe
+minus
+Dodatkowe emisje związane z działaniem systemu.
+
+Przykład hipotetyczny:
+
+- Uniknięte emisje transportowe: 100 ton CO₂e rocznie.
+- Dodatkowe emisje systemu: 15 ton CO₂e rocznie.
+- Korzyść netto: 85 ton CO₂e rocznie.
+
+To wyłącznie przykład obliczeniowy, a nie prognoza dla konkretnego miasta.
+
+Rzeczywisty bilans wymaga pomiarów oraz odpowiedniego modelu emisji.
+
+#### D. Efekty uboczne
+
+Należy sprawdzić, czy usprawnienie ruchu samochodowego nie prowadzi do:
+
+- wzrostu liczby przejazdów samochodowych,
+- przeniesienia korków na inne ulice,
+- pogorszenia warunków dla pieszych i rowerzystów,
+- spadku atrakcyjności transportu zbiorowego.
+
+Jest to istotne, ponieważ krótszy czas podróży nie zawsze oznacza proporcjonalne zmniejszenie emisji w dłuższym okresie.
+
+### 13. Ryzyka techniczne
+
+#### A. Awarie czujników
+
+Problem:
+
+Błędne lub brakujące dane mogą prowadzić do niewłaściwych decyzji.
+
+Rozwiązanie:
+
+Walidacja danych, redundancja czujników i bezpieczne programy awaryjne.
+
+#### B. Opóźnienia komunikacji
+
+Problem:
+
+Decyzje mogą być podejmowane na podstawie nieaktualnych informacji.
+
+Rozwiązanie:
+
+Kontrola wieku danych, ograniczenia czasowe i lokalne sterowanie awaryjne.
+
+#### C. Data drift i concept drift
+
+Problem:
+
+Zmiany organizacji ruchu mogą obniżać skuteczność modeli.
+
+Rozwiązanie:
+
+Monitoring rozkładu danych i okresowa aktualizacja modeli.
+
+#### D. Błędy optymalizacji
+
+Problem:
+
+System może poprawiać sytuację na jednym skrzyżowaniu kosztem innych.
+
+Rozwiązanie:
+
+Optymalizacja sieciowa i testy obejmujące sąsiednie skrzyżowania.
+
+#### E. Cyberbezpieczeństwo
+
+Problem:
+
+Nieautoryzowany dostęp do sterowników może zagrozić bezpieczeństwu ruchu.
+
+Rozwiązanie:
+
+Szyfrowanie, uwierzytelnianie, segmentacja sieci, monitoring bezpieczeństwa i kontrola uprawnień.
+
+### 14. Ryzyka etyczne i społeczne
+
+#### A. Prywatność
+
+Kamery i dane lokalizacyjne mogą umożliwiać identyfikację osób.
+
+Rozwiązanie:
+
+Minimalizacja danych, anonimizacja, przetwarzanie lokalne i ograniczone okresy przechowywania.
+
+#### B. Nierówne traktowanie dzielnic
+
+System może preferować główne arterie kosztem osiedli mieszkalnych.
+
+Rozwiązanie:
+
+Uwzględnienie sprawiedliwości przestrzennej i analiza wyników w różnych częściach miasta.
+
+#### C. Dyskryminacja uczestników ruchu
+
+System nie powinien optymalizować wyłącznie czasu przejazdu samochodów.
+
+Rozwiązanie:
+
+Uwzględnienie potrzeb pieszych, rowerzystów, osób z niepełnosprawnościami i komunikacji miejskiej.
+
+#### D. Przejrzystość decyzji
+
+Mieszkańcy powinni wiedzieć, jakie cele realizuje system i jakie są zasady jego działania.
+
+Rozwiązanie:
+
+Publikowanie zagregowanych wyników, zasad optymalizacji i procedur zgłaszania problemów.
+
+#### E. Odpowiedzialność
+
+Decyzje wpływające na bezpieczeństwo nie mogą pozostawać bez nadzoru.
+
+Rozwiązanie:
+
+Wyznaczenie odpowiedzialnych operatorów, audyty, logowanie decyzji i możliwość ręcznej interwencji.
+
+### 15. Bezpieczeństwo i tryb awaryjny
+
+Najważniejsza zasada:
+
+Machine Learning nie powinien mieć możliwości naruszenia obowiązkowych zasad bezpieczeństwa sygnalizacji.
+
+System musi respektować:
+
+- minimalne czasy zielonego światła,
+- wymagane czasy żółtego i międzyzielonego,
+- bezpieczne przejścia między fazami,
+- priorytety wynikające z przepisów i organizacji ruchu,
+- zasady obsługi pieszych,
+- ograniczenia sterowników.
+
+W przypadku:
+
+- awarii modelu,
+- utraty łączności,
+- błędnych danych,
+- przekroczenia czasu odpowiedzi,
+
+system powinien przełączyć się na wcześniej zatwierdzony, bezpieczny tryb sterowania.
+
+Nie należy traktować predykcji ML jako niezależnego systemu bezpieczeństwa.
+
+### 16. Plan realizacji projektu
+
+#### Etap 1 – Analiza i dane
+
+- Wybór obszaru pilotażowego.
+- Inwentaryzacja czujników.
+- Zebranie danych historycznych.
+- Określenie metryk i wymagań bezpieczeństwa.
+
+#### Etap 2 – Modele bazowe
+
+- Prognozowanie natężenia ruchu.
+- Wykrywanie zatorów.
+- Porównanie z istniejącymi programami sygnalizacji.
+
+#### Etap 3 – Symulacja
+
+- Utworzenie modelu ruchu w SUMO.
+- Kalibracja symulatora na danych rzeczywistych.
+- Testowanie różnych strategii sterowania.
+- Sprawdzenie sytuacji awaryjnych.
+
+#### Etap 4 – Optymalizacja
+
+- Wdrożenie algorytmu optymalizacji z ograniczeniami.
+- Opcjonalne testowanie reinforcement learning.
+- Porównanie jakości i kosztów obliczeniowych.
+
+#### Etap 5 – Pilotaż
+
+- Uruchomienie w trybie obserwacyjnym.
+- Weryfikacja decyzji przez operatorów.
+- Stopniowe dopuszczanie zatwierdzonych funkcji sterowania.
+- Monitoring bezpieczeństwa.
+
+#### Etap 6 – Ewaluacja
+
+- Analiza czasu przejazdu.
+- Analiza długości kolejek.
+- Analiza liczby zatrzymań.
+- Analiza emisji CO₂.
+- Ocena wpływu na pieszych i komunikację miejską.
+- Ocena energooszczędności systemu.
+
+#### Etap 7 – Skalowanie
+
+Po uzyskaniu pozytywnych wyników:
+
+- rozszerzenie na kolejne skrzyżowania,
+- integracja z miejskimi systemami transportowymi,
+- ciągły monitoring i utrzymanie.
+
+### 17. Rekomendowana technologia
+
+Przykładowy stos technologiczny:
+
+- Python – analiza danych i modele ML.
+- Pandas, NumPy – przygotowanie danych.
+- Scikit-learn – regresja, klasyfikacja i klasteryzacja.
+- LightGBM – prognozowanie na danych tabelarycznych.
+- SUMO – symulacja ruchu drogowego.
+- PostgreSQL – przechowywanie danych.
+- Apache Kafka – przesyłanie danych strumieniowych, jeżeli skala tego wymaga.
+- FastAPI – udostępnianie usług predykcyjnych.
+- Docker – uruchamianie komponentów.
+- Prometheus i Grafana – monitoring.
+
+Nie wszystkie technologie są niezbędne w pierwszej wersji.
+
+Dla pilotażu należy wybrać możliwie prostą architekturę spełniającą wymagania.
+
+### 18. Kryteria akceptacji projektu
+
+Projekt można uznać za udany, jeżeli:
+
+1. Nie występują naruszenia zasad bezpieczeństwa sterowania.
+2. System działa stabilnie w wymaganych warunkach.
+3. Poprawia wybrane wskaźniki ruchu względem rozwiązania bazowego.
+4. Nie powoduje istotnego pogorszenia warunków w sąsiednich obszarach.
+5. Uwzględnia pieszych, rowerzystów i komunikację miejską.
+6. Osiąga mierzalne korzyści środowiskowe netto.
+7. Koszty utrzymania są uzasadnione osiąganymi korzyściami.
+8. Zapewnia ochronę danych i możliwość audytu decyzji.
+
+### 19. Rekomendacja końcowa
+
+Rekomenduję etapowe wdrożenie inteligentnego systemu sterowania ruchem, opartego na połączeniu:
+
+1. Czujników ruchu i danych historycznych.
+2. Modeli prognozowania natężenia ruchu.
+3. Algorytmu optymalizacji sygnalizacji.
+4. Twardych ograniczeń bezpieczeństwa.
+5. Monitoringu ruchu, energii i emisji CO₂.
+
+Reinforcement Learning warto rozważyć jako kolejny etap, po przygotowaniu wiarygodnego symulatora i przeprowadzeniu testów bezpieczeństwa.
+
+Kluczowa zasada:
+
+Najlepszy system Smart City Traffic nie jest tym, który wyłącznie maksymalizuje przepustowość samochodów.
+
+Powinien poprawiać funkcjonowanie całego systemu transportowego, chronić uczestników ruchu oraz przynosić rzeczywiste, mierzalne korzyści środowiskowe.
+
+### 20. Podsumowanie
+
+Projekt Smart City Traffic stanowi przykład kompleksowego zastosowania Data Science.
+
+Łączy:
+
+- analizę danych,
+- regresję,
+- klasyfikację,
+- klasteryzację,
+- opcjonalnie Computer Vision,
+- opcjonalnie Reinforcement Learning,
+- optymalizację,
+- Green AI,
+- monitoring i ocenę skutków środowiskowych.
+
+Wniosek końcowy:
+
+Najbardziej racjonalnym podejściem jest rozpoczęcie od prostych, interpretowalnych modeli oraz bezpiecznej optymalizacji, a następnie rozwijanie systemu na podstawie wyników pilotażu.
+
+Sukces należy mierzyć nie tylko dokładnością modeli, ale przede wszystkim poprawą warunków ruchu, bezpieczeństwem wszystkich uczestników, kosztami i bilansem środowiskowym netto.
