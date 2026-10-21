@@ -1,0 +1,744 @@
+# Lekcja 1 – Zadanie 14
+## Semi-Supervised Strategy – klasyfikacja zdjęć produktów
+
+### 1. Opis problemu
+
+Sklep internetowy posiada 100 000 zdjęć produktów.
+
+Dane:
+- 1 000 zdjęć posiada etykiety, np. buty, koszula, spodnie.
+- 99 000 zdjęć nie posiada etykiet.
+- Udział danych oznaczonych wynosi 1%.
+- Udział danych nieoznaczonych wynosi 99%.
+
+Celem projektu jest stworzenie modelu automatycznie klasyfikującego zdjęcia produktów przy ograniczonej liczbie etykiet.
+
+System powinien osiągać wysoką skuteczność, ograniczać koszty ręcznego oznaczania danych oraz zużywać możliwie mało energii.
+
+Rekomendowane rozwiązanie:
+
+Semi-Supervised Learning (SSL), czyli uczenie częściowo nadzorowane, połączone z Transfer Learning, Pseudo-Labeling oraz Active Learning.
+
+W projekcie zakładamy, że zdjęcia pochodzą z podobnego katalogu produktów, a kategorie są znane. Założenie to należy zweryfikować przed rozpoczęciem trenowania.
+
+### 2. Dlaczego Semi-Supervised Learning?
+
+Klasyczne Supervised Learning wykorzystałoby jedynie 1 000 oznaczonych zdjęć.
+
+Pozostałe 99 000 obrazów nie uczestniczyłoby w treningu.
+
+Semi-Supervised Learning wykorzystuje zarówno dane oznaczone, jak i nieoznaczone.
+
+Model może uczyć się:
+- rozpoznawania kategorii z oznaczonych przykładów,
+- struktury danych z nieoznaczonych zdjęć,
+- podobieństw między produktami,
+- większej odporności na różnice w oświetleniu, tle i ułożeniu przedmiotu.
+
+Nie oznacza to jednak, że wykorzystanie nieoznaczonych danych zawsze poprawia jakość.
+
+Błędne pseudoetykiety mogą pogorszyć model, dlatego konieczne są kontrola jakości i walidacja.
+
+### 3. Jak wykorzystać 1 000 opisanych zdjęć?
+
+Pierwszym etapem jest przygotowanie oznaczonego zbioru danych.
+
+#### A. Kontrola jakości
+
+Należy sprawdzić:
+1. Czy etykiety są poprawne.
+2. Czy wszystkie kategorie mają wystarczającą reprezentację.
+3. Czy zdjęcia nie są uszkodzone.
+4. Czy nie występują duplikaty.
+5. Czy te same produkty nie trafiają do różnych zbiorów danych.
+
+Przykładowe kategorie:
+- buty,
+- koszule,
+- spodnie.
+
+W rzeczywistym projekcie należy uwzględnić wszystkie kategorie występujące w sklepie.
+
+#### B. Podział danych
+
+Przykładowy podział 1 000 oznaczonych zdjęć:
+
+- 700 zdjęć – trening,
+- 150 zdjęć – walidacja,
+- 150 zdjęć – test.
+
+Podział należy przeprowadzić warstwowo, jeśli pozwala na to liczebność klas.
+
+Zdjęcia tego samego produktu powinny należeć do jednego zbioru.
+
+Zbiór testowy pozostaje nietknięty podczas trenowania i wyboru modelu.
+
+#### C. Transfer Learning
+
+Zamiast trenować sieć neuronową od początku, wykorzystujemy model wstępnie wytrenowany na dużym zbiorze obrazów.
+
+Przykładowe modele:
+- MobileNetV3,
+- EfficientNet-B0,
+- ResNet18.
+
+Dla projektu nastawionego na oszczędność energii dobrym kandydatem jest MobileNetV3.
+
+Proponowane postępowanie:
+
+1. Wczytać model wstępnie wytrenowany.
+2. Dostosować ostatnią warstwę do liczby kategorii produktów.
+3. Początkowo zamrozić większość warstw.
+4. Wytrenować nową warstwę klasyfikacyjną.
+5. Ocenić model na zbiorze walidacyjnym.
+6. W razie potrzeby odblokować wybrane warstwy i przeprowadzić ostrożny fine-tuning.
+
+Tak powstaje model bazowy, wykorzystujący tylko oznaczone zdjęcia.
+
+### 4. Jak wykorzystać 99 000 nieopisanych zdjęć?
+
+Nieoznaczone zdjęcia zostaną wykorzystane w procesie Pseudo-Labeling.
+
+Pseudo-Labeling polega na tym, że model przewiduje etykiety dla nieoznaczonych danych.
+
+Najbardziej wiarygodne przewidywania mogą zostać wykorzystane podczas dalszego treningu.
+
+#### Etap 1 – Przygotowanie danych
+
+Dla 99 000 zdjęć należy:
+
+- sprawdzić poprawność plików,
+- usunąć duplikaty,
+- ujednolicić rozmiar obrazów,
+- zastosować normalizację,
+- sprawdzić podobieństwo rozkładu danych do oznaczonego zbioru.
+
+#### Etap 2 – Predykcje
+
+Model bazowy analizuje nieoznaczone zdjęcia.
+
+Przykład:
+
+Zdjęcie A:
+- buty: 0,98,
+- koszula: 0,01,
+- spodnie: 0,01.
+
+Zdjęcie B:
+- buty: 0,45,
+- koszula: 0,35,
+- spodnie: 0,20.
+
+Dla zdjęcia A model wykazuje wysoką pewność.
+
+Zdjęcie B jest niejednoznaczne i nie powinno automatycznie otrzymać pseudoetykiety.
+
+#### Etap 3 – Wybór pseudoetykiet
+
+Można rozpocząć od progu pewności 0,95.
+
+Przewidywania z wynikiem co najmniej 0,95 mogą zostać zakwalifikowane do zbioru pseudoetykiet.
+
+Próg 0,95 jest jedynie przykładem.
+
+Należy go dobrać eksperymentalnie, ponieważ wysokie prawdopodobieństwo zwrócone przez model nie gwarantuje poprawnej klasyfikacji.
+
+Warto sprawdzać jakość pseudoetykiet na ręcznie oznaczonej próbce.
+
+#### Etap 4 – Ponowne trenowanie
+
+Model jest trenowany na połączonym zbiorze:
+
+- oryginalne zdjęcia oznaczone,
+- wybrane zdjęcia z pseudoetykietami.
+
+Oryginalnym etykietom można nadać większą wagę niż pseudoetykietom.
+
+Pozwala to ograniczyć wpływ błędnych przewidywań.
+
+#### Etap 5 – Kolejne iteracje
+
+Po treningu model ponownie analizuje pozostałe nieoznaczone zdjęcia.
+
+Proces można powtarzać, jeśli kolejne iteracje poprawiają wyniki walidacyjne.
+
+Należy zatrzymać trening, jeżeli jakość przestaje rosnąć lub pojawiają się oznaki utrwalania błędów.
+
+### 5. Konkretny algorytm – Transfer Learning + Pseudo-Labeling
+
+Proponowana metodologia:
+
+1. Przygotować 1 000 oznaczonych zdjęć.
+2. Wydzielić zbiory treningowy, walidacyjny i testowy.
+3. Wczytać wstępnie wytrenowany MobileNetV3.
+4. Wytrenować klasyfikator na 700 zdjęciach treningowych.
+5. Ocenić model na 150 zdjęciach walidacyjnych.
+6. Przeprowadzić predykcję dla 99 000 nieoznaczonych zdjęć.
+7. Wybrać zdjęcia o odpowiednio wysokiej pewności predykcji.
+8. Utworzyć zbiór pseudoetykiet.
+9. Połączyć pseudoetykiety z oryginalnym zbiorem treningowym.
+10. Trenować model z kontrolą wag i jakości etykiet.
+11. Ponownie ocenić wyniki walidacyjne.
+12. Powtarzać proces tylko wtedy, gdy przynosi poprawę.
+13. Wybrać najlepszy model na podstawie walidacji.
+14. Przeprowadzić końcową ocenę na nietkniętym zbiorze testowym.
+
+Schemat algorytmu:
+
+1 000 ZDJĘĆ Z ETYKIETAMI
+           |
+           v
+    PODZIAŁ DANYCH
+           |
+           v
+   TRANSFER LEARNING
+           |
+           v
+       MODEL BAZOWY
+           |
+           +-----------------------+
+           |                       |
+           v                       v
+   OCENA WALIDACYJNA       99 000 ZDJĘĆ
+                                   |
+                                   v
+                              PREDYKCJE
+                                   |
+                                   v
+                           WYBÓR PEWNYCH
+                             PSEUDOETYKIET
+                                   |
+                                   v
+                            POŁĄCZENIE Z
+                          DANYMI TRENINGOWYMI
+                                   |
+                                   v
+                            PONOWNY TRENING
+                                   |
+                                   v
+                           OCENA WALIDACYJNA
+                                   |
+                         +---------+---------+
+                         |                   |
+                         v                   v
+                     POPRAWA?             BRAK POPRAWY
+                         |                   |
+                         v                   v
+                  KOLEJNA ITERACJA     ZATRZYMANIE
+                         |
+                         v
+                  WYBÓR MODELU
+                         |
+                         v
+                KOŃCOWY TEST MODELU
+
+### 6. Active Learning – dodatkowe usprawnienie
+
+Active Learning polega na wyborze zdjęć, których ręczne oznaczenie może przynieść największą korzyść.
+
+Przykład:
+
+Model jest niepewny, czy produkt przedstawia koszulę, czy bluzę.
+
+Zamiast automatycznie przypisywać etykietę, kierujemy zdjęcie do pracownika sklepu.
+
+Proponowana strategia:
+
+1. Obliczyć poziom niepewności dla nieoznaczonych zdjęć.
+2. Wybrać próbkę najbardziej niejednoznacznych przypadków.
+3. Zadbać o różnorodność wybranych przykładów.
+4. Przekazać zdjęcia do ręcznego oznaczenia.
+5. Dodać poprawnie oznaczone przykłady do zbioru treningowego.
+6. Ponownie wytrenować model.
+
+Przykładowo można oznaczyć dodatkowe 500 zdjęć.
+
+Liczba ta jest założeniem projektowym, a nie wymaganiem zadania.
+
+Active Learning może poprawić jakość modelu przy mniejszej liczbie ręcznie oznaczanych zdjęć.
+
+### 7. Jak porównać wyniki z baseline?
+
+Należy przygotować kilka wariantów eksperymentu.
+
+#### Model A – Baseline
+
+Supervised Learning z wykorzystaniem wyłącznie oryginalnych oznaczonych zdjęć.
+
+Model:
+
+MobileNetV3 + Transfer Learning.
+
+Do treningu wykorzystujemy 700 zdjęć.
+
+Pozostałe 300 zdjęć służy do walidacji i testu.
+
+#### Model B – Semi-Supervised Learning
+
+Ten sam MobileNetV3 i te same oznaczone zdjęcia treningowe.
+
+Dodatkowo wykorzystujemy pseudoetykiety wyznaczone dla części z 99 000 nieoznaczonych zdjęć.
+
+#### Model C – Semi-Supervised + Active Learning
+
+Model B rozszerzony o dodatkowe ręcznie oznaczone zdjęcia wybrane metodą Active Learning.
+
+#### Model D – Fully Supervised
+
+Wariant porównawczy zakładający dostęp do 100 000 poprawnie oznaczonych zdjęć.
+
+Ten wariant wymagałby znacznego dodatkowego nakładu pracy i kosztów oznaczania danych.
+
+W rzeczywistym projekcie może pozostać scenariuszem referencyjnym, jeżeli nie dysponujemy pełnym zbiorem etykiet.
+
+Wszystkie warianty powinny być oceniane na tym samym niezależnym zbiorze testowym.
+
+### 8. Metryki jakości
+
+Najważniejsze metryki:
+
+#### A. Accuracy
+
+Accuracy = liczba poprawnych predykcji / liczba wszystkich predykcji.
+
+Informuje o ogólnej skuteczności klasyfikacji.
+
+#### B. Precision
+
+Precision informuje, jaki odsetek przewidywań danej kategorii jest poprawny.
+
+#### C. Recall
+
+Recall informuje, jaki odsetek produktów danej kategorii został poprawnie rozpoznany.
+
+#### D. Macro F1-score
+
+Średnia wartość F1-score obliczona osobno dla każdej klasy.
+
+Macro F1 jest przydatny, gdy liczba zdjęć w poszczególnych kategoriach jest nierówna.
+
+#### E. Confusion Matrix
+
+Macierz pomyłek pozwala sprawdzić, które kategorie model najczęściej myli.
+
+Przykład:
+
+Model może częściej mylić koszule z bluzami niż buty ze spodniami.
+
+#### F. Dodatkowe metryki
+
+- Czas predykcji jednego zdjęcia.
+- Zużycie pamięci RAM.
+- Wielkość modelu.
+- Zużycie energii.
+- Koszt oznaczania zdjęć.
+- Koszt treningu.
+- Jakość pseudoetykiet.
+
+### 9. Przykładowe porównanie wyników
+
+Poniższe wartości są hipotetyczne i służą jedynie zilustrowaniu metody porównania.
+
+Nie są to wyniki rzeczywistego eksperymentu.
+
+| Wariant | Accuracy | Macro F1 | Liczba ręcznie opisanych zdjęć |
+|---|---:|---:|---:|
+| A – Baseline | 78% | 0,75 | 1 000 |
+| B – Semi-Supervised | 88% | 0,86 | 1 000 |
+| C – SSL + Active Learning | 91% | 0,90 | 1 500 |
+| D – Fully Supervised | 93% | 0,92 | 100 000 |
+
+Interpretacja przykładu:
+
+- SSL poprawia accuracy z 78% do 88%.
+- Zysk wynosi 10 punktów procentowych.
+- Dodanie Active Learning zwiększa przykładową accuracy do 91%.
+- Pełne oznaczenie 100 000 zdjęć daje w tym scenariuszu 93%.
+
+Wartości te muszą zostać potwierdzone eksperymentalnie.
+
+W praktyce SSL może również nie poprawić wyników baseline, np. przy błędnych pseudoetykietach lub różnicach między zbiorami.
+
+### 10. Porównanie z alternatywnymi metodami
+
+#### A. Trening od zera na 1 000 zdjęć
+
+Zalety:
+- Prosta koncepcja.
+- Brak konieczności korzystania z modelu wstępnie wytrenowanego.
+
+Wady:
+- Bardzo mała ilość danych.
+- Ryzyko przeuczenia.
+- Potencjalnie słaba skuteczność.
+- Kosztowne uczenie reprezentacji obrazu od podstaw.
+
+Nie jest to preferowane podejście.
+
+#### B. Transfer Learning bez SSL
+
+Zalety:
+- Prosty proces.
+- Niski koszt treningu.
+- Możliwość uzyskania dobrych wyników.
+
+Wady:
+- Nie wykorzystuje dodatkowych 99 000 zdjęć.
+- Może mieć ograniczoną skuteczność przy małej liczbie przykładów.
+
+To rekomendowany baseline.
+
+#### C. Semi-Supervised Learning
+
+Zalety:
+- Wykorzystuje nieoznaczone zdjęcia.
+- Ogranicza potrzebę ręcznego oznaczania.
+- Może zwiększać skuteczność.
+
+Wady:
+- Ryzyko błędnych pseudoetykiet.
+- Większa złożoność procesu.
+- Dodatkowy koszt predykcji i treningu.
+
+#### D. Fully Supervised Learning
+
+Zalety:
+- Dostęp do dużego zbioru prawdziwych etykiet.
+- Potencjalnie bardzo dobra skuteczność.
+
+Wady:
+- Wysoki koszt oznaczania danych.
+- Długi czas przygotowania zbioru.
+- Konieczność kontroli jakości etykiet.
+
+#### E. Self-Supervised Learning
+
+Alternatywą jest uczenie reprezentacji obrazów na podstawie nieoznaczonych zdjęć, np. metodami kontrastowymi.
+
+Zalety:
+- Możliwość wykorzystania wszystkich 99 000 zdjęć bez pseudoetykiet.
+- Uczenie reprezentacji specyficznych dla katalogu sklepu.
+
+Wady:
+- Potencjalnie wysoki koszt obliczeniowy.
+- Większa złożoność.
+- Nie zawsze lepsze wyniki od Transfer Learning.
+
+W pierwszej wersji projektu rekomenduję prostszy wariant Transfer Learning + Pseudo-Labeling.
+
+### 11. Analiza zużycia energii
+
+Celem jest porównanie energii potrzebnej do przygotowania modeli.
+
+Należy rozróżnić:
+
+1. Energię treningu.
+2. Energię generowania pseudoetykiet.
+3. Energię predykcji podczas użytkowania.
+4. Energię przygotowania i przechowywania danych.
+
+Samo wykorzystanie mniejszej liczby etykiet nie oznacza automatycznie niższego zużycia energii przez trening.
+
+SSL wymaga dodatkowych obliczeń, dlatego rzeczywisty bilans należy zmierzyć.
+
+### 12. Hipotetyczne oszacowanie energii
+
+Przyjmijmy przykładowy scenariusz, w którym wszystkie warianty korzystają z tego samego sprzętu.
+
+Założenia:
+
+- Trening baseline: 1 kWh.
+- Generowanie pseudoetykiet dla 99 000 zdjęć: 0,5 kWh.
+- Dodatkowe iteracje treningu SSL: 2 kWh.
+- Trening Fully Supervised na 100 000 zdjęć: 12 kWh.
+
+Wariant A – Baseline:
+
+Energia = 1 kWh.
+
+Wariant B – SSL:
+
+Energia = 1 + 0,5 + 2 = 3,5 kWh.
+
+Wariant D – Fully Supervised:
+
+Energia = 12 kWh.
+
+Oszczędność energii SSL względem Fully Supervised:
+
+12 - 3,5 = 8,5 kWh.
+
+Oszczędność procentowa:
+
+(8,5 / 12) * 100% = około 70,83%.
+
+W tym hipotetycznym scenariuszu SSL zużywa około 70,8% mniej energii niż Fully Supervised.
+
+Jednocześnie SSL zużywa więcej energii niż prosty baseline:
+
+3,5 kWh wobec 1 kWh.
+
+Wniosek:
+
+SSL może ograniczyć zużycie energii w porównaniu z pełnym treningiem nadzorowanym na dużym zbiorze, ale nie musi być bardziej energooszczędny od prostego modelu bazowego.
+
+Podane wartości są przykładowymi założeniami, a nie wynikami pomiarów.
+
+Dodatkowo porównanie wymaga doprecyzowania, czy pełny model jest trenowany od zera, czy również wykorzystuje Transfer Learning.
+
+Dla uczciwego porównania wszystkie warianty powinny korzystać z podobnej architektury, sprzętu i procedury pomiaru.
+
+### 13. Koszt ręcznego oznaczania danych
+
+Przyjmijmy hipotetyczny koszt oznaczenia jednego zdjęcia:
+
+0,50 zł.
+
+Wariant A – 1 000 etykiet:
+
+1 000 * 0,50 zł = 500 zł.
+
+Wariant B – SSL:
+
+1 000 * 0,50 zł = 500 zł.
+
+Wariant C – SSL + Active Learning:
+
+1 500 * 0,50 zł = 750 zł.
+
+Wariant D – Fully Supervised:
+
+100 000 * 0,50 zł = 50 000 zł.
+
+Oszczędność kosztu oznaczania danych w SSL:
+
+50 000 zł - 500 zł = 49 500 zł.
+
+Oszczędność procentowa:
+
+49 500 / 50 000 * 100% = 99%.
+
+Jest to oszczędność dotycząca samego oznaczania zdjęć.
+
+Nie obejmuje kosztów infrastruktury, kontroli jakości, pracy specjalistów ani utrzymania systemu.
+
+### 14. Analiza ROI – dokładność, koszt i energia
+
+ROI, czyli Return on Investment, pozwala ocenić opłacalność projektu.
+
+Klasyczna formuła:
+
+ROI = (korzyści finansowe - całkowite koszty) / całkowite koszty * 100%.
+
+Aby obliczyć rzeczywiste ROI, trzeba znać korzyści finansowe wynikające z automatycznej klasyfikacji produktów.
+
+Przykładowe korzyści:
+
+- mniejszy koszt ręcznego katalogowania,
+- szybsze dodawanie produktów,
+- mniej błędów w kategoriach,
+- lepsza wyszukiwarka sklepu,
+- sprawniejsza obsługa katalogu.
+
+Bez wartości tych korzyści nie można rzetelnie obliczyć finansowego ROI.
+
+Można natomiast porównać przykładowe wskaźniki kosztu i jakości.
+
+### 15. Przykładowa tabela ROI i efektywności
+
+Wartości hipotetyczne:
+
+| Wariant | Accuracy | Koszt etykiet | Energia treningu |
+|---|---:|---:|---:|
+| A – Baseline | 78% | 500 zł | 1 kWh |
+| B – SSL | 88% | 500 zł | 3,5 kWh |
+| C – SSL + Active Learning | 91% | 750 zł | wymaga pomiaru |
+| D – Fully Supervised | 93% | 50 000 zł | 12 kWh |
+
+Interpretacja:
+
+1. Baseline ma najniższy koszt obliczeniowy.
+2. SSL w przykładzie poprawia accuracy o 10 punktów procentowych bez zwiększania liczby ręcznych etykiet.
+3. Active Learning wymaga dodatkowego oznaczania, ale może poprawić jakość modelu.
+4. Fully Supervised zapewnia najwyższą przykładową dokładność, lecz wymaga największych nakładów na etykietowanie.
+
+Nie należy utożsamiać samego stosunku accuracy do kosztu z klasycznym finansowym ROI.
+
+### 16. Green AI – dodatkowe sposoby ograniczenia energii
+
+A. Wykorzystanie modeli wstępnie wytrenowanych
+
+Ogranicza potrzebę uczenia reprezentacji obrazów od początku.
+
+B. Zamrożenie części warstw
+
+Zmniejsza liczbę parametrów aktualizowanych podczas treningu.
+
+C. Dobór lekkiej architektury
+
+Przykład: MobileNetV3.
+
+D. Early Stopping
+
+Zatrzymanie treningu, gdy wyniki walidacyjne przestają się poprawiać.
+
+E. Kontrola liczby iteracji pseudoetykietowania
+
+Nie należy wykonywać kolejnych rund, jeśli nie poprawiają jakości.
+
+F. Ograniczenie liczby eksperymentów
+
+Warto prowadzić uporządkowaną dokumentację wyników i nie powtarzać niepotrzebnych treningów.
+
+G. Optymalizacja rozmiaru obrazów
+
+Stosowanie rozdzielczości odpowiedniej do rozpoznawania produktów.
+
+H. Monitoring energii
+
+Pomiar energii w Wh lub kWh dla każdego etapu eksperymentu.
+
+### 17. Ryzyka projektu
+
+#### A. Błędne pseudoetykiety
+
+Problem:
+
+Model może utrwalać własne błędy.
+
+Rozwiązanie:
+
+Wysoki próg pewności, kontrola jakości i większa waga prawdziwych etykiet.
+
+#### B. Nierównomierne rozłożenie kategorii
+
+Problem:
+
+Model może częściej wybierać dominujące klasy.
+
+Rozwiązanie:
+
+Kontrola liczby przykładów na kategorię, Macro F1 i analiza macierzy pomyłek.
+
+#### C. Nowe kategorie produktów
+
+Problem:
+
+W nieoznaczonym zbiorze mogą pojawić się produkty spoza znanych klas.
+
+Rozwiązanie:
+
+Wykrywanie niepewnych i nietypowych przypadków oraz możliwość dodawania nowych kategorii.
+
+#### D. Data Leakage
+
+Problem:
+
+Podobne lub identyczne zdjęcia tego samego produktu mogą trafić do treningu i testu.
+
+Rozwiązanie:
+
+Podział danych na poziomie produktu, a nie pojedynczego zdjęcia.
+
+#### E. Błędna kalibracja prawdopodobieństw
+
+Problem:
+
+Wysoka pewność modelu nie musi oznaczać poprawnej predykcji.
+
+Rozwiązanie:
+
+Ocena kalibracji i ręczna kontrola próbek pseudoetykiet.
+
+#### F. Zmiany katalogu sklepu
+
+Problem:
+
+Nowe rodzaje produktów, tła i style zdjęć mogą obniżać skuteczność.
+
+Rozwiązanie:
+
+Monitoring jakości i aktualizacja modeli.
+
+### 18. Plan realizacji projektu
+
+#### Etap 1 – Audyt danych
+
+- Sprawdzenie etykiet.
+- Analiza kategorii.
+- Usunięcie duplikatów.
+- Podział danych.
+
+#### Etap 2 – Baseline
+
+- Wczytanie MobileNetV3.
+- Transfer Learning.
+- Ocena wyników na walidacji.
+
+#### Etap 3 – Semi-Supervised Learning
+
+- Predykcja dla nieoznaczonych zdjęć.
+- Wybór pseudoetykiet.
+- Ponowny trening.
+- Kontrola jakości.
+
+#### Etap 4 – Active Learning
+
+- Wybór trudnych zdjęć.
+- Ręczne oznaczenie wybranych przykładów.
+- Ponowny trening.
+
+#### Etap 5 – Porównanie modeli
+
+- Accuracy.
+- Macro F1.
+- Confusion Matrix.
+- Energia.
+- Koszt.
+- Czas predykcji.
+
+#### Etap 6 – Wdrożenie
+
+- Udostępnienie modelu do automatycznej klasyfikacji.
+- Ręczna weryfikacja niepewnych predykcji.
+- Monitoring skuteczności.
+- Okresowe aktualizacje.
+
+### 19. Rekomendacja końcowa
+
+Rekomenduję następującą strategię:
+
+1. Zbudować baseline na 1 000 oznaczonych zdjęć z wykorzystaniem Transfer Learning.
+2. Wykorzystać 99 000 nieoznaczonych zdjęć do generowania pseudoetykiet.
+3. Trenować model iteracyjnie, kontrolując jakość etykiet.
+4. Zastosować Active Learning do wyboru trudnych przypadków.
+5. Porównać wyniki na wspólnym, niezależnym zbiorze testowym.
+6. Mierzyć zużycie energii i koszty na każdym etapie.
+
+Największą zaletą tego podejścia jest ograniczenie liczby zdjęć wymagających ręcznego oznaczenia.
+
+Jednocześnie należy pamiętać, że poprawa dokładności i oszczędność energii nie są gwarantowane.
+
+Muszą zostać potwierdzone pomiarami.
+
+### 20. Podsumowanie
+
+Semi-Supervised Learning pozwala wykorzystać niewielki zbiór oznaczonych zdjęć oraz duży zbiór zdjęć bez etykiet.
+
+Transfer Learning zmniejsza zapotrzebowanie na dane i koszt treningu.
+
+Pseudo-Labeling umożliwia stopniowe rozszerzanie zbioru treningowego.
+
+Active Learning pomaga wybierać zdjęcia, których ręczne oznaczenie przyniesie największą korzyść.
+
+W przedstawionym hipotetycznym scenariuszu:
+
+- SSL osiąga accuracy 88% zamiast 78% dla baseline.
+- Oszczędność energii względem Fully Supervised wynosi około 70,8%.
+- Oszczędność kosztu oznaczania zdjęć wynosi 99%.
+
+Są to wyniki przykładowych obliczeń, a nie rzeczywiste pomiary.
+
+Wniosek końcowy:
+
+Najbardziej racjonalnym rozwiązaniem jest rozpoczęcie od lekkiego modelu wstępnie wytrenowanego, wykorzystanie pseudoetykiet i stopniowe rozszerzanie zbioru treningowego przy zachowaniu kontroli jakości, kosztów i zużycia energii.
