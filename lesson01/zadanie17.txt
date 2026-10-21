@@ -1,0 +1,970 @@
+# Lekcja 1 – Zadanie 17
+## Benchmark: Energy vs Accuracy – klasyfikacja tekstu
+
+### 1. Cel benchmarku
+
+Celem zadania jest teoretyczne porównanie pięciu metod klasyfikacji tekstu pod względem:
+
+- dokładności (accuracy),
+- energii zużywanej podczas treningu,
+- energii zużywanej podczas predykcji,
+- czasu treningu,
+- czasu predykcji,
+- łatwości wdrożenia,
+- efektywności Green AI.
+
+Porównywane metody:
+
+1. Keyword Matching – klasyfikacja regułowa.
+2. Logistic Regression + TF-IDF.
+3. Random Forest + TF-IDF.
+4. LSTM – sieć rekurencyjna.
+5. BERT – model typu Transformer.
+
+Jest to benchmark teoretyczny oparty na charakterystyce metod i przykładowym scenariuszu obliczeniowym.
+
+Nie przeprowadzono treningu ani pomiarów pięciu modeli.
+
+Podane wartości liczbowe są hipotetycznymi założeniami dydaktycznymi, a nie wynikami opublikowanych eksperymentów.
+
+### 2. Wspólny scenariusz testowy
+
+Zadanie biznesowe:
+
+Automatyczna klasyfikacja opinii klientów sklepu internetowego.
+
+Kategorie:
+
+- pozytywna,
+- neutralna,
+- negatywna.
+
+Dane:
+
+100 000 polskojęzycznych opinii.
+
+Podział:
+
+- trening: 80 000 opinii,
+- walidacja: 10 000 opinii,
+- test: 10 000 opinii.
+
+Dla wszystkich modeli należy stosować identyczny podział danych.
+
+Podział powinien zapobiegać przeciekowi informacji, np. przez występowanie niemal identycznych opinii w treningu i teście.
+
+Wszystkie modele powinny być oceniane na tym samym zbiorze testowym.
+
+Zakładamy:
+
+- klasyfikację trójklasową,
+- porównywalne przygotowanie danych,
+- identyczną definicję poprawnej odpowiedzi,
+- osobny pomiar treningu i inferencji,
+- pomiar zużycia energii CPU, GPU i RAM.
+
+Wartości czasu i energii w tabeli są ilustracyjne.
+
+Nie przypisujemy im statusu uniwersalnych parametrów modeli.
+
+### 3. Charakterystyka metod
+
+#### 3.1. Keyword Matching
+
+Metoda opiera się na regułach i słowach kluczowych.
+
+Przykład:
+
+Słowa pozytywne:
+
+świetny, dobry, polecam, doskonały.
+
+Słowa negatywne:
+
+fatalny, słaby, zepsuty, nie polecam.
+
+System analizuje tekst i przypisuje kategorię na podstawie zdefiniowanych reguł.
+
+Zalety:
+
+- brak treningu statystycznego,
+- niewielkie wymagania sprzętowe,
+- szybkie predykcje,
+- łatwe wyjaśnianie decyzji.
+
+Wady:
+
+- trudności z ironią,
+- trudności z kontekstem,
+- konieczność ręcznej aktualizacji reguł,
+- ograniczona obsługa synonimów i nietypowych sformułowań.
+
+Keyword Matching jest dobrym baseline.
+
+Energia potrzebna do tworzenia reguł nie jest tutaj traktowana jako energia treningu ML.
+
+#### 3.2. Logistic Regression + TF-IDF
+
+TF-IDF zamienia tekst na wektor cech.
+
+Logistic Regression uczy się przypisywać klasy na podstawie tych cech.
+
+Zalety:
+
+- stosunkowo szybki trening,
+- niskie koszty inferencji,
+- dobra interpretowalność współczynników,
+- skuteczny baseline dla klasyfikacji tekstu.
+
+Wady:
+
+- ograniczone rozumienie kolejności słów,
+- zależność od sposobu reprezentacji tekstu,
+- trudności z bardziej złożonym kontekstem.
+
+To bardzo rozsądny pierwszy model produkcyjny.
+
+#### 3.3. Random Forest + TF-IDF
+
+Random Forest to zespół drzew decyzyjnych.
+
+W tym scenariuszu model korzysta z reprezentacji TF-IDF.
+
+Zalety:
+
+- potrafi modelować zależności nieliniowe,
+- nie wymaga sieci neuronowej,
+- może być użyteczny przy dodatkowych cechach tabelarycznych.
+
+Wady:
+
+- może być pamięciochłonny,
+- wiele drzew zwiększa koszt predykcji,
+- przy bardzo dużych, rzadkich wektorach TF-IDF nie musi przewyższać regresji logistycznej.
+
+W klasyfikacji tekstu Random Forest nie jest automatycznie lepszy od Logistic Regression.
+
+#### 3.4. LSTM
+
+LSTM to rodzaj rekurencyjnej sieci neuronowej.
+
+Model przetwarza sekwencję tokenów i uczy się zależności między słowami.
+
+Zalety:
+
+- uwzględnia kolejność słów,
+- potrafi modelować zależności sekwencyjne,
+- może korzystać z wcześniej wytrenowanych embeddingów.
+
+Wady:
+
+- kosztowniejszy trening,
+- większa złożoność,
+- trudniejsza optymalizacja niż w prostych modelach liniowych.
+
+LSTM może być użyteczny, gdy zależności sekwencyjne mają duże znaczenie.
+
+#### 3.5. BERT
+
+BERT to model typu Transformer.
+
+Wykorzystuje reprezentacje kontekstowe słów.
+
+Przykładowo znaczenie słowa zależy od pozostałych słów w zdaniu.
+
+Zalety:
+
+- uwzględnianie kontekstu,
+- możliwość wykorzystania modelu wstępnie wytrenowanego,
+- potencjalnie wysoka jakość w złożonych zadaniach NLP.
+
+Wady:
+
+- większe wymagania sprzętowe,
+- kosztowniejszy fine-tuning,
+- większe zużycie pamięci,
+- wyższy koszt inferencji niż w lekkich modelach.
+
+W benchmarku zakładamy fine-tuning modelu wstępnie wytrenowanego.
+
+Nie uwzględniamy energii pierwotnego pretrainingu BERT.
+
+### 4. Tabela porównawcza – dokładność i energia
+
+Poniższe wartości są hipotetyczne i służą do analizy kompromisów.
+
+| Metoda | Accuracy | Energia treningu | Energia na 1000 predykcji |
+|---|---:|---:|---:|
+| Keyword Matching | 70% | 0 Wh | 0,02 Wh |
+| Logistic Regression + TF-IDF | 84% | 5 Wh | 0,05 Wh |
+| Random Forest + TF-IDF | 82% | 30 Wh | 0,40 Wh |
+| LSTM | 87% | 300 Wh | 2,00 Wh |
+| BERT fine-tuning | 92% | 1500 Wh | 5,00 Wh |
+
+Wartości energii treningu dotyczą pojedynczego przykładowego procesu przygotowania modelu.
+
+W rzeczywistym projekcie należy doliczyć:
+
+- przygotowanie danych,
+- strojenie hiperparametrów,
+- nieudane eksperymenty,
+- ponowny trening,
+- koszty infrastruktury.
+
+### 5. Tabela porównawcza – czas i wdrożenie
+
+Przykładowe czasy dla przyjętego scenariusza:
+
+| Metoda | Czas treningu | Czas na 1000 predykcji | Wdrożenie |
+|---|---:|---:|---|
+| Keyword Matching | Brak treningu ML | 0,5 s | Bardzo łatwe |
+| Logistic Regression | 2 min | 1 s | Łatwe |
+| Random Forest | 10 min | 8 s | Średnie |
+| LSTM | 2 h | 20 s | Trudniejsze |
+| BERT | 5 h | 30 s | Trudne |
+
+Są to założenia dydaktyczne, a nie zmierzone czasy.
+
+Czas na 1000 predykcji oznacza całkowity czas przetworzenia partii 1000 opinii.
+
+Nie jest to opóźnienie pojedynczego żądania użytkownika.
+
+Wyniki zależą między innymi od długości tekstu, wielkości batcha, tokenizacji i sprzętu.
+
+### 6. Interpretacja dokładności
+
+W hipotetycznym przykładzie:
+
+- Keyword Matching: 70%.
+- Logistic Regression: 84%.
+- Random Forest: 82%.
+- LSTM: 87%.
+- BERT: 92%.
+
+Najwyższą dokładność ma BERT.
+
+Nie oznacza to jednak, że zawsze będzie najlepszy biznesowo.
+
+Różnica między BERT a Logistic Regression:
+
+92% - 84% = 8 punktów procentowych.
+
+Różnica między LSTM a Logistic Regression:
+
+87% - 84% = 3 punkty procentowe.
+
+Dodatkowa jakość może być cenna, ale należy zestawić ją z kosztami.
+
+### 7. Dlaczego accuracy nie wystarcza?
+
+Accuracy to odsetek poprawnych klasyfikacji.
+
+Accuracy = liczba poprawnych predykcji / liczba wszystkich predykcji.
+
+Jeżeli klasy są niezrównoważone, sama accuracy może wprowadzać w błąd.
+
+Dlatego należy również mierzyć:
+
+- Precision dla poszczególnych klas.
+- Recall dla poszczególnych klas.
+- Macro F1-score.
+- Weighted F1-score.
+- Confusion Matrix.
+
+W klasyfikacji opinii szczególnie ważne mogą być błędy między klasą neutralną a pozytywną lub negatywną.
+
+Model powinien być oceniany nie tylko według jednego wskaźnika.
+
+### 8. Analiza energii treningu
+
+Zestawienie:
+
+Keyword Matching: 0 Wh.
+
+Logistic Regression: 5 Wh.
+
+Random Forest: 30 Wh.
+
+LSTM: 300 Wh.
+
+BERT: 1500 Wh.
+
+W przypadku Keyword Matching zero oznacza brak treningu modelu ML.
+
+Nie oznacza zerowego kosztu przygotowania i utrzymywania reguł.
+
+Porównanie BERT z Logistic Regression:
+
+1500 / 5 = 300.
+
+W przyjętym przykładzie fine-tuning BERT zużywa 300 razy więcej energii niż trening Logistic Regression.
+
+Porównanie LSTM z Logistic Regression:
+
+300 / 5 = 60.
+
+W przyjętym przykładzie LSTM zużywa 60 razy więcej energii.
+
+Różnice są konsekwencją przyjętych założeń, a nie ogólnym prawem dotyczącym tych architektur.
+
+### 9. Analiza energii inferencji
+
+Energia na 1000 predykcji:
+
+- Keyword Matching: 0,02 Wh.
+- Logistic Regression: 0,05 Wh.
+- Random Forest: 0,40 Wh.
+- LSTM: 2,00 Wh.
+- BERT: 5,00 Wh.
+
+Porównanie BERT z Logistic Regression:
+
+5,00 / 0,05 = 100.
+
+W naszym scenariuszu 1000 predykcji BERT zużywa 100 razy więcej energii.
+
+Przy dużym ruchu internetowym koszt inferencji może być ważniejszy niż jednorazowy koszt treningu.
+
+### 10. Scenariusz produkcyjny – milion opinii dziennie
+
+Załóżmy:
+
+1 000 000 klasyfikacji dziennie.
+
+To 1000 pakietów po 1000 opinii.
+
+Energia inferencji na dzień:
+
+Keyword Matching:
+
+1000 * 0,02 Wh = 20 Wh = 0,02 kWh.
+
+Logistic Regression:
+
+1000 * 0,05 Wh = 50 Wh = 0,05 kWh.
+
+Random Forest:
+
+1000 * 0,40 Wh = 400 Wh = 0,40 kWh.
+
+LSTM:
+
+1000 * 2,00 Wh = 2000 Wh = 2,00 kWh.
+
+BERT:
+
+1000 * 5,00 Wh = 5000 Wh = 5,00 kWh.
+
+Tabela:
+
+| Metoda | Energia inferencji na dzień |
+|---|---:|
+| Keyword Matching | 0,02 kWh |
+| Logistic Regression | 0,05 kWh |
+| Random Forest | 0,40 kWh |
+| LSTM | 2,00 kWh |
+| BERT | 5,00 kWh |
+
+Wartości nie uwzględniają wszystkich kosztów serwerów, sieci i przechowywania danych.
+
+### 11. Scenariusz roczny
+
+Przy milionie klasyfikacji dziennie przez 365 dni:
+
+Keyword Matching:
+
+0,02 * 365 = 7,3 kWh.
+
+Logistic Regression:
+
+0,05 * 365 = 18,25 kWh.
+
+Random Forest:
+
+0,40 * 365 = 146 kWh.
+
+LSTM:
+
+2,00 * 365 = 730 kWh.
+
+BERT:
+
+5,00 * 365 = 1825 kWh.
+
+Różnica między BERT a Logistic Regression:
+
+1825 - 18,25 = 1806,75 kWh rocznie.
+
+Są to hipotetyczne koszty samej inferencji.
+
+Nie uwzględniają energii treningu ani pełnej infrastruktury.
+
+### 12. Łączna energia treningu i inferencji
+
+Przyjmijmy:
+
+- jeden trening modelu,
+- milion predykcji dziennie,
+- 365 dni działania.
+
+Wtedy:
+
+E_total = E_training + E_inference_year.
+
+Keyword Matching:
+
+0 + 7,3 = 7,3 kWh.
+
+Logistic Regression:
+
+0,005 + 18,25 = 18,255 kWh.
+
+Random Forest:
+
+0,030 + 146 = 146,030 kWh.
+
+LSTM:
+
+0,300 + 730 = 730,300 kWh.
+
+BERT:
+
+1,500 + 1825 = 1826,500 kWh.
+
+Tabela:
+
+| Metoda | Trening | Inferencja roczna | Łącznie |
+|---|---:|---:|---:|
+| Keyword Matching | 0 kWh | 7,3 kWh | 7,3 kWh |
+| Logistic Regression | 0,005 kWh | 18,25 kWh | 18,255 kWh |
+| Random Forest | 0,030 kWh | 146 kWh | 146,030 kWh |
+| LSTM | 0,300 kWh | 730 kWh | 730,300 kWh |
+| BERT | 1,500 kWh | 1825 kWh | 1826,500 kWh |
+
+Jest to uproszczony model kosztów.
+
+W rzeczywistym systemie modele mogą być trenowane wielokrotnie, a infrastruktura działać również między żądaniami.
+
+### 13. Green AI – efektywność jakości względem energii
+
+Można analizować dokładność względem energii.
+
+Nie należy jednak traktować prostego ilorazu accuracy / energia jako uniwersalnego wskaźnika jakości.
+
+Przykład:
+
+Logistic Regression:
+
+84 / 0,05 = 1680 punktów procentowych na Wh zużytej energii podczas 1000 predykcji.
+
+BERT:
+
+92 / 5 = 18,4 punktu procentowego na Wh.
+
+Wskaźnik ten jest bardzo wrażliwy na małe wartości energii i nie uwzględnia znaczenia biznesowego dodatkowej dokładności.
+
+Dlatego lepiej analizować:
+
+- przyrost accuracy,
+- dodatkową energię,
+- koszt dodatkowej poprawnej klasyfikacji,
+- ograniczenia jakościowe,
+- całkowity koszt użytkowania.
+
+### 14. Dodatkowa energia za poprawę jakości
+
+Porównajmy Logistic Regression i BERT.
+
+Accuracy:
+
+84% i 92%.
+
+Różnica:
+
+8 punktów procentowych.
+
+Energia na 1000 predykcji:
+
+0,05 Wh i 5 Wh.
+
+Różnica:
+
+4,95 Wh.
+
+Dodatkowa energia na jeden punkt procentowy poprawy:
+
+4,95 / 8 = 0,61875 Wh.
+
+W tym uproszczonym porównaniu poprawa o jeden punkt procentowy accuracy odpowiada dodatkowym 0,61875 Wh na pakiet 1000 opinii.
+
+Nie jest to uniwersalna miara efektywności modeli.
+
+### 15. Ile dodatkowych opinii klasyfikuje poprawnie BERT?
+
+Załóżmy, że różnica accuracy utrzymuje się w produkcji.
+
+Dla 1 000 000 opinii:
+
+Logistic Regression:
+
+0,84 * 1 000 000 = 840 000 poprawnych klasyfikacji.
+
+BERT:
+
+0,92 * 1 000 000 = 920 000 poprawnych klasyfikacji.
+
+Różnica:
+
+80 000 dodatkowych poprawnych klasyfikacji.
+
+Dodatkowa energia:
+
+5,00 kWh - 0,05 kWh = 4,95 kWh.
+
+Energia przypadająca na jedną dodatkową poprawną klasyfikację:
+
+4,95 kWh / 80 000 = 0,000061875 kWh.
+
+Po przeliczeniu:
+
+0,061875 Wh na dodatkową poprawną klasyfikację.
+
+To ilustracyjny rachunek, a nie prognoza rzeczywistego działania systemu.
+
+### 16. Wykres Accuracy vs Energy
+
+Przygotowujemy wykres punktowy.
+
+Oś X:
+
+Energia na 1000 predykcji w Wh.
+
+Oś Y:
+
+Accuracy w procentach.
+
+Punkty:
+
+- Keyword Matching: (0,02; 70).
+- Logistic Regression: (0,05; 84).
+- Random Forest: (0,40; 82).
+- LSTM: (2,00; 87).
+- BERT: (5,00; 92).
+
+Ze względu na duże różnice zużycia energii używamy skali logarytmicznej osi X.
+
+Wykres zostanie wygenerowany w Pythonie i zapisany jako:
+
+zadanie17_wykres.png
+
+Kod źródłowy:
+
+zadanie17_wykres.py
+
+### 17. Analiza wykresu
+
+Keyword Matching:
+
+Najniższe zużycie energii, ale najniższa dokładność.
+
+Logistic Regression:
+
+Duży wzrost accuracy przy niewielkim wzroście energii.
+
+Random Forest:
+
+W przyjętym scenariuszu ma niższą accuracy i większe zużycie energii niż Logistic Regression.
+
+LSTM:
+
+Wyższa accuracy, ale wyraźnie większe zapotrzebowanie energetyczne.
+
+BERT:
+
+Najwyższa accuracy, ale najwyższy koszt energetyczny.
+
+### 18. Analiza Pareto
+
+Model A dominuje model B, jeżeli:
+
+- ma nie mniejsze accuracy,
+- zużywa nie więcej energii,
+- jest lepszy przynajmniej w jednym z tych kryteriów.
+
+W naszym scenariuszu Logistic Regression dominuje Random Forest.
+
+Logistic Regression:
+
+84%, 0,05 Wh.
+
+Random Forest:
+
+82%, 0,40 Wh.
+
+Logistic Regression ma wyższą dokładność i zużywa mniej energii.
+
+Random Forest nie należy więc do granicy Pareto dla tych dwóch kryteriów.
+
+Pozostałe modele tworzą kompromis między accuracy a energią:
+
+- Keyword Matching,
+- Logistic Regression,
+- LSTM,
+- BERT.
+
+Analiza Pareto zależy od przyjętych liczb.
+
+Przy innych danych i konfiguracjach wyniki mogą być odmienne.
+
+### 19. Który model wybrać do prostego projektu?
+
+Rekomendacja:
+
+Keyword Matching lub Logistic Regression.
+
+Keyword Matching:
+
+Gdy wymagania są proste i łatwe do zapisania jako reguły.
+
+Logistic Regression:
+
+Gdy potrzebna jest większa elastyczność i możliwość uczenia na danych.
+
+Dla typowej klasyfikacji opinii preferowałbym Logistic Regression jako pierwszy model ML.
+
+### 20. Który model wybrać do dużego sklepu?
+
+Rekomendacja:
+
+Logistic Regression jako baseline i potencjalne rozwiązanie produkcyjne.
+
+Uzasadnienie:
+
+- dobra hipotetyczna accuracy,
+- niski koszt inferencji,
+- łatwość wdrożenia,
+- niewielkie wymagania sprzętowe.
+
+Jeżeli jakość jest niewystarczająca, należy przetestować model Transformer.
+
+Można także zastosować system kaskadowy.
+
+### 21. Który model wybrać przy najwyższych wymaganiach jakościowych?
+
+Rekomendacja:
+
+BERT jako kandydat do eksperymentów.
+
+Uzasadnienie:
+
+- reprezentacje kontekstowe,
+- możliwość wykorzystania pretrainingu,
+- potencjał poprawy jakości.
+
+Warunek:
+
+Rzeczywiste wyniki muszą potwierdzić, że dodatkowa jakość uzasadnia koszty.
+
+### 22. Który model wybrać na słaby sprzęt?
+
+Rekomendacja:
+
+Keyword Matching lub Logistic Regression.
+
+Powody:
+
+- małe zapotrzebowanie na pamięć,
+- niski koszt inferencji,
+- możliwość działania na CPU.
+
+LSTM i BERT mogą wymagać większych zasobów, szczególnie podczas treningu.
+
+### 23. Architektura hybrydowa
+
+Proponuję system trzystopniowy.
+
+Etap 1:
+
+Keyword Matching dla jednoznacznych przypadków.
+
+Etap 2:
+
+Logistic Regression dla większości pozostałych opinii.
+
+Etap 3:
+
+BERT dla przypadków niejednoznacznych.
+
+Schemat:
+
+                    +------------------+
+                    |   OPINIA KLIENTA |
+                    +---------+--------+
+                              |
+                              v
+                    +------------------+
+                    | KEYWORD MATCHING |
+                    +---------+--------+
+                              |
+                    +---------+---------+
+                    |                   |
+             Jednoznaczne          Niejednoznaczne
+                    |                   |
+                    v                   v
+               Wynik reguły    +--------------------+
+                               | LOGISTIC REGRESSION|
+                               +---------+----------+
+                                         |
+                               +---------+---------+
+                               |                   |
+                         Wysoka pewność       Niska pewność
+                               |                   |
+                               v                   v
+                          Wynik modelu      +------------+
+                                            |    BERT    |
+                                            +------+-----+
+                                                   |
+                                                   v
+                                              Wynik końcowy
+
+Wdrożenie takiej kaskady wymaga kalibracji prawdopodobieństw i testów jakości.
+
+Nie należy zakładać, że reguły zawsze poprawnie rozpoznają jednoznaczne przypadki.
+
+### 24. Hipotetyczny koszt energetyczny kaskady
+
+Załóżmy:
+
+- 20% opinii kończy analizę na regułach,
+- 70% kończy analizę na Logistic Regression,
+- 10% wymaga BERT.
+
+Przyjmujemy, że każda opinia przechodzi przez reguły.
+
+Pozostałe 80% przechodzi przez Logistic Regression.
+
+Ostatnie 10% przechodzi dodatkowo przez BERT.
+
+Energia na 1000 opinii:
+
+Keyword Matching:
+
+0,02 Wh.
+
+Logistic Regression:
+
+0,80 * 0,05 = 0,04 Wh.
+
+BERT:
+
+0,10 * 5,00 = 0,50 Wh.
+
+Łącznie:
+
+0,02 + 0,04 + 0,50 = 0,56 Wh.
+
+Pełny BERT:
+
+5,00 Wh na 1000 opinii.
+
+Oszczędność:
+
+5,00 - 0,56 = 4,44 Wh.
+
+Procentowo:
+
+4,44 / 5,00 * 100% = 88,8%.
+
+W tym hipotetycznym scenariuszu kaskada zużywa o 88,8% mniej energii inferencji niż uruchamianie BERT dla każdej opinii.
+
+Nie znamy jednak jej accuracy.
+
+Nie można twierdzić, że kaskada zachowuje dokładność BERT bez przeprowadzenia eksperymentu.
+
+### 25. Optymalizacja Green AI
+
+#### A. Transfer Learning
+
+Zamiast trenować BERT od początku, wykorzystujemy model wstępnie wytrenowany.
+
+#### B. Distillation
+
+Można wytrenować mniejszy model na podstawie zachowania większego modelu.
+
+#### C. Quantization
+
+Zmniejszenie precyzji reprezentacji wag i obliczeń może ograniczyć zapotrzebowanie na pamięć i energię.
+
+Wpływ zależy od sprzętu i implementacji.
+
+#### D. Przetwarzanie wsadowe
+
+Batching może zwiększyć wykorzystanie CPU i GPU.
+
+#### E. Cache
+
+Powtarzające się identyczne opinie nie zawsze muszą być analizowane ponownie.
+
+Trzeba uwzględnić kontekst i wersję modelu.
+
+#### F. Early Stopping
+
+Zatrzymywanie treningu, gdy wyniki walidacyjne przestają się poprawiać.
+
+#### G. Mniejsze modele
+
+Przed wdrożeniem dużego Transformera warto przetestować lżejsze warianty.
+
+#### H. Ograniczenie długości tekstu
+
+Zmniejszenie liczby tokenów może ograniczyć koszt przetwarzania.
+
+Nie wolno jednak usuwać informacji istotnych dla klasyfikacji.
+
+### 26. Jak zmierzyć rzeczywiste zużycie energii?
+
+Do pomiarów można wykorzystać:
+
+- CodeCarbon,
+- liczniki energii sprzętu,
+- narzędzia profilujące CPU i GPU.
+
+Przykładowy proces:
+
+1. Uruchomić pomiar energii.
+2. Wytrenować model.
+3. Zakończyć pomiar.
+4. Zapisać czas i energię.
+5. Uruchomić osobny pomiar inferencji.
+6. Przetworzyć ustaloną liczbę opinii.
+7. Powtórzyć eksperyment.
+8. Obliczyć średnie i rozrzut wyników.
+
+Należy stosować tę samą metodę pomiaru dla wszystkich modeli.
+
+Trzeba również ustalić, czy uwzględniamy energię całego komputera, czy tylko przypisaną do procesu.
+
+### 27. Ryzyka metodologiczne
+
+#### A. Nierówny sprzęt
+
+CPU i GPU mogą mieć różne charakterystyki energetyczne.
+
+#### B. Różna długość opinii
+
+Długie teksty mogą zwiększać koszt inferencji.
+
+#### C. Różne implementacje
+
+Biblioteki i optymalizacje mogą istotnie wpływać na wydajność.
+
+#### D. Nieporównywalne modele
+
+BERT po fine-tuningu i Logistic Regression mogą mieć różny zakres przygotowania danych.
+
+#### E. Data Leakage
+
+Przeciek informacji może sztucznie zawyżać accuracy.
+
+#### F. Koszty pominięte w tabelach
+
+Trening, strojenie, tokenizacja, przygotowanie danych i infrastruktura mogą zwiększać zużycie energii.
+
+#### G. Niezrównoważone klasy
+
+Accuracy może ukrywać słabą jakość rozpoznawania rzadszych klas.
+
+### 28. Rekomendacje według scenariusza
+
+| Scenariusz | Rekomendacja | Uzasadnienie |
+|---|---|---|
+| Proste reguły biznesowe | Keyword Matching | Prostota i minimalne wymagania |
+| Standardowa klasyfikacja opinii | Logistic Regression + TF-IDF | Dobry kompromis jakości i kosztu |
+| Tekst z dodatkowymi cechami tabelarycznymi | Random Forest jako eksperyment | Możliwość modelowania nieliniowości |
+| Zadania sekwencyjne | LSTM jako kandydat | Uwzględnianie kolejności tokenów |
+| Złożony kontekst językowy | BERT | Potencjalnie wysoka jakość |
+| Bardzo duży ruch | Logistic Regression lub kaskada | Kontrola kosztów inferencji |
+| Wysokie wymagania Green AI | Najlżejszy model spełniający próg jakości | Minimalizacja energii przy zachowaniu wymagań |
+
+### 29. Rekomendacja końcowa
+
+Najbardziej racjonalnym pierwszym wyborem dla opisanego systemu jest Logistic Regression + TF-IDF.
+
+Powody:
+
+1. Prosta implementacja.
+2. Niski koszt treningu.
+3. Niski koszt inferencji.
+4. Możliwość działania na CPU.
+5. Łatwość aktualizacji.
+6. Dobra baza porównawcza dla bardziej zaawansowanych modeli.
+
+Jeżeli wyniki okażą się niewystarczające, należy przetestować BERT i ocenić, czy wzrost jakości uzasadnia dodatkowy koszt.
+
+Dla dużej skali działania interesującym rozwiązaniem może być kaskada:
+
+Keyword Matching -> Logistic Regression -> BERT.
+
+Ostateczny wybór wymaga pomiarów jakości, energii i opóźnień na rzeczywistych danych.
+
+### 30. Źródła i dalsza weryfikacja
+
+CodeCarbon – dokumentacja:
+
+https://docs.codecarbon.io/
+
+CodeCarbon – metodologia pomiarów:
+
+https://docs.codecarbon.io/3.2/explanation/methodology/
+
+scikit-learn – dokumentacja:
+
+https://scikit-learn.org/stable/
+
+PyTorch – dokumentacja:
+
+https://pytorch.org/docs/stable/
+
+Hugging Face Transformers – dokumentacja:
+
+https://huggingface.co/docs/transformers/
+
+Dokumentacja CodeCarbon opisuje sposoby monitorowania energii i emisji.
+
+Dokumentacje bibliotek pomagają odtworzyć konfiguracje modeli.
+
+Żadne z tych źródeł nie stanowi potwierdzenia konkretnych wartości liczbowych użytych w hipotetycznych tabelach.
+
+### 31. Podsumowanie
+
+W zadaniu porównano pięć podejść do klasyfikacji tekstu:
+
+- Keyword Matching,
+- Logistic Regression + TF-IDF,
+- Random Forest,
+- LSTM,
+- BERT.
+
+Analiza obejmuje:
+
+- accuracy,
+- energię treningu,
+- energię inferencji,
+- czas treningu,
+- czas predykcji,
+- łatwość wdrożenia,
+- analizę Pareto,
+- Green AI,
+- rekomendacje biznesowe.
+
+Najważniejszy wniosek:
+
+Najbardziej złożony model nie zawsze jest najlepszym wyborem.
+
+Dla wielu zastosowań prostszy model może zapewnić wystarczającą jakość przy znacznie mniejszym zużyciu zasobów.
+
+BERT warto stosować wtedy, gdy dodatkowa jakość ma rzeczywistą wartość biznesową.
+
+Właściwa strategia Green AI polega na wyborze najlżejszego rozwiązania, które spełnia wymagania jakościowe, bezpieczeństwa i wydajności.
+
+Wszystkie przedstawione wartości liczbowe są przykładowe i wymagają weryfikacji eksperymentalnej.
