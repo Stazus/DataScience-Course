@@ -1,0 +1,41 @@
+Zadanie 3 - Regresja vs Klasyfikacja
+
+**1. Przewidywanie liczby sprzedanych produktów w następnym miesiącu**
+
+Typ: regresja.
+
+Uzasadnienie: Model przewiduje wartość liczbową określającą liczbę produktów, które zostaną sprzedane w kolejnym miesiącu. Chociaż liczba produktów jest liczbą całkowitą, w tym zadaniu traktujemy jej przewidywanie jako problem regresji.
+
+Przykładowy wynik modelu: 1250 sprzedanych produktów.
+
+**2. Określenie, czy klient zrezygnuje z usługi (tak/nie)**
+
+Typ: klasyfikacja binarna.
+
+Uzasadnienie: Model przypisuje klienta do jednej z dwóch kategorii: zrezygnuje z usługi albo nie zrezygnuje. Nie przewiduje wartości ciągłej, lecz określoną klasę.
+
+Przykładowy wynik modelu: TAK - klient zrezygnuje z usługi.
+
+**3. Szacowanie czasu dostawy paczki**
+
+Typ: regresja.
+
+Uzasadnienie: Model przewiduje wartość liczbową określającą czas potrzebny na dostarczenie przesyłki. Czas może przyjmować różne wartości, dlatego jest to problem regresji.
+
+Przykładowy wynik modelu: 2,5 dnia.
+
+**4. Klasyfikacja gatunku kwiatu (Iris setosa/versicolor/virginica)**
+
+Typ: klasyfikacja wieloklasowa.
+
+Uzasadnienie: Model przypisuje kwiat do jednej z trzech określonych kategorii gatunkowych. Ponieważ istnieją więcej niż dwie możliwe klasy, jest to klasyfikacja wieloklasowa.
+
+Przykładowy wynik modelu: Iris virginica.
+
+**5. Przewidywanie ceny akcji za tydzień**
+
+Typ: regresja.
+
+Uzasadnienie: Model przewiduje przyszłą cenę akcji, czyli wartość liczbową. Ponieważ wynikiem jest konkretna cena, a nie kategoria, jest to problem regresji.
+
+Przykładowy wynik modelu: 185,50 zł za jedną akcję.
