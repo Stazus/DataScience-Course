@@ -1,0 +1,73 @@
+Zadanie 7 - Transfer Learning
+
+Dane:
+
+Firma farmaceutyczna chce klasyfikować zdjęcia komórek jako zdrowe lub chore.
+
+Dostępny zbiór: 2 000 opisanych zdjęć.
+
+Opcja A: Trenowanie modelu od zera na 2 000 zdjęciach.
+
+Opcja B: Wykorzystanie gotowego modelu wytrenowanego na milionach zdjęć medycznych i dostosowanie go do klasyfikacji komórek.
+
+**1. Która opcja zużyje mniej energii?**
+
+Wybrałbym opcję B, czyli transfer learning (uczenie transferowe).
+
+W tym podejściu wykorzystujemy model, który został już wcześniej wytrenowany na dużym zbiorze obrazów medycznych. Model posiada wyuczone cechy obrazów, które mogą być przydatne w rozpoznawaniu zdrowych i chorych komórek.
+
+Zamiast trenować całą sieć neuronową od początku, możemy dostosować jej ostatnie warstwy do naszego zadania. Możemy również zamrozić część wcześniejszych warstw, aby ograniczyć liczbę trenowanych parametrów.
+
+Dzięki temu trening może trwać krócej i wymagać mniejszej liczby obliczeń.
+
+Opcja B prawdopodobnie zużyje mniej energii podczas dostosowywania modelu. Nie można jednak zagwarantować tego bez znajomości architektury modeli, sprzętu i czasu treningu.
+
+Należy również pamiętać, że wcześniejsze wytrenowanie gotowego modelu wymagało energii, ale jego koszt może być rozłożony na wiele późniejszych zastosowań.
+
+**2. Która opcja da lepsze wyniki?**
+
+Prawdopodobnie lepsze wyniki zapewni opcja B, czyli transfer learning.
+
+Posiadamy tylko 2 000 opisanych zdjęć, co może być niewystarczające do skutecznego wytrenowania dużej sieci neuronowej od zera.
+
+Model trenowany od początku może mieć problemy z generalizacją i nadmiernie dopasować się do danych treningowych (overfitting).
+
+Model wstępnie wytrenowany na milionach zdjęć medycznych posiada już wiedzę o różnych cechach obrazów. Możemy wykorzystać tę wiedzę i dostosować model do rozpoznawania zdrowych oraz chorych komórek.
+
+Transfer learning może dzięki temu zapewnić:
+- Lepszą skuteczność przy niewielkiej liczbie danych.
+- Krótszy czas treningu.
+- Mniejsze ryzyko przeuczenia.
+- Mniejsze wymagania obliczeniowe podczas dostosowywania modelu.
+
+Nie ma jednak gwarancji, że opcja B zawsze będzie lepsza. Duże znaczenie ma podobieństwo danych wykorzystanych podczas wcześniejszego treningu do zdjęć komórek.
+
+Skuteczność obu rozwiązań należy porównać na niezależnym zbiorze testowym, wykorzystując m.in. accuracy, precision, recall i F1-score.
+
+W przypadku rozpoznawania chorych komórek szczególnie ważna może być wysoka czułość (recall), aby ograniczać liczbę chorych komórek błędnie uznanych za zdrowe.
+
+**3. Dlaczego transfer learning to podejście Green AI?**
+
+Green AI to podejście do sztucznej inteligencji, które uwzględnia nie tylko skuteczność modeli, ale również zużycie energii, zasobów obliczeniowych i wpływ na środowisko.
+
+Transfer learning wspiera Green AI, ponieważ:
+
+- Pozwala ponownie wykorzystać wcześniej wytrenowany model.
+- Ogranicza potrzebę trenowania dużych modeli od początku.
+- Może skrócić czas treningu.
+- Może zmniejszyć zużycie energii elektrycznej.
+- Może ograniczyć wykorzystanie CPU i GPU.
+- Umożliwia osiąganie dobrych wyników przy mniejszej liczbie danych.
+- Pozwala wykorzystywać ten sam model bazowy w wielu różnych zastosowaniach.
+
+Mniejsze zużycie energii może również oznaczać mniejszy ślad węglowy, zależnie od źródła wykorzystywanej energii.
+
+**Wniosek:**
+
+W przedstawionym przypadku wybrałbym opcję B, czyli transfer learning.
+
+Firma posiada tylko 2 000 opisanych zdjęć komórek, dlatego wykorzystanie wcześniej wytrenowanego modelu jest rozsądnym rozwiązaniem.
+
+Transfer learning prawdopodobnie pozwoli uzyskać lepszą skuteczność przy krótszym czasie treningu i mniejszym zużyciu zasobów obliczeniowych.
+
+Ostateczną decyzję należy jednak podjąć po porównaniu jakości modeli oraz rzeczywistego zużycia energii.
