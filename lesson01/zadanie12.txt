@@ -1,0 +1,458 @@
+# Lekcja 1 – Zadanie 12
+## Comparison: reguły vs Machine Learning
+
+### 1. Opis problemu
+
+Celem zadania jest porównanie dwóch podejść do automatycznej moderacji komentarzy na forum internetowym:
+
+1. Tradycyjnego programowania opartego na regułach.
+2. Machine Learning (ML), czyli uczenia maszynowego.
+
+System powinien wykrywać komentarze obraźliwe, zawierające wyzwiska, groźby, mowę nienawiści oraz inne treści naruszające regulamin forum.
+
+Główne wymagania:
+
+- wysoka skuteczność wykrywania szkodliwych treści,
+- ograniczenie niesłusznego blokowania komentarzy,
+- szybkie przetwarzanie wiadomości,
+- łatwość utrzymania i rozwoju systemu,
+- racjonalne zużycie energii,
+- kontrola kosztów infrastruktury i moderacji.
+
+Ważne jest również rozróżnienie między treściami faktycznie obraźliwymi a cytatami, żartami, dyskusją naukową czy zgłaszaniem cudzych wypowiedzi.
+
+### 2. Rozwiązanie oparte na tradycyjnych regułach
+
+W podejściu regułowym programista sam definiuje warunki, na podstawie których komentarz zostaje oznaczony jako potencjalnie obraźliwy.
+
+Przykładowe reguły:
+
+1. Sprawdzenie, czy komentarz zawiera słowa z listy niedozwolonych wyrażeń.
+2. Wykrywanie określonych kombinacji słów i zwrotów.
+3. Wykrywanie prób ukrywania wyrazów przez zastępowanie liter cyframi lub znakami.
+4. Ograniczanie powtarzających się wiadomości i spamu.
+5. Uwzględnienie liczby wcześniejszych naruszeń regulaminu przez użytkownika.
+
+Przykładowy uproszczony algorytm:
+
+START
+  |
+  v
+POBRANIE KOMENTARZA
+  |
+  v
+NORMALIZACJA TEKSTU
+  |
+  v
+SPRAWDZENIE LISTY WYRAŻEŃ
+  |
+  v
+SPRAWDZENIE DODATKOWYCH REGUŁ
+  |
+  v
+CZY WYKRYTO NARUSZENIE?
+  |
+  +--> TAK: oznaczenie do moderacji
+  |
+  +--> NIE: publikacja komentarza
+
+Przykład działania:
+
+Komentarz zawierający wyrażenie znajdujące się na liście zakazanych zwrotów może zostać automatycznie skierowany do moderatora.
+
+Ważne ograniczenie:
+
+Samo wystąpienie określonego słowa nie zawsze oznacza, że wypowiedź jest obraźliwa.
+
+Przykładowo cytowanie obraźliwej wypowiedzi w celu jej krytyki nie powinno automatycznie prowadzić do blokady.
+
+Zalety podejścia regułowego:
+
+- Prosta implementacja.
+- Łatwość wyjaśnienia decyzji.
+- Brak konieczności trenowania modelu.
+- Zwykle niewielkie wymagania sprzętowe.
+- Możliwość szybkiego dodawania pojedynczych reguł.
+
+Wady:
+
+- Słabe rozumienie kontekstu.
+- Trudność wykrywania ironii i sarkazmu.
+- Podatność na omijanie filtrów.
+- Konieczność ręcznej aktualizacji reguł.
+- Ryzyko blokowania poprawnych wypowiedzi.
+- Rosnąca złożoność przy dużej liczbie wyjątków.
+
+### 3. Rozwiązanie oparte na Machine Learning
+
+W podejściu ML system uczy się rozpoznawać obraźliwe komentarze na podstawie przykładów.
+
+Jest to przede wszystkim problem klasyfikacji tekstu.
+
+W najprostszej wersji można zastosować klasyfikację binarną:
+
+- 0 – komentarz akceptowalny,
+- 1 – komentarz naruszający regulamin.
+
+Bardziej zaawansowany system może wykorzystywać klasyfikację wieloetykietową, ponieważ jeden komentarz może jednocześnie zawierać np. wyzwiska, groźby i mowę nienawiści.
+
+#### Dane treningowe
+
+Potrzebujemy zbioru komentarzy oznaczonych przez moderatorów lub odpowiednio przeszkolonych anotatorów.
+
+Przykładowe etykiety:
+
+- komentarz poprawny,
+- obraźliwy,
+- zawierający groźby,
+- zawierający mowę nienawiści,
+- spam.
+
+Etykiety muszą wynikać z jasno określonej polityki moderacji.
+
+#### Przygotowanie danych
+
+Etapy:
+
+1. Zebranie i bezpieczne przechowywanie komentarzy.
+2. Usunięcie duplikatów oraz kontrola jakości danych.
+3. Anonimizacja lub pseudonimizacja danych osobowych, gdy jest potrzebna.
+4. Oznaczenie komentarzy przez moderatorów.
+5. Podział na zbiory treningowy, walidacyjny i testowy.
+6. Przekształcenie tekstu na reprezentację zrozumiałą dla modelu.
+
+#### Proponowane modele
+
+A. TF-IDF + Logistic Regression
+
+Prosty model bazowy.
+
+Zalety:
+
+- Szybkie trenowanie.
+- Niewielkie wymagania obliczeniowe.
+- Stosunkowo łatwa interpretacja.
+- Niskie koszty predykcji.
+
+Wady:
+
+- Ograniczone rozumienie kontekstu.
+- Trudność w rozpoznawaniu bardziej złożonych wypowiedzi.
+
+B. TF-IDF + Linear SVM
+
+Model klasyfikacyjny, który może dobrze sprawdzać się przy dużej liczbie cech tekstowych.
+
+Zalety:
+
+- Często dobra skuteczność dla klasyfikacji tekstu.
+- Szybkie przewidywanie.
+- Możliwość pracy na CPU.
+
+Wady:
+
+- Ograniczone rozumienie znaczenia całej wypowiedzi.
+- Konieczność odpowiedniego przygotowania danych.
+
+C. Model Transformer, np. BERT lub model dostosowany do języka polskiego
+
+Model analizuje słowa w kontekście całej wypowiedzi.
+
+Zalety:
+
+- Potencjalnie lepsze rozpoznawanie kontekstu.
+- Większa elastyczność językowa.
+- Możliwość wykrywania bardziej złożonych form obraźliwych treści.
+
+Wady:
+
+- Większe zużycie zasobów.
+- Wyższe koszty trenowania i predykcji.
+- Większa złożoność wdrożenia.
+
+Ostateczny wybór modelu powinien wynikać z pomiarów na reprezentatywnych danych, a nie tylko z jego popularności.
+
+### 4. Architektura systemu ML
+
+Proponowany przepływ:
+
+KOMENTARZ UŻYTKOWNIKA
+         |
+         v
+WSTĘPNE PRZETWARZANIE TEKSTU
+         |
+         v
+WEKTORYZACJA LUB TOKENIZACJA
+         |
+         v
+MODEL KLASYFIKACYJNY ML
+         |
+         v
+WYNIK RYZYKA NARUSZENIA
+         |
+         v
+SILNIK DECYZYJNY
+         |
+         +--> Niskie ryzyko: publikacja
+         |
+         +--> Średnie ryzyko: kontrola moderatora
+         |
+         +--> Wysokie ryzyko: czasowe ukrycie i weryfikacja
+         |
+         v
+MONITORING I INFORMACJA ZWROTNA
+
+Model powinien zwracać wynik ryzyka, a nie jedynie odpowiedź TAK/NIE.
+
+Progi decyzyjne należy ustalić na podstawie testów, polityki forum i kosztów błędnych decyzji.
+
+### 5. Tabela porównawcza: reguły vs ML
+
+| Kryterium | Tradycyjne reguły | Machine Learning |
+|---|---|---|
+| Dokładność | Dobra dla znanych, jednoznacznych wzorców; ograniczona przy złożonym języku | Potencjalnie wyższa przy dobrych danych treningowych |
+| Rozumienie kontekstu | Bardzo ograniczone | Lepsze, zwłaszcza przy modelach kontekstowych |
+| Ironia i sarkazm | Trudne do wykrycia | Możliwe do wykrycia częściowo, ale nadal problematyczne |
+| Nowe formy obraźliwych treści | Wymagają aktualizacji reguł | Mogą być rozpoznawane dzięki generalizacji, ale również wymagają aktualizacji |
+| Łatwość wdrożenia | Zwykle wysoka | Zależna od modelu i infrastruktury |
+| Łatwość utrzymania | Prosta przy małej liczbie reguł, trudniejsza przy wielu wyjątkach | Wymaga monitoringu, danych i okresowego trenowania |
+| Zużycie energii | Zwykle bardzo niskie | Od niskiego dla prostych modeli do wysokiego dla dużych sieci |
+| Koszt początkowy | Zwykle niski | Wyższy przy tworzeniu i oznaczaniu danych |
+| Koszt utrzymania | Może rosnąć wraz z liczbą reguł i wyjątków | Obejmuje infrastrukturę, monitoring i aktualizacje |
+| Skalowalność | Dobra przy prostych regułach | Dobra przy odpowiednio dobranym modelu |
+| Interpretowalność | Wysoka | Zależna od modelu |
+| Odporność na obchodzenie filtrów | Ograniczona | Potencjalnie większa, lecz niepełna |
+| Wymagania dotyczące danych | Nie wymaga oznaczonego zbioru treningowego | Zazwyczaj wymaga danych oznaczonych |
+| Możliwość rozwoju | Ręczne dopisywanie reguł | Uczenie na nowych przykładach i aktualizacja modeli |
+
+Warto zaznaczyć, że nie można z góry przypisać obu podejściom konkretnych wartości accuracy lub zużycia energii.
+
+Wyniki zależą od danych, modelu, implementacji, sprzętu i charakteru forum.
+
+### 6. Jak porównać dokładność?
+
+Oba systemy należy ocenić na tym samym zbiorze testowym, przygotowanym z rzeczywistych komentarzy.
+
+Podstawowe pojęcia:
+
+- TP – obraźliwy komentarz poprawnie wykryty.
+- TN – poprawny komentarz poprawnie zaakceptowany.
+- FP – poprawny komentarz błędnie oznaczony jako obraźliwy.
+- FN – obraźliwy komentarz, którego system nie wykrył.
+
+Metryki:
+
+Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+Precision = TP / (TP + FP)
+
+Recall = TP / (TP + FN)
+
+F1-score = 2 * Precision * Recall / (Precision + Recall)
+
+Ważne są szczególnie:
+
+- Precision – aby nie blokować nadmiernie poprawnych komentarzy.
+- Recall – aby wykrywać możliwie dużo rzeczywistych naruszeń.
+- F1-score – aby ocenić kompromis między precision i recall.
+
+Przy nierównych proporcjach klas sama accuracy może być myląca.
+
+Dodatkowo warto analizować skuteczność dla poszczególnych kategorii naruszeń, języków i grup użytkowników.
+
+### 7. Porównanie energooszczędności
+
+Podejście regułowe:
+
+- Zwykle wymaga niewielkiej mocy obliczeniowej.
+- Nie wymaga trenowania modelu.
+- Może działać na standardowym serwerze CPU.
+- Przy prostych regułach zużycie energii jest zwykle niskie.
+
+Podejście ML:
+
+- Proste modele tekstowe mogą działać bardzo efektywnie na CPU.
+- Duże modele Transformer mogą wymagać większych zasobów.
+- Trenowanie modelu generuje dodatkowy koszt energetyczny.
+- Koszt predykcji zależy od liczby komentarzy i wielkości modelu.
+
+Przykładowe metryki energetyczne:
+
+- Wh na 100 000 przetworzonych komentarzy.
+- Średni czas przetwarzania komentarza.
+- Wykorzystanie CPU i GPU.
+- Zużycie pamięci RAM.
+- Energia potrzebna do trenowania i aktualizacji modelu.
+
+Rzetelne porównanie wymaga wykonania pomiarów na tym samym sprzęcie i przy podobnym obciążeniu.
+
+### 8. Porównanie kosztów
+
+Koszty rozwiązania regułowego:
+
+1. Opracowanie list i wzorców.
+2. Implementacja reguł.
+3. Ręczna aktualizacja filtrów.
+4. Obsługa błędnych blokad.
+5. Praca moderatorów.
+
+Koszty rozwiązania ML:
+
+1. Zebranie i oznaczenie danych.
+2. Trenowanie i walidacja modelu.
+3. Infrastruktura obliczeniowa.
+4. Wdrożenie i monitoring.
+5. Okresowe aktualizacje modelu.
+6. Praca moderatorów nad przypadkami niejednoznacznymi.
+
+W małym forum prosty system regułowy może być tańszy.
+
+Na dużym forum, gdzie liczba komentarzy jest wysoka, model ML może ograniczać koszty ręcznej moderacji.
+
+Nie oznacza to jednak automatycznie, że ML będzie tańszy w każdym przypadku.
+
+### 9. Która metoda jest lepsza i dlaczego?
+
+Dla większego forum z różnorodnymi wypowiedziami preferuję Machine Learning, ale nie jako jedyne zabezpieczenie.
+
+Uzasadnienie:
+
+1. Język naturalny jest złożony i zależny od kontekstu.
+2. Użytkownicy stosują skróty, literówki i nowe formy obraźliwych wypowiedzi.
+3. Rozbudowane reguły stają się trudne w utrzymaniu.
+4. ML może uczyć się na rzeczywistych przykładach moderacji.
+5. Modele kontekstowe mogą lepiej odróżniać niektóre obraźliwe wypowiedzi od neutralnych cytatów.
+
+Jednocześnie:
+
+- ML nie gwarantuje poprawnego rozumienia ironii i intencji.
+- Jakość modelu zależy od danych treningowych.
+- Model może popełniać błędy i wykazywać uprzedzenia.
+- Trudne decyzje powinny być weryfikowane przez człowieka.
+
+Dla małego forum, z ograniczonym budżetem i niewielką liczbą komentarzy, reguły mogą być rozsądnym rozwiązaniem początkowym.
+
+### 10. Czy można połączyć oba podejścia?
+
+Tak. Najbardziej praktyczne jest rozwiązanie hybrydowe.
+
+Łączy ono:
+
+- proste i jednoznaczne reguły,
+- model Machine Learning,
+- system oceny ryzyka,
+- moderację przez człowieka,
+- mechanizm odwołań i poprawiania błędów.
+
+Proponowana architektura:
+
+NOWY KOMENTARZ
+       |
+       v
+NORMALIZACJA TEKSTU
+       |
+       v
+PROSTE REGUŁY
+       |
+       +--> Jednoznaczny spam techniczny: blokada
+       |
+       +--> Inne komentarze
+                    |
+                    v
+             LEKKI MODEL ML
+                    |
+                    +--> Niskie ryzyko: publikacja
+                    |
+                    +--> Średnie ryzyko
+                    |          |
+                    |          v
+                    |     MODERATOR
+                    |
+                    +--> Wysokie ryzyko
+                               |
+                               v
+                      MODEL KONTEKSTOWY
+                               |
+                               v
+                       DECYZJA SYSTEMU
+                               |
+                               +--> Publikacja
+                               |
+                               +--> Kontrola moderatora
+                               |
+                               +--> Tymczasowe ukrycie
+
+Uwaga:
+
+Komentarze o wysokim ryzyku nie powinny być automatycznie usuwane wyłącznie na podstawie wyniku modelu bez odpowiednich zabezpieczeń i możliwości odwołania.
+
+### 11. Dlaczego system hybrydowy jest korzystny?
+
+A. Wyższa elastyczność
+
+Reguły obsługują proste, jednoznaczne przypadki.
+
+ML analizuje bardziej złożone wypowiedzi.
+
+B. Oszczędność energii
+
+Najbardziej kosztowny model jest uruchamiany tylko wtedy, gdy prostsze metody nie dają wystarczającej pewności.
+
+C. Kontrola kosztów
+
+Zmniejsza się liczba komentarzy wymagających analizy przez drogi model lub moderatora.
+
+D. Łatwiejsza aktualizacja
+
+Nowe jednoznaczne zagrożenia można obsługiwać regułami, a model ML aktualizować na podstawie nowych danych.
+
+E. Większe bezpieczeństwo decyzji
+
+Moderator może rozstrzygać przypadki niejednoznaczne i analizować odwołania.
+
+### 12. Plan wdrożenia i testowania
+
+Proponuję następujące etapy:
+
+1. Zdefiniowanie regulaminu i kategorii naruszeń.
+2. Zebranie reprezentatywnych komentarzy.
+3. Przygotowanie oznaczonego zbioru testowego.
+4. Implementacja podstawowego filtra regułowego.
+5. Trenowanie modelu TF-IDF + Logistic Regression.
+6. Porównanie obu metod na tych samych danych.
+7. Pomiar precision, recall, F1-score i accuracy.
+8. Pomiar czasu przetwarzania i zużycia energii.
+9. Test modelu kontekstowego, jeśli prostsze rozwiązania nie wystarczają.
+10. Połączenie reguł, ML i moderacji w system hybrydowy.
+11. Testy z rzeczywistymi moderatorami.
+12. Stopniowe wdrożenie i monitoring wyników.
+
+Warto dodatkowo monitorować:
+
+- liczbę fałszywych blokad,
+- liczbę niewykrytych naruszeń,
+- czas oczekiwania na moderację,
+- liczbę odwołań użytkowników,
+- skuteczność po zmianach języka i zachowań użytkowników.
+
+### 13. Rekomendacja końcowa
+
+Dla automatycznej moderacji komentarzy na forum najlepszym rozwiązaniem jest system hybrydowy łączący tradycyjne reguły, Machine Learning i kontrolę moderatorów.
+
+Rekomendowana konfiguracja:
+
+1. Reguły – wykrywanie prostego spamu i jednoznacznych naruszeń technicznych.
+2. Lekki model ML – klasyfikacja większości komentarzy.
+3. Model kontekstowy – analiza wybranych, trudniejszych przypadków.
+4. Moderator – decyzje w przypadkach niejednoznacznych i obsługa odwołań.
+5. Monitoring – kontrola skuteczności, kosztów i energooszczędności.
+
+Ostateczny wybór powinien być oparty na testach przeprowadzonych na rzeczywistych danych.
+
+Wniosek:
+
+Tradycyjne reguły są proste, tanie i energooszczędne, ale słabo radzą sobie z kontekstem językowym.
+
+Machine Learning jest bardziej elastyczny i może osiągać wyższą skuteczność, lecz wymaga danych, monitoringu i większych nakładów.
+
+Połączenie obu podejść pozwala wykorzystać ich zalety, ograniczyć koszty i zwiększyć jakość moderacji.
