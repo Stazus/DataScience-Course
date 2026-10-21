@@ -1,0 +1,21 @@
+Zadanie 1 – Identyfikacja typu zadania ML
+
+1. Przewidywanie ceny samochodu na podstawie przebiegu i roku produkcji
+Typ: regresja.
+Uzasadnienie: Wynikiem jest konkretna wartość liczbowa, czyli przewidywana cena samochodu.
+
+2. Grupowanie artykułów w sklepie internetowym według podobieństwa
+Typ: klasteryzacja.
+Uzasadnienie: Algorytm grupuje podobne produkty bez wcześniej określonych klas.
+
+3. Wykrywanie twarzy na zdjęciu z kamery
+Typ: detekcja obiektów.
+Uzasadnienie: Model wykrywa twarz oraz określa jej położenie na obrazie.
+
+4. Klasyfikacja e-maili jako spam/nie-spam
+Typ: klasyfikacja binarna.
+Uzasadnienie: Wiadomość jest przypisywana do jednej z dwóch klas: spam lub nie-spam.
+
+5. Generowanie opisów produktów na podstawie zdjęć
+Typ: zadanie generatywne (image captioning).
+Uzasadnienie: Model analizuje zdjęcie produktu i generuje na jego podstawie opis tekstowy.
