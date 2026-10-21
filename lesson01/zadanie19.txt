@@ -1,0 +1,1600 @@
+# Lekcja 1 – Zadanie 19
+## Data Science for Climate Change
+### EcoBuilding AI – inteligentna optymalizacja energii w budynkach publicznych
+
+---
+
+## 1. Streszczenie projektu
+
+EcoBuilding AI to projekt Data Science mający na celu ograniczenie zużycia energii i emisji gazów cieplarnianych w budynkach publicznych.
+
+System wykorzystuje dane historyczne, prognozy pogody, informacje o użytkowaniu budynków oraz algorytmy Machine Learning do przewidywania zapotrzebowania na energię.
+
+Na podstawie prognoz system proponuje optymalne ustawienia ogrzewania, wentylacji i klimatyzacji (HVAC).
+
+Główne cele:
+
+1. Zmniejszenie zużycia energii.
+2. Ograniczenie emisji CO2e.
+3. Obniżenie rachunków za energię.
+4. Utrzymanie komfortu i bezpieczeństwa użytkowników.
+5. Ograniczenie zużycia energii przez sam system AI.
+6. Zapewnienie mierzalnych i weryfikowalnych rezultatów.
+
+Projekt jest koncepcyjny. Nie przeprowadzono rzeczywistego wdrożenia ani eksperymentu.
+
+Wszystkie przykładowe wartości liczbowe są hipotetyczne.
+
+---
+
+## 2. Problem klimatyczny
+
+Budynki zużywają energię między innymi na:
+
+- ogrzewanie,
+- chłodzenie,
+- wentylację,
+- oświetlenie,
+- przygotowanie ciepłej wody,
+- urządzenia elektryczne.
+
+Część energii jest marnowana wskutek:
+
+- ogrzewania pustych pomieszczeń,
+- niewłaściwych harmonogramów,
+- niedostosowania pracy HVAC do pogody,
+- błędnych ustawień instalacji,
+- braku monitorowania zużycia,
+- zbyt późnego wykrywania awarii.
+
+Przykład:
+
+Szkoła jest ogrzewana z pełną intensywnością także w czasie, gdy budynek jest pusty.
+
+System ML może przewidzieć godziny użytkowania i odpowiednio wcześniej dostosować ogrzewanie.
+
+Nie chodzi jednak o wyłączanie ogrzewania bez kontroli.
+
+Optymalizacja musi uwzględniać temperaturę, jakość powietrza, wilgotność i wymagania bezpieczeństwa.
+
+---
+
+## 3. Cele SMART
+
+Proponowany pilotaż:
+
+10 budynków publicznych.
+
+Czas pilotażu:
+
+12 miesięcy, poprzedzone przygotowaniem danych i wdrożeniem.
+
+Cele projektowe:
+
+- uzyskać mierzalną redukcję zużycia energii,
+- dążyć do redukcji zużycia energii o 12% względem odpowiednio skorygowanej linii bazowej,
+- utrzymać wymagane warunki komfortu,
+- ograniczyć liczbę nieuzasadnionych godzin pracy HVAC,
+- zapewnić audytowalność wyników,
+- raportować energię zużytą przez infrastrukturę ML.
+
+Wartość 12% jest hipotetycznym celem projektu.
+
+Nie stanowi prognozy gwarantowanych oszczędności.
+
+---
+
+## 4. Rodzaje zadań Machine Learning
+
+Projekt wykorzystuje kilka typów zadań.
+
+### 4.1. Regression
+
+Prognozowanie zapotrzebowania na energię.
+
+Przykład:
+
+Model przewiduje zużycie 85 kWh w następnej godzinie.
+
+### 4.2. Time Series Forecasting
+
+Prognozowanie zużycia w kolejnych godzinach i dniach.
+
+Model wykorzystuje zależności czasowe.
+
+### 4.3. Anomaly Detection
+
+Wykrywanie nietypowego zużycia.
+
+Przykład:
+
+Wentylacja pobiera znacznie więcej energii niż zwykle.
+
+### 4.4. Optimization
+
+Dobór ustawień instalacji minimalizujących zużycie energii przy zachowaniu ograniczeń.
+
+### 4.5. Reinforcement Learning – opcjonalnie
+
+W bardziej zaawansowanej wersji można zastosować uczenie ze wzmocnieniem.
+
+Agent uczy się strategii sterowania HVAC.
+
+Ze względów bezpieczeństwa nie należy rozpoczynać od swobodnego uczenia metodą prób i błędów na rzeczywistym budynku.
+
+Najpierw potrzebna jest symulacja i walidacja.
+
+---
+
+## 5. Podejścia do uczenia
+
+### Supervised Learning
+
+Podstawowe podejście do prognozowania energii.
+
+Dane historyczne zawierają:
+
+- warunki pogodowe,
+- temperatury,
+- harmonogramy,
+- rzeczywiste zużycie energii.
+
+Model uczy się przewidywać przyszłe zużycie.
+
+### Unsupervised Learning
+
+Stosowane do wykrywania anomalii.
+
+Model rozpoznaje nietypowe wzorce zużycia.
+
+### Reinforcement Learning
+
+Może służyć do zaawansowanej optymalizacji sterowania.
+
+Wymaga dodatkowych zabezpieczeń i odpowiednio przygotowanego środowiska.
+
+### Rekomendacja
+
+Pierwsza wersja:
+
+Supervised Learning + regułowa optymalizacja + Anomaly Detection.
+
+Zaawansowane Reinforcement Learning dopiero po udanym pilotażu.
+
+---
+
+## 6. Dane potrzebne do projektu
+
+### 6.1. Zużycie energii
+
+- energia elektryczna,
+- energia cieplna,
+- zużycie gazu, jeśli występuje,
+- pomiary godzinowe lub częstsze,
+- moc chwilowa, jeśli dostępna.
+
+### 6.2. Dane pogodowe
+
+- temperatura zewnętrzna,
+- wilgotność,
+- nasłonecznienie,
+- prędkość wiatru,
+- prognozy pogody.
+
+### 6.3. Dane dotyczące budynku
+
+- powierzchnia,
+- rok budowy,
+- izolacja,
+- rodzaj ogrzewania,
+- charakterystyka instalacji HVAC,
+- harmonogram użytkowania,
+- liczba użytkowników w ujęciu zagregowanym.
+
+### 6.4. Warunki wewnętrzne
+
+- temperatura,
+- wilgotność,
+- stężenie CO2 jako wskaźnik jakości powietrza,
+- stan urządzeń,
+- ustawienia termostatów.
+
+Uwaga:
+
+CO2 mierzone w pomieszczeniu jako wskaźnik wentylacji nie jest tym samym co emisja CO2e wynikająca ze zużycia energii.
+
+### 6.5. Dane ekonomiczne
+
+- taryfy energetyczne,
+- koszty eksploatacji,
+- koszty serwisowania,
+- koszty wdrożenia,
+- koszty infrastruktury AI.
+
+### 6.6. Dane o emisjach
+
+- współczynniki emisji energii elektrycznej,
+- współczynniki emisji ciepła,
+- współczynniki emisji paliw,
+- informacje o sposobie wytwarzania energii.
+
+---
+
+## 7. Skąd pozyskać dane?
+
+### Źródła wewnętrzne
+
+- systemy BMS,
+- liczniki energii,
+- czujniki IoT,
+- faktury energetyczne,
+- harmonogramy budynków,
+- dokumentacja techniczna.
+
+### Źródła zewnętrzne
+
+IMGW:
+
+https://imgw.pl/
+
+Copernicus Climate Data Store:
+
+https://cds.climate.copernicus.eu/
+
+Open-Meteo:
+
+https://open-meteo.com/
+
+ENTSO-E Transparency Platform:
+
+https://transparency.entsoe.eu/
+
+KOBiZE:
+
+https://www.kobize.pl/
+
+OpenStreetMap:
+
+https://www.openstreetmap.org/
+
+Możliwe wykorzystanie:
+
+- IMGW i Copernicus do danych pogodowych,
+- Open-Meteo do wybranych danych i prognoz pogodowych,
+- ENTSO-E do danych dotyczących systemu elektroenergetycznego,
+- KOBiZE do informacji o wskaźnikach emisji.
+
+Dostępność konkretnych danych, licencje, rozdzielczość czasową i aktualność należy sprawdzić przed wdrożeniem.
+
+---
+
+## 8. Projekt bazy danych
+
+Proponowane tabele PostgreSQL:
+
+### buildings
+
+- building_id,
+- name,
+- area_m2,
+- building_type,
+- heating_type,
+- location_region.
+
+### energy_measurements
+
+- measurement_id,
+- building_id,
+- timestamp,
+- electricity_kwh,
+- heating_kwh,
+- gas_kwh.
+
+### weather_measurements
+
+- timestamp,
+- region,
+- outdoor_temperature,
+- humidity,
+- solar_radiation,
+- wind_speed.
+
+### indoor_measurements
+
+- measurement_id,
+- building_id,
+- timestamp,
+- indoor_temperature,
+- indoor_humidity,
+- co2_ppm.
+
+### occupancy_schedule
+
+- building_id,
+- date,
+- start_time,
+- end_time,
+- occupancy_level.
+
+### model_predictions
+
+- prediction_id,
+- building_id,
+- timestamp,
+- predicted_energy_kwh,
+- model_version.
+
+### optimization_actions
+
+- action_id,
+- building_id,
+- timestamp,
+- recommended_setting,
+- approval_status,
+- actual_result.
+
+### impact_reports
+
+- report_id,
+- building_id,
+- reporting_period,
+- baseline_energy_kwh,
+- actual_energy_kwh,
+- adjusted_savings_kwh,
+- estimated_co2e_avoided.
+
+---
+
+## 9. Architektura systemu
+
+Schemat logiczny:
+
+          +------------------------+
+          | LICZNIKI / BMS / IoT   |
+          +------------+-----------+
+                       |
+                       v
+          +------------------------+
+          | POBIERANIE DANYCH      |
+          | API / ETL              |
+          +------------+-----------+
+                       |
+          +------------+------------+
+          |                         |
+          v                         v
++---------------------+   +---------------------+
+| DANE BUDYNKÓW       |   | DANE POGODOWE       |
+| POSTGRESQL          |   | I PROGNOZY          |
++----------+----------+   +----------+----------+
+           |                         |
+           +------------+------------+
+                        |
+                        v
+          +------------------------+
+          | WALIDACJA I FEATURE    |
+          | ENGINEERING            |
+          +------------+-----------+
+                       |
+          +------------+------------+
+          |                         |
+          v                         v
++---------------------+   +---------------------+
+| MODEL PROGNOZOWANIA |   | ANOMALY DETECTION   |
+| ZUŻYCIA ENERGII     |   |                     |
++----------+----------+   +----------+----------+
+           |                         |
+           +------------+------------+
+                        |
+                        v
+          +------------------------+
+          | SILNIK OPTYMALIZACJI   |
+          | Z OGRANICZENIAMI       |
+          +------------+-----------+
+                       |
+                       v
+          +------------------------+
+          | KONTROLA BEZPIECZEŃSTWA|
+          | I AKCEPTACJA           |
+          +------------+-----------+
+                       |
+                       v
+          +------------------------+
+          | SYSTEM BMS / OPERATOR  |
+          +------------+-----------+
+                       |
+                       v
+          +------------------------+
+          | POMIAR RZECZYWISTYCH   |
+          | EFEKTÓW                |
+          +------------+-----------+
+                       |
+                       v
+          +------------------------+
+          | DASHBOARD / GREEN AI   |
+          | ROI / CO2e / AUDYT     |
+          +------------------------+
+
+System nie powinien wysyłać nieograniczonych poleceń sterujących bez kontroli.
+
+Należy zachować możliwość ręcznego przejęcia sterowania.
+
+---
+
+## 10. Przygotowanie danych
+
+Proces ETL:
+
+1. Pobranie danych z liczników.
+2. Ujednolicenie stref czasowych.
+3. Ujednolicenie jednostek.
+4. Wykrycie brakujących pomiarów.
+5. Wykrycie błędnych wartości.
+6. Synchronizacja z danymi pogodowymi.
+7. Dodanie informacji o dniach wolnych.
+8. Obliczenie cech historycznych.
+9. Utworzenie zbiorów treningowych.
+10. Walidacja jakości danych.
+
+Przykładowe problemy:
+
+- brak odczytu licznika,
+- zmiana urządzenia pomiarowego,
+- błędna jednostka,
+- przesunięcie czasu,
+- nagły wzrost zużycia.
+
+Nie wolno bezrefleksyjnie zastępować wszystkich braków średnią.
+
+Może to ukrywać rzeczywiste awarie.
+
+---
+
+## 11. Feature Engineering
+
+Przykładowe cechy:
+
+- godzina,
+- dzień tygodnia,
+- miesiąc,
+- temperatura zewnętrzna,
+- prognozowana temperatura,
+- wilgotność,
+- poziom użytkowania budynku,
+- zużycie energii godzinę wcześniej,
+- średnie zużycie z ostatnich 24 godzin,
+- temperatura wewnętrzna,
+- stan HVAC.
+
+Dodatkowo:
+
+Heating Degree Days i Cooling Degree Days.
+
+Pozwalają one opisywać zapotrzebowanie na ogrzewanie i chłodzenie.
+
+Należy unikać Data Leakage.
+
+Przykład:
+
+Nie można używać rzeczywistej temperatury z przyszłej godziny, jeżeli podczas predykcji dostępna będzie tylko jej prognoza.
+
+---
+
+## 12. Modele Machine Learning
+
+### Model bazowy
+
+Seasonal Naive Forecast.
+
+Prognoza zakłada, że zużycie będzie podobne do analogicznej wcześniejszej godziny.
+
+Stanowi punkt odniesienia.
+
+### Model 1 – Linear Regression
+
+Zalety:
+
+- prostota,
+- interpretowalność,
+- niskie koszty.
+
+### Model 2 – Random Forest Regressor
+
+Zalety:
+
+- nieliniowe zależności,
+- możliwość wykorzystania różnych cech.
+
+Wady:
+
+- większy koszt obliczeniowy niż prosty model liniowy.
+
+### Model 3 – Gradient Boosting
+
+Przykładowo:
+
+LightGBM lub XGBoost.
+
+Zalety:
+
+- skuteczność na danych tabelarycznych,
+- modelowanie nieliniowości,
+- możliwość analizowania znaczenia cech.
+
+### Model 4 – LSTM
+
+Może modelować zależności sekwencyjne.
+
+Wymaga bardziej złożonego treningu.
+
+### Rekomendacja
+
+Najpierw:
+
+Seasonal Naive + Linear Regression.
+
+Następnie:
+
+LightGBM.
+
+LSTM tylko wtedy, gdy testy wykażą istotną dodatkową korzyść.
+
+---
+
+## 13. Metody walidacji
+
+Dane energetyczne są szeregami czasowymi.
+
+Nie należy stosować przypadkowego mieszania wszystkich obserwacji bez uwzględnienia czasu.
+
+Proponowany podział:
+
+- wcześniejsze miesiące – trening,
+- kolejne miesiące – walidacja,
+- najnowszy okres – test.
+
+Dodatkowo:
+
+Rolling Window Validation.
+
+Model jest oceniany na kolejnych przyszłych okresach.
+
+Ważne jest testowanie w różnych porach roku.
+
+Model działający dobrze latem może działać gorzej zimą.
+
+---
+
+## 14. Metryki prognozowania
+
+### MAE
+
+Mean Absolute Error.
+
+Średni błąd bezwzględny.
+
+### RMSE
+
+Root Mean Squared Error.
+
+Silniej karze duże błędy.
+
+### WAPE
+
+Weighted Absolute Percentage Error.
+
+Może być przydatny do oceny błędu względem całkowitego zużycia.
+
+### Bias
+
+Średnia tendencja do zawyżania lub zaniżania prognoz.
+
+### Dodatkowe metryki
+
+- czas inferencji,
+- energia na 1000 prognoz,
+- koszt aktualizacji modelu,
+- stabilność w różnych sezonach.
+
+Nie wystarczy wybrać modelu o najniższym błędzie prognozy.
+
+Trzeba również sprawdzić, czy jego zastosowanie rzeczywiście ogranicza zużycie energii.
+
+---
+
+## 15. Optymalizacja działania HVAC
+
+Model prognozuje zapotrzebowanie na energię.
+
+Silnik optymalizacji wybiera ustawienia instalacji.
+
+Cel:
+
+Minimalizacja energii i kosztu przy zachowaniu komfortu oraz ograniczeń technicznych.
+
+Uproszczona funkcja celu:
+
+J = E + lambda * P_comfort
+
+Gdzie:
+
+E – prognozowane zużycie energii.
+
+P_comfort – kara za naruszenie warunków komfortu.
+
+lambda – współczynnik określający znaczenie komfortu.
+
+W rzeczywistym projekcie ograniczenia bezpieczeństwa powinny być traktowane jako twarde wymagania, a nie tylko kary w funkcji celu.
+
+Przykładowe ograniczenia:
+
+- minimalna i maksymalna temperatura,
+- wymagania wentylacyjne,
+- bezpieczna wilgotność,
+- dostępność pomieszczeń,
+- maksymalna szybkość zmian ustawień,
+- ograniczenia techniczne urządzeń.
+
+---
+
+## 16. Bezpieczeństwo systemu
+
+Zasady:
+
+1. Możliwość ręcznego przejęcia sterowania.
+2. Zdefiniowane dopuszczalne zakresy ustawień.
+3. Automatyczny powrót do bezpiecznych ustawień.
+4. Rejestrowanie decyzji.
+5. Monitorowanie awarii czujników.
+6. Alarmy dla operatorów.
+7. Testy przed wdrożeniem.
+8. Stopniowe uruchamianie automatyzacji.
+
+Nie należy poświęcać bezpieczeństwa użytkowników w celu oszczędzania energii.
+
+---
+
+## 17. Impact Assessment Framework
+
+Najważniejsze pytanie:
+
+Jak udowodnić, że oszczędności energii wynikają z działania systemu?
+
+Nie wystarczy porównać rachunków przed i po wdrożeniu.
+
+Zużycie energii zależy również od:
+
+- pogody,
+- liczby użytkowników,
+- godzin otwarcia,
+- remontów,
+- zmian instalacji,
+- innych działań oszczędnościowych.
+
+Potrzebna jest odpowiednio skorygowana linia bazowa.
+
+---
+
+## 18. Baseline energetyczny
+
+Baseline to szacunkowe zużycie energii, które wystąpiłoby bez wdrożenia systemu.
+
+Można zbudować model uwzględniający:
+
+- temperaturę,
+- sezon,
+- godziny pracy,
+- użytkowanie budynku,
+- historyczne zużycie.
+
+Przykład:
+
+Przed wdrożeniem budynek zużywał średnio 100 MWh rocznie.
+
+Po wdrożeniu zużył 88 MWh.
+
+Prosta różnica:
+
+12 MWh.
+
+Nie oznacza to automatycznie, że system oszczędził 12 MWh.
+
+Jeżeli rok był cieplejszy, część różnicy mogła wynikać z pogody.
+
+---
+
+## 19. Measurement and Verification
+
+Proponowana metodologia:
+
+1. Zebranie danych przed wdrożeniem.
+2. Zbudowanie modelu bazowego.
+3. Określenie okresu raportowania.
+4. Skorygowanie baseline o warunki pogodowe i użytkowanie.
+5. Pomiar rzeczywistego zużycia.
+6. Wyznaczenie różnicy.
+7. Oszacowanie niepewności.
+8. Audyt wyników.
+
+Można wykorzystać zasady IPMVP – International Performance Measurement and Verification Protocol.
+
+Informacje:
+
+https://evo-world.org/
+
+---
+
+## 20. Wzór na oszczędność energii
+
+S = E_baseline_adjusted - E_actual
+
+Gdzie:
+
+S – oszczędność energii.
+
+E_baseline_adjusted – skorygowany baseline.
+
+E_actual – rzeczywiste zużycie energii.
+
+Oszczędność procentowa:
+
+S_percent = (S / E_baseline_adjusted) * 100%
+
+Wyniki należy podawać wraz z zakresem niepewności, jeżeli jest możliwy do oszacowania.
+
+---
+
+## 21. Hipotetyczny scenariusz pilotażowy
+
+Przyjmijmy:
+
+10 budynków publicznych.
+
+Łączne skorygowane zużycie bazowe:
+
+1 000 MWh rocznie.
+
+Założona redukcja dzięki optymalizacji:
+
+12%.
+
+Oszczędność brutto:
+
+1 000 * 0,12 = 120 MWh.
+
+Zużycie po optymalizacji:
+
+1 000 - 120 = 880 MWh.
+
+Wartości są hipotetyczne.
+
+Nie są wynikami rzeczywistych pomiarów.
+
+---
+
+## 22. Zużycie energii przez sam system AI
+
+System ML również zużywa energię.
+
+Uwzględniamy:
+
+- serwery,
+- trening modeli,
+- inferencję,
+- przetwarzanie danych,
+- dodatkową infrastrukturę projektu.
+
+Założenie:
+
+2 MWh rocznie.
+
+Wtedy:
+
+Oszczędność brutto:
+
+120 MWh.
+
+Energia systemu AI:
+
+2 MWh.
+
+Oszczędność netto:
+
+120 - 2 = 118 MWh rocznie.
+
+Warunek:
+
+Nie należy podwójnie liczyć energii systemu AI, jeżeli została już uwzględniona w pomiarach rzeczywistego zużycia.
+
+---
+
+## 23. Redukcja emisji CO2e
+
+Uproszczony wzór:
+
+CO2e_avoided = E_saved * EF
+
+Gdzie:
+
+E_saved – oszczędność energii.
+
+EF – współczynnik emisji.
+
+Przyjmijmy hipotetycznie:
+
+EF = 0,5 t CO2e/MWh.
+
+Oszczędność netto:
+
+118 MWh.
+
+Redukcja emisji:
+
+118 * 0,5 = 59 t CO2e rocznie.
+
+Wynik:
+
+59 ton CO2e rocznie.
+
+Jest to ilustracyjna kalkulacja.
+
+Nie stanowi rzeczywistego wskaźnika emisji dla konkretnego budynku.
+
+---
+
+## 24. Ograniczenia obliczania emisji
+
+W praktyce należy oddzielnie analizować:
+
+- energię elektryczną,
+- ciepło sieciowe,
+- gaz,
+- inne paliwa.
+
+Każdy nośnik energii może mieć inny współczynnik emisji.
+
+Dodatkowo trzeba określić, czy stosujemy:
+
+- średni współczynnik emisji,
+- współczynnik krańcowy,
+- współczynnik roczny,
+- współczynnik godzinowy.
+
+Wybór zależy od celu raportowania.
+
+Przykładowo:
+
+Dla oceny wpływu ograniczenia poboru energii elektrycznej na emisje systemowe odpowiedni współczynnik krańcowy może być bardziej informatywny niż średni.
+
+Nie należy bez wyjaśnienia mieszać różnych metod.
+
+---
+
+## 25. Analiza ekonomiczna
+
+Założenia hipotetyczne:
+
+Oszczędność brutto:
+
+120 000 kWh rocznie.
+
+Zużycie energii przez AI:
+
+2 000 kWh rocznie.
+
+Oszczędność netto:
+
+118 000 kWh rocznie.
+
+Średnia cena energii:
+
+0,80 zł/kWh.
+
+Korzyść finansowa z energii:
+
+118 000 * 0,80 = 94 400 zł rocznie.
+
+Koszt inwestycji początkowej:
+
+180 000 zł.
+
+Roczny koszt utrzymania systemu:
+
+30 000 zł.
+
+Założenie:
+
+Koszt utrzymania 30 000 zł nie obejmuje energii AI, ponieważ została już odjęta od oszczędności energetycznej.
+
+Roczna korzyść finansowa netto:
+
+94 400 - 30 000 = 64 400 zł.
+
+---
+
+## 26. Simple Payback Period
+
+Okres prostego zwrotu:
+
+Payback = koszt inwestycji / roczna korzyść netto.
+
+Payback:
+
+180 000 / 64 400 = około 2,80 roku.
+
+Oznacza to hipotetyczny prosty okres zwrotu wynoszący około 2 lata i 10 miesięcy.
+
+Nie uwzględnia:
+
+- zmiennej wartości pieniądza w czasie,
+- zmian cen energii,
+- nieplanowanych kosztów,
+- zmian wielkości oszczędności,
+- kosztów finansowania.
+
+---
+
+## 27. ROI
+
+Uproszczony roczny zwrot względem nakładu początkowego:
+
+ROI_annual = (64 400 / 180 000) * 100%
+
+ROI_annual = około 35,78%.
+
+Jest to uproszczony wskaźnik rocznej korzyści netto względem początkowej inwestycji.
+
+Nie należy utożsamiać go z pełną analizą inwestycyjną.
+
+Dla rzeczywistego wdrożenia warto obliczyć również:
+
+- NPV,
+- IRR,
+- zdyskontowany okres zwrotu,
+- analizę wrażliwości.
+
+---
+
+## 28. Środowiskowy ROI
+
+Można zdefiniować dodatkowy wskaźnik:
+
+Environmental ROI = uniknięta emisja CO2e / nakład finansowy.
+
+W naszym przykładzie:
+
+59 t CO2e rocznie / 180 000 zł.
+
+Wynik:
+
+0,0003278 t CO2e na 1 zł nakładu początkowego w skali roku.
+
+Czytelniejsza interpretacja:
+
+Około 0,328 t CO2e rocznie na każde 1000 zł inwestycji początkowej.
+
+Wskaźnik jest uproszczony.
+
+Nie obejmuje całego cyklu życia infrastruktury.
+
+---
+
+## 29. Koszt uniknięcia jednej tony CO2e
+
+W uproszczonym pierwszym roku:
+
+Nakład inwestycyjny:
+
+180 000 zł.
+
+Roczna korzyść netto:
+
+64 400 zł.
+
+Bilans finansowy pierwszego roku:
+
+180 000 - 64 400 = 115 600 zł kosztu netto.
+
+Redukcja emisji:
+
+59 t CO2e.
+
+Uproszczony koszt netto pierwszego roku:
+
+115 600 / 59 = około 1959 zł/t CO2e.
+
+Nie jest to pełny koszt redukcji emisji w całym okresie eksploatacji.
+
+Po kolejnych latach inwestycja może przynosić dodatnie korzyści finansowe.
+
+Do porównań między projektami należy stosować spójną analizę cyklu życia.
+
+---
+
+## 30. Analiza wrażliwości
+
+Rzeczywiste oszczędności mogą różnić się od planowanych.
+
+Przyjmijmy trzy scenariusze.
+
+W każdym przypadku:
+
+- baseline: 1000 MWh rocznie,
+- energia AI: 2 MWh rocznie,
+- cena energii: 0,80 zł/kWh,
+- utrzymanie: 30 000 zł rocznie,
+- inwestycja: 180 000 zł.
+
+### Scenariusz pesymistyczny
+
+Redukcja brutto:
+
+5% = 50 MWh.
+
+Redukcja netto:
+
+48 MWh.
+
+Korzyść z energii:
+
+38 400 zł.
+
+Korzyść po kosztach utrzymania:
+
+8400 zł rocznie.
+
+Prosty okres zwrotu:
+
+180 000 / 8400 = około 21,43 roku.
+
+### Scenariusz bazowy
+
+Redukcja brutto:
+
+12% = 120 MWh.
+
+Redukcja netto:
+
+118 MWh.
+
+Korzyść z energii:
+
+94 400 zł.
+
+Korzyść po kosztach utrzymania:
+
+64 400 zł.
+
+Prosty okres zwrotu:
+
+około 2,80 roku.
+
+### Scenariusz optymistyczny
+
+Redukcja brutto:
+
+18% = 180 MWh.
+
+Redukcja netto:
+
+178 MWh.
+
+Korzyść z energii:
+
+142 400 zł.
+
+Korzyść po kosztach utrzymania:
+
+112 400 zł.
+
+Prosty okres zwrotu:
+
+180 000 / 112 400 = około 1,60 roku.
+
+---
+
+## 31. Tabela analizy wrażliwości
+
+| Parametr | Pesymistyczny | Bazowy | Optymistyczny |
+|---|---:|---:|---:|
+| Redukcja brutto | 5% | 12% | 18% |
+| Oszczędność brutto | 50 MWh | 120 MWh | 180 MWh |
+| Energia AI | 2 MWh | 2 MWh | 2 MWh |
+| Oszczędność netto | 48 MWh | 118 MWh | 178 MWh |
+| Redukcja CO2e | 24 t | 59 t | 89 t |
+| Korzyść netto roczna | 8400 zł | 64 400 zł | 112 400 zł |
+| Prosty okres zwrotu | 21,43 roku | 2,80 roku | 1,60 roku |
+
+Wszystkie wartości wynikają z hipotetycznych założeń.
+
+---
+
+## 32. Jak zapewnić, że projekt sam jest Green AI?
+
+### 32.1. Małe modele
+
+Najpierw należy przetestować:
+
+- Linear Regression,
+- lekkie modele drzewiaste,
+- LightGBM.
+
+Duże sieci neuronowe powinny być stosowane tylko wtedy, gdy przynoszą istotną dodatkową korzyść.
+
+### 32.2. Ograniczenie częstotliwości treningu
+
+Model nie musi być trenowany codziennie, jeżeli jego jakość pozostaje stabilna.
+
+### 32.3. Early Stopping
+
+Trening kończy się, gdy dalsze iteracje nie poprawiają wyników walidacyjnych.
+
+### 32.4. Efektywne przetwarzanie danych
+
+Należy unikać wielokrotnego wykonywania tych samych obliczeń.
+
+### 32.5. Przetwarzanie wsadowe
+
+Zadania niekrytyczne można grupować.
+
+### 32.6. Monitoring energii
+
+System powinien raportować energię zużywaną przez własną infrastrukturę.
+
+### 32.7. Wykorzystanie istniejącego sprzętu
+
+Nie należy kupować kosztownej infrastruktury GPU bez potwierdzenia potrzeby.
+
+### 32.8. Ograniczenie przechowywania danych
+
+Należy stosować rozsądną politykę retencji.
+
+### 32.9. Dobór infrastruktury
+
+Należy porównywać efektywność energetyczną lokalnych serwerów i usług chmurowych.
+
+### 32.10. Analiza cyklu życia
+
+W pełnej analizie środowiskowej trzeba uwzględnić także produkcję i utylizację sprzętu.
+
+---
+
+## 33. Green AI – mierniki
+
+Przykładowe KPI:
+
+- Wh na 1000 prognoz,
+- kWh na trening,
+- kWh miesięcznie dla infrastruktury ML,
+- kWh zaoszczędzone na 1 kWh zużytą przez AI,
+- t CO2e uniknięte rocznie,
+- stosunek korzyści energetycznej do kosztu energetycznego.
+
+Dla naszego scenariusza:
+
+Oszczędność brutto:
+
+120 MWh.
+
+Energia AI:
+
+2 MWh.
+
+Stosunek:
+
+120 / 2 = 60.
+
+Oznacza to, że na każdą 1 kWh zużytą przez AI przypada hipotetycznie 60 kWh zaoszczędzonej energii w budynkach.
+
+Jest to wskaźnik scenariusza, nie rzeczywisty wynik pomiarów.
+
+---
+
+## 34. Monitoring projektu
+
+System powinien monitorować:
+
+### Jakość modeli
+
+- MAE,
+- RMSE,
+- WAPE,
+- Bias.
+
+### Efekty energetyczne
+
+- zużycie energii,
+- skorygowane oszczędności,
+- energia AI.
+
+### Efekty klimatyczne
+
+- uniknięte emisje CO2e,
+- współczynniki emisji,
+- niepewność szacowania.
+
+### Efekty ekonomiczne
+
+- koszty energii,
+- koszty utrzymania,
+- oszczędności finansowe,
+- ROI.
+
+### Komfort użytkowników
+
+- temperatura,
+- wilgotność,
+- jakość powietrza,
+- liczba skarg,
+- czas naruszenia dopuszczalnych warunków.
+
+---
+
+## 35. Ryzyka projektu
+
+### Niedostateczna jakość danych
+
+Rozwiązanie:
+
+Walidacja czujników, kontrola braków i monitoring.
+
+### Zmiana warunków pogodowych
+
+Rozwiązanie:
+
+Korekta baseline o pogodę.
+
+### Data Drift
+
+Rozwiązanie:
+
+Monitoring jakości i aktualizacje modelu.
+
+### Niewłaściwe sterowanie HVAC
+
+Rozwiązanie:
+
+Twarde ograniczenia bezpieczeństwa i nadzór operatora.
+
+### Zawyżone oszczędności
+
+Rozwiązanie:
+
+Niezależna weryfikacja i transparentna metodologia.
+
+### Zbyt duże zużycie energii przez AI
+
+Rozwiązanie:
+
+Profilowanie i optymalizacja infrastruktury.
+
+### Cyberbezpieczeństwo
+
+Rozwiązanie:
+
+Segmentacja sieci, kontrola dostępu i aktualizacje.
+
+### Ryzyko prywatności
+
+Rozwiązanie:
+
+Minimalizacja danych i stosowanie zagregowanych informacji o użytkowaniu budynku.
+
+---
+
+## 36. Plan realizacji projektu
+
+### Faza 1 – Analiza i przygotowanie
+
+Czas orientacyjny:
+
+1–2 miesiące.
+
+Zadania:
+
+- wybór budynków,
+- analiza liczników,
+- ocena jakości danych,
+- ustalenie baseline,
+- analiza ryzyk.
+
+### Faza 2 – Budowa modeli
+
+Czas orientacyjny:
+
+2–3 miesiące.
+
+Zadania:
+
+- ETL,
+- feature engineering,
+- modele bazowe,
+- walidacja czasowa,
+- porównanie jakości i energii.
+
+### Faza 3 – Symulacja i testy
+
+Czas orientacyjny:
+
+1–2 miesiące.
+
+Zadania:
+
+- testowanie optymalizacji,
+- kontrola ograniczeń,
+- analiza błędów,
+- ocena bezpieczeństwa.
+
+### Faza 4 – Pilotaż
+
+Czas:
+
+12 miesięcy.
+
+Zadania:
+
+- stopniowe wdrożenie,
+- monitoring zużycia,
+- ocena komfortu,
+- pomiar oszczędności,
+- kontrola jakości modeli.
+
+### Faza 5 – Ocena wyników
+
+Zadania:
+
+- analiza energetyczna,
+- analiza emisji,
+- analiza ekonomiczna,
+- audyt wyników,
+- decyzja o skalowaniu.
+
+---
+
+## 37. Zespół projektowy
+
+### Data Scientist
+
+- przygotowanie danych,
+- modele prognozowania,
+- analiza wyników.
+
+### ML Engineer
+
+- wdrożenie modeli,
+- monitoring,
+- optymalizacja inferencji.
+
+### Data Engineer
+
+- integracja danych,
+- ETL,
+- bazy danych.
+
+### Specjalista HVAC
+
+- wymagania techniczne,
+- ograniczenia sterowania,
+- bezpieczeństwo instalacji.
+
+### Energy Manager
+
+- analiza zużycia energii,
+- metodologia oszczędności,
+- kontrola KPI.
+
+### Specjalista ds. bezpieczeństwa
+
+- bezpieczeństwo infrastruktury,
+- kontrola dostępu,
+- zarządzanie incydentami.
+
+### Kierownik projektu
+
+- harmonogram,
+- budżet,
+- komunikacja,
+- koordynacja interesariuszy.
+
+---
+
+## 38. Stakeholders
+
+Główni interesariusze:
+
+- samorząd lokalny,
+- dyrekcja budynków,
+- administratorzy techniczni,
+- użytkownicy budynków,
+- dostawcy energii,
+- zespół Data Science,
+- dział finansowy,
+- mieszkańcy.
+
+Każda grupa może oceniać projekt według innych kryteriów.
+
+Samorząd:
+
+Redukcja emisji i kosztów.
+
+Administrator:
+
+Niezawodność i prostota obsługi.
+
+Użytkownicy:
+
+Komfort i bezpieczeństwo.
+
+Dział finansowy:
+
+ROI i okres zwrotu.
+
+Zespół techniczny:
+
+Jakość danych i stabilność systemu.
+
+---
+
+## 39. Prezentacja dla interesariuszy
+
+Poniżej proponowany układ prezentacji zarządczej.
+
+### Slajd 1 – Problem
+
+Tytuł:
+
+EcoBuilding AI – inteligentna energia dla budynków publicznych.
+
+Treść:
+
+Budynki publiczne generują koszty energetyczne i emisje gazów cieplarnianych.
+
+Część zużycia wynika z nieoptymalnego sterowania instalacjami.
+
+### Slajd 2 – Rozwiązanie
+
+System Machine Learning:
+
+- prognozuje zapotrzebowanie,
+- analizuje pogodę,
+- wykrywa anomalie,
+- rekomenduje ustawienia HVAC.
+
+### Slajd 3 – Dane
+
+Źródła:
+
+- liczniki,
+- BMS,
+- czujniki,
+- prognozy pogody,
+- harmonogramy użytkowania.
+
+### Slajd 4 – Technologia
+
+- Python,
+- PostgreSQL,
+- LightGBM,
+- scikit-learn,
+- API,
+- monitoring.
+
+### Slajd 5 – Korzyści energetyczne
+
+Hipotetyczny scenariusz:
+
+- baseline: 1000 MWh rocznie,
+- oszczędność brutto: 120 MWh,
+- energia AI: 2 MWh,
+- oszczędność netto: 118 MWh.
+
+### Slajd 6 – Korzyści klimatyczne
+
+Hipotetyczna redukcja:
+
+59 ton CO2e rocznie.
+
+Wynik wymaga potwierdzenia pomiarami i odpowiednimi współczynnikami emisji.
+
+### Slajd 7 – Korzyści ekonomiczne
+
+- inwestycja: 180 000 zł,
+- roczna korzyść netto: 64 400 zł,
+- prosty okres zwrotu: około 2,80 roku.
+
+### Slajd 8 – Green AI
+
+- lekkie modele,
+- ograniczenie treningu,
+- monitoring energii,
+- optymalizacja infrastruktury.
+
+### Slajd 9 – Ryzyka i zabezpieczenia
+
+- kontrola komfortu,
+- możliwość ręcznego sterowania,
+- walidacja danych,
+- cyberbezpieczeństwo,
+- niezależny pomiar oszczędności.
+
+### Slajd 10 – Decyzja
+
+Rekomendacja:
+
+Uruchomić kontrolowany pilotaż w 10 budynkach i podjąć decyzję o skalowaniu po uzyskaniu zweryfikowanych wyników.
+
+---
+
+## 40. Kryteria sukcesu
+
+Projekt można uznać za udany, jeżeli:
+
+1. Osiąga mierzalną oszczędność energii.
+2. Redukcja emisji jest potwierdzona metodologicznie.
+3. Komfort użytkowników nie ulega niedopuszczalnemu pogorszeniu.
+4. System działa stabilnie.
+5. Koszt utrzymania jest uzasadniony korzyściami.
+6. Zużycie energii przez AI jest mierzone.
+7. Wyniki są audytowalne.
+8. Korzyści utrzymują się w kolejnych okresach.
+
+---
+
+## 41. Rekomendacja końcowa
+
+Rekomenduję wdrożenie EcoBuilding AI w formule kontrolowanego pilotażu.
+
+Pierwszym modelem powinien być prosty model bazowy.
+
+Następnie warto przetestować LightGBM i ocenić, czy poprawia prognozy oraz rzeczywiste oszczędności.
+
+Nie należy stosować dużych sieci neuronowych wyłącznie dlatego, że są bardziej zaawansowane.
+
+Najważniejsze są:
+
+- realna redukcja energii,
+- realna redukcja emisji,
+- bezpieczeństwo,
+- opłacalność,
+- niskie koszty działania AI.
+
+W hipotetycznym scenariuszu:
+
+- oszczędność netto wynosi 118 MWh rocznie,
+- redukcja emisji wynosi 59 t CO2e rocznie,
+- roczna korzyść finansowa netto wynosi 64 400 zł,
+- prosty okres zwrotu wynosi około 2,80 roku.
+
+Wszystkie te wartości wymagają potwierdzenia w rzeczywistym pilotażu.
+
+---
+
+## 42. Podsumowanie
+
+EcoBuilding AI łączy Data Science z przeciwdziałaniem zmianom klimatycznym.
+
+Projekt obejmuje:
+
+1. Konkretny problem klimatyczny.
+2. Typy zadań ML.
+3. Podejścia do uczenia.
+4. Źródła danych.
+5. Architekturę techniczną.
+6. Metodologię prognozowania.
+7. Optymalizację zużycia energii.
+8. Framework oceny wpływu.
+9. Szacowanie redukcji CO2e.
+10. Green AI.
+11. Analizę ROI.
+12. Analizę ryzyk.
+13. Harmonogram realizacji.
+14. Prezentację dla interesariuszy.
+
+Najważniejszy wniosek:
+
+Projekt Data Science wspierający ochronę klimatu powinien wykazywać rzeczywiste, mierzalne korzyści środowiskowe.
+
+Nie wystarczy stworzyć dokładny model ML.
+
+Trzeba udowodnić, że jego wykorzystanie prowadzi do oszczędności energii i ograniczenia emisji, a korzyści przewyższają koszty energetyczne oraz ekonomiczne samego rozwiązania.
+
+To podstawowa zasada odpowiedzialnego Green AI.
