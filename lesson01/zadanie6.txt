@@ -1,0 +1,75 @@
+Zadanie 6 - Supervised vs Unsupervised
+
+Dane:
+Baza 100 000 klientów sklepu.
+Cel: podział klientów na grupy w celu personalizacji ofert.
+
+1. Jakie podejście zastosujesz w każdym scenariuszu?
+
+Scenariusz A - uczenie nienadzorowane (unsupervised learning).
+
+Posiadamy dane o wieku, dochodach i historii zakupów klientów, ale nie mamy gotowych kategorii.
+
+Najlepszym rozwiązaniem jest klasteryzacja, np. algorytmem K-Means. Model samodzielnie odkryje podobieństwa między klientami i podzieli ich na grupy.
+
+Przykładowe grupy:
+- Klienci kupujący często i wydający dużo.
+- Klienci kupujący sporadycznie.
+- Klienci zainteresowani promocjami.
+- Klienci kupujący określone kategorie produktów.
+
+Scenariusz B - uczenie nadzorowane (supervised learning).
+
+Mamy 10 000 klientów ręcznie przypisanych do 5 kategorii oraz 90 000 klientów bez etykiet.
+
+Możemy wytrenować model klasyfikacyjny na 10 000 oznaczonych przykładów, a następnie wykorzystać go do przewidywania kategorii pozostałych klientów.
+
+Przykładowe algorytmy: Random Forest, Decision Tree lub Logistic Regression.
+
+2. Jakie są zalety i wady każdego podejścia?
+
+Scenariusz A - uczenie nienadzorowane.
+
+Zalety:
+- Nie wymaga ręcznego oznaczania danych.
+- Pozwala wykorzystać dane wszystkich 100 000 klientów.
+- Może odkrywać nowe, wcześniej nieznane grupy klientów.
+- Umożliwia analizę naturalnych podobieństw między klientami.
+
+Wady:
+- Odkryte grupy nie zawsze są łatwe do interpretacji.
+- Nie ma gwarancji, że grupy będą przydatne biznesowo.
+- Wyniki zależą od wyboru cech, skalowania danych i algorytmu.
+- Trudniej jednoznacznie ocenić jakość podziału.
+
+Scenariusz B - uczenie nadzorowane.
+
+Zalety:
+- Model uczy się na wcześniej określonych kategoriach.
+- Wyniki można porównywać z poprawnymi etykietami.
+- Można stosować metryki takie jak accuracy, precision, recall i F1-score.
+- Kategorie mogą być bezpośrednio powiązane z celami marketingowymi.
+
+Wady:
+- Wymaga ręcznego oznaczania danych, co jest czasochłonne i kosztowne.
+- Jakość modelu zależy od poprawności etykiet.
+- Model może powielać błędy i uprzedzenia występujące w oznaczonych danych.
+- Model jest ograniczony do 5 zdefiniowanych kategorii i może nie wykryć nowych segmentów.
+
+3. Który scenariusz daje lepsze wyniki?
+
+Nie można jednoznacznie stwierdzić, który scenariusz jest lepszy bez sprawdzenia wyników na rzeczywistych danych i oceny skuteczności personalizacji ofert.
+
+Jeśli celem jest odkrycie nowych grup klientów, wybrałbym scenariusz A, czyli uczenie nienadzorowane.
+
+Jeśli 5 ręcznie zdefiniowanych kategorii jest poprawnych i odpowiada potrzebom marketingowym, wybrałbym scenariusz B, czyli uczenie nadzorowane.
+
+W scenariuszu B warto także rozważyć uczenie półnadzorowane, ponieważ mamy 10 000 oznaczonych i 90 000 nieoznaczonych klientów.
+
+Ostateczną decyzję podjąłbym na podstawie testów biznesowych, np. porównania skuteczności kampanii, współczynnika konwersji i wartości sprzedaży.
+
+Wniosek:
+
+Uczenie nienadzorowane służy przede wszystkim do odkrywania grup bez gotowych etykiet, natomiast uczenie nadzorowane pozwala przypisywać klientów do wcześniej zdefiniowanych kategorii.
+
+Najlepsze podejście zależy od jakości danych, celu biznesowego i wyników przeprowadzonych testów.
