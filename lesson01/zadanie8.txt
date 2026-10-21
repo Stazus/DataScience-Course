@@ -1,0 +1,167 @@
+Zadanie 8 - Przykłady zastosowań Data Science dla ekologii
+
+**Projekt 1 - Prognozowanie zużycia energii elektrycznej w budynkach**
+
+1. Problem do rozwiązania
+
+Budynki mieszkalne, biurowce i zakłady przemysłowe zużywają duże ilości energii elektrycznej.
+
+Część energii jest marnowana z powodu nieefektywnego ogrzewania, klimatyzacji, oświetlenia oraz niewłaściwego zarządzania urządzeniami.
+
+Celem projektu jest stworzenie modelu przewidującego zapotrzebowanie na energię elektryczną w kolejnych godzinach lub dniach.
+
+Na podstawie prognoz można lepiej planować zużycie energii i ograniczać straty.
+
+2. Typ zadania ML
+
+Regresja (regression).
+
+Model przewiduje konkretną wartość liczbową, np. ilość energii elektrycznej potrzebnej w danym okresie.
+
+Przykładowy wynik modelu: przewidywane zużycie energii jutro wyniesie 850 kWh.
+
+Ponieważ analizujemy dane zmieniające się w czasie, projekt można również zaliczyć do prognozowania szeregów czasowych (time series forecasting).
+
+3. Jakie dane są potrzebne?
+
+- Historyczne zużycie energii elektrycznej w kWh.
+- Data i godzina pomiaru.
+- Temperatura zewnętrzna i wewnętrzna.
+- Wilgotność powietrza.
+- Liczba osób przebywających w budynku.
+- Informacje o działaniu ogrzewania i klimatyzacji.
+- Dni tygodnia, weekendy i święta.
+- Powierzchnia i charakterystyka energetyczna budynku.
+
+4. Pozytywny wpływ na środowisko
+
+- Ograniczenie niepotrzebnego zużycia energii.
+- Zmniejszenie emisji CO2 związanej z produkcją energii.
+- Efektywniejsze zarządzanie ogrzewaniem i klimatyzacją.
+- Lepsze wykorzystanie energii ze źródeł odnawialnych.
+- Obniżenie kosztów eksploatacji budynków.
+
+Wniosek:
+
+Model regresyjny może pomóc przewidywać zapotrzebowanie na energię i wspierać działania ograniczające jej marnowanie.
+
+---
+
+**Projekt 2 - Automatyczne rozpoznawanie i segregacja odpadów**
+
+1. Problem do rozwiązania
+
+Nieprawidłowa segregacja odpadów utrudnia recykling i powoduje, że część surowców nadających się do ponownego wykorzystania trafia na składowiska.
+
+Celem projektu jest stworzenie systemu rozpoznającego rodzaje odpadów na podstawie zdjęć.
+
+System mógłby wspierać automatyczne sortownie lub inteligentne pojemniki na odpady.
+
+2. Typ zadania ML
+
+Klasyfikacja wieloklasowa (multiclass classification).
+
+Model analizuje zdjęcie odpadu i przypisuje go do odpowiedniej kategorii.
+
+Przykładowe klasy:
+- Papier.
+- Plastik.
+- Szkło.
+- Metal.
+- Bioodpady.
+- Odpady zmieszane.
+
+Przykładowy wynik modelu: plastik.
+
+Jeżeli system ma jednocześnie wykrywać i lokalizować wiele przedmiotów na zdjęciu, można dodatkowo zastosować detekcję obiektów (object detection).
+
+3. Jakie dane są potrzebne?
+
+- Zdjęcia różnych rodzajów odpadów.
+- Etykiety określające kategorię każdego odpadu.
+- Zdjęcia wykonane w różnych warunkach oświetleniowych.
+- Zdjęcia odpadów o różnych kształtach i rozmiarach.
+- Przykłady zabrudzonych i uszkodzonych opakowań.
+- Dane o materiałach, z których wykonano przedmioty.
+- Informacje o lokalnych zasadach segregacji.
+
+4. Pozytywny wpływ na środowisko
+
+- Zwiększenie skuteczności segregacji odpadów.
+- Poprawa jakości surowców kierowanych do recyklingu.
+- Ograniczenie ilości odpadów trafiających na składowiska.
+- Zmniejszenie zapotrzebowania na nowe surowce.
+- Ograniczenie zanieczyszczenia środowiska.
+- Wsparcie gospodarki o obiegu zamkniętym.
+
+Wniosek:
+
+Model klasyfikacyjny może wspierać prawidłową segregację odpadów, zwiększając możliwości ich ponownego wykorzystania.
+
+---
+
+**Projekt 3 - Wykrywanie obszarów o wysokim zanieczyszczeniu powietrza**
+
+1. Problem do rozwiązania
+
+Zanieczyszczenie powietrza stanowi poważny problem środowiskowy i zdrowotny.
+
+Poziom zanieczyszczeń może różnić się pomiędzy dzielnicami miasta w zależności od natężenia ruchu samochodowego, przemysłu, ogrzewania budynków i warunków atmosferycznych.
+
+Celem projektu jest analiza danych z czujników jakości powietrza i identyfikacja obszarów o podobnym poziomie oraz charakterystyce zanieczyszczeń.
+
+2. Typ zadania ML
+
+Klasteryzacja (clustering), czyli uczenie nienadzorowane.
+
+Model grupuje obszary na podstawie podobieństwa parametrów jakości powietrza.
+
+Przykładowy algorytm: K-Means.
+
+Przykładowe wyniki:
+- Grupa 1: obszary o niskim poziomie zanieczyszczeń.
+- Grupa 2: obszary o umiarkowanym poziomie zanieczyszczeń.
+- Grupa 3: obszary o wysokim poziomie zanieczyszczeń.
+
+Nazwy i interpretację grup nadaje się po przeanalizowaniu wyników klasteryzacji.
+
+3. Jakie dane są potrzebne?
+
+- Pomiary stężenia pyłów PM2.5 i PM10.
+- Pomiary dwutlenku azotu (NO2).
+- Pomiary innych zanieczyszczeń, np. ozonu (O3).
+- Lokalizacja czujników jakości powietrza.
+- Data i godzina pomiarów.
+- Temperatura i wilgotność powietrza.
+- Prędkość i kierunek wiatru.
+- Natężenie ruchu samochodowego.
+- Informacje o źródłach emisji zanieczyszczeń.
+
+4. Pozytywny wpływ na środowisko
+
+- Identyfikacja obszarów wymagających działań ograniczających emisję.
+- Lepsze planowanie kontroli źródeł zanieczyszczeń.
+- Wsparcie decyzji dotyczących transportu miejskiego.
+- Pomoc w planowaniu terenów zielonych.
+- Skuteczniejsze monitorowanie jakości powietrza.
+- Możliwość oceny efektów działań ekologicznych.
+
+Wniosek:
+
+Klasteryzacja może pomóc wykrywać obszary o podobnej charakterystyce zanieczyszczeń i wspierać planowanie działań poprawiających jakość powietrza.
+
+---
+
+**Podsumowanie**
+
+Przedstawione projekty pokazują trzy różne zastosowania Data Science w ochronie środowiska:
+
+1. Prognozowanie zużycia energii - regresja.
+2. Automatyczna segregacja odpadów - klasyfikacja wieloklasowa.
+3. Analiza zanieczyszczenia powietrza - klasteryzacja.
+
+Każdy z projektów wykorzystuje dane do rozwiązywania konkretnego problemu środowiskowego.
+
+Data Science może wspierać ograniczanie zużycia zasobów naturalnych, zwiększanie efektywności recyklingu oraz poprawę jakości powietrza.
+
+Rzeczywisty wpływ środowiskowy każdego rozwiązania powinien zostać potwierdzony pomiarami po jego wdrożeniu.
