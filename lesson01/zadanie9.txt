@@ -1,0 +1,317 @@
+# Zadanie 9 – Projektowanie systemu rekomendacji filmów
+
+## Cel projektu
+
+Celem projektu jest zaprojektowanie systemu rekomendacji filmów dla platformy streamingowej.
+
+System powinien analizować preferencje użytkowników, informacje o filmach oraz historię interakcji, a następnie proponować filmy, które z największym prawdopodobieństwem zainteresują konkretnego użytkownika.
+
+Przykładowy wynik działania systemu:
+
+Użytkownik otrzymuje listę 10 filmów uporządkowanych od najbardziej do najmniej rekomendowanego.
+
+## 1. Jaki typ zadania Machine Learning zastosujemy?
+
+Głównym typem zadania jest ranking (learning to rank), czyli porządkowanie filmów według przewidywanego zainteresowania użytkownika.
+
+System może również wykorzystywać:
+
+- Klasyfikację – przewidywanie, czy użytkownik obejrzy dany film.
+- Regresję – przewidywanie oceny, jaką użytkownik wystawi filmowi.
+- Klasteryzację – grupowanie użytkowników o podobnych zainteresowaniach.
+
+Ostatecznym zadaniem systemu jest utworzenie rankingu filmów dopasowanego do konkretnego użytkownika.
+
+Przykładowy wynik:
+
+1. Film A – wynik rekomendacji 0,95.
+2. Film B – wynik rekomendacji 0,89.
+3. Film C – wynik rekomendacji 0,83.
+
+Wartości te są przykładowymi wynikami modelu, a nie rzeczywistymi prawdopodobieństwami.
+
+## 2. Jakie dane są potrzebne?
+
+### A. Dane o użytkownikach
+
+- Anonimowy identyfikator użytkownika.
+- Historia oglądanych filmów.
+- Preferowane gatunki filmowe.
+- Oceny wystawiane filmom.
+- Lista ulubionych filmów.
+- Preferowany język treści.
+
+Dane powinny być ograniczone do informacji potrzebnych do działania systemu, z uwzględnieniem ochrony prywatności.
+
+### B. Dane o filmach
+
+- Identyfikator filmu.
+- Tytuł.
+- Gatunek.
+- Rok produkcji.
+- Reżyser i obsada.
+- Opis fabuły.
+- Czas trwania.
+- Język.
+- Słowa kluczowe opisujące tematykę.
+
+### C. Dane o interakcjach
+
+- Obejrzenie filmu.
+- Czas oglądania.
+- Procent obejrzanego filmu.
+- Przerwanie oglądania.
+- Dodanie filmu do ulubionych.
+- Ocena filmu.
+- Kliknięcie rekomendacji.
+- Data i godzina interakcji.
+
+Ważne jest rozróżnienie braku zainteresowania od sytuacji, w której użytkownik nie miał możliwości zobaczenia danego filmu.
+
+## 3. Jakie podejście do uczenia zastosujemy?
+
+Zastosowałbym hybrydowy system rekomendacji, łączący trzy podejścia.
+
+### A. Collaborative Filtering – filtrowanie współpracujące
+
+System analizuje podobieństwa pomiędzy użytkownikami oraz ich interakcjami z filmami.
+
+Jeżeli użytkownicy A i B oglądają podobne filmy, system może polecić użytkownikowi A film, który spodobał się użytkownikowi B.
+
+Zalety:
+
+- Wykorzystuje rzeczywiste zachowania użytkowników.
+- Może odkrywać nieoczywiste zainteresowania.
+- Nie wymaga szczegółowego opisu każdego filmu.
+
+Wady:
+
+- Problem cold start dla nowych użytkowników i filmów.
+- Trudności przy niewielkiej liczbie interakcji.
+
+### B. Content-Based Filtering – filtrowanie na podstawie treści
+
+System rekomenduje filmy podobne do tych, które użytkownik wcześniej oglądał i pozytywnie oceniał.
+
+Podobieństwo można określać na podstawie gatunku, opisu, obsady i innych cech filmu.
+
+Zalety:
+
+- Możliwość rekomendowania nowych filmów na podstawie ich opisów.
+- Łatwiejsze wyjaśnienie, dlaczego film został polecony.
+
+Wady:
+
+- Ryzyko rekomendowania zbyt podobnych filmów.
+- Jakość zależy od dostępnych informacji o filmach.
+
+### C. Model rankingowy
+
+Model otrzymuje listę potencjalnie interesujących filmów i ustala kolejność rekomendacji.
+
+Może wykorzystywać:
+
+- Podobieństwo filmu do zainteresowań użytkownika.
+- Historię oglądania.
+- Oceny filmów.
+- Popularność filmu.
+- Wyniki wcześniejszych interakcji.
+
+W wersji początkowej można zastosować prosty model rankingowy lub algorytm punktowy, a następnie porównać go z bardziej zaawansowanymi rozwiązaniami.
+
+### Rodzaj uczenia
+
+Wykorzystamy przede wszystkim uczenie nadzorowane na historycznych interakcjach użytkowników, a także metody filtrowania współpracującego, które mogą korzystać z niejawnej informacji zwrotnej.
+
+Klasteryzacja użytkowników może stanowić dodatkowy element uczenia nienadzorowanego.
+
+**Uzasadnienie wyboru:**
+
+System hybrydowy łączy zalety rekomendacji opartych na zachowaniach użytkowników i cechach filmów. Pozwala również ograniczać niektóre problemy występujące przy stosowaniu tylko jednej metody.
+
+## 4. Architektura systemu
+
+Proponowana architektura składa się z następujących elementów:
+
+**Etap 1 – Gromadzenie danych**
+
+Platforma zapisuje informacje o filmach, użytkownikach i ich interakcjach.
+
+**Etap 2 – Przygotowanie danych**
+
+Dane są czyszczone, przekształcane i przygotowywane do analizy.
+
+Przykładowe technologie: Python, Pandas, NumPy.
+
+**Etap 3 – Generowanie kandydatów**
+
+System wybiera ograniczoną grupę filmów, które mogą zainteresować użytkownika.
+
+Wykorzystuje filtrowanie współpracujące oraz filtrowanie na podstawie treści.
+
+**Etap 4 – Ranking rekomendacji**
+
+Model rankingowy oblicza wynik dopasowania dla każdego kandydata i porządkuje filmy.
+
+**Etap 5 – Udostępnienie rekomendacji**
+
+Backend udostępnia rekomendacje poprzez REST API.
+
+Przykładowy endpoint:
+
+GET /api/recommendations/123/
+
+Przykładowa odpowiedź:
+
+```json
+{
+  "user_id": 123,
+  "recommended_movies": [
+    {"movie_id": 15, "score": 0.95},
+    {"movie_id": 42, "score": 0.89},
+    {"movie_id": 87, "score": 0.83}
+  ]
+}
+```
+
+**Etap 6 – Zbieranie informacji zwrotnej**
+
+System rejestruje interakcje z rekomendacjami, aby okresowo aktualizować model.
+
+Schemat przepływu danych:
+
+Dane użytkowników i filmów → Przygotowanie danych → Generowanie kandydatów → Ranking → REST API → Rekomendacje → Nowe interakcje.
+
+### Proponowane technologie
+
+- Python – implementacja logiki systemu.
+- Pandas i NumPy – przetwarzanie danych.
+- Scikit-learn – proste modele i analiza podobieństwa.
+- PostgreSQL – przechowywanie danych.
+- Django REST Framework – udostępnianie rekomendacji przez API.
+- Docker – uruchamianie aplikacji w kontenerach.
+
+Technologie te stanowią propozycję architektury, a nie informację o już wykonanej implementacji.
+
+## 5. Jak ocenić jakość rekomendacji?
+
+Podstawową metryką będzie Precision@10.
+
+Metryka określa, jaki odsetek spośród 10 poleconych filmów jest rzeczywiście trafny dla użytkownika.
+
+Przykład:
+
+System rekomenduje 10 filmów, z których 7 uznajemy za trafne na podstawie przyjętej definicji zainteresowania.
+
+Precision@10 = 7 / 10 = 70%.
+
+Dodatkowe metryki:
+
+- Recall@10 – jaki odsetek wszystkich istotnych filmów znalazł się w pierwszych 10 rekomendacjach.
+- NDCG@10 – ocenia trafność rekomendacji z uwzględnieniem ich pozycji w rankingu.
+- Coverage – jaki odsetek dostępnego katalogu filmów pojawia się w rekomendacjach.
+- Diversity – różnorodność proponowanych filmów.
+
+### Sposób testowania
+
+Dane należy podzielić chronologicznie na treningowe, walidacyjne i testowe.
+
+Model trenujemy na wcześniejszych interakcjach, a jego skuteczność sprawdzamy na późniejszych zachowaniach użytkowników.
+
+Trzeba unikać wykorzystywania przyszłych interakcji podczas trenowania modelu.
+
+Po wdrożeniu można przeprowadzić testy A/B, porównując nowy system z dotychczasowym.
+
+Przykładowe wskaźniki biznesowe:
+
+- Współczynnik kliknięć rekomendacji (CTR).
+- Odsetek rozpoczętych seansów.
+- Odsetek obejrzanych filmów.
+- Satysfakcja użytkowników.
+
+## 6. Jak zoptymalizować system pod kątem Green AI?
+
+Celem jest ograniczenie zużycia energii i zasobów obliczeniowych przy zachowaniu odpowiedniej jakości rekomendacji.
+
+### A. Wykorzystanie prostszych modeli
+
+Na początku zastosujemy prostsze algorytmy, np. podobieństwo kosinusowe i filtrowanie współpracujące.
+
+Bardziej złożone modele wykorzystamy dopiero wtedy, gdy testy potwierdzą istotną poprawę jakości rekomendacji.
+
+### B. Ograniczenie liczby kandydatów
+
+Zamiast oceniać wszystkie filmy za pomocą kosztownego modelu rankingowego, najpierw wybierzemy ograniczoną liczbę kandydatów.
+
+Przykład:
+
+Z katalogu 100 000 filmów wybieramy 200 kandydatów, a następnie model rankingowy ustala ich kolejność.
+
+Pozwala to ograniczyć liczbę kosztownych obliczeń.
+
+### C. Cache rekomendacji
+
+Gotowe rekomendacje można tymczasowo przechowywać w pamięci podręcznej.
+
+Jeżeli użytkownik wielokrotnie otwiera stronę, system nie musi za każdym razem wykonywać wszystkich obliczeń.
+
+### D. Okresowe trenowanie
+
+Nie będziemy trenować modelu po każdej pojedynczej interakcji.
+
+Model może być aktualizowany okresowo, np. raz dziennie, jeżeli testy wykażą, że taka częstotliwość jest wystarczająca.
+
+### E. Optymalizacja danych
+
+- Usuwanie zbędnych cech.
+- Wykorzystanie odpowiednich typów danych.
+- Przetwarzanie danych partiami.
+- Unikanie wielokrotnego wykonywania tych samych obliczeń.
+- Ograniczanie liczby eksperymentów bez uzasadnienia.
+
+### F. Dobór sprzętu
+
+Dla prostszych modeli można wykorzystywać CPU.
+
+GPU powinno być stosowane wtedy, gdy zapewnia rzeczywistą korzyść pod względem czasu obliczeń lub efektywności energetycznej.
+
+### G. Monitorowanie zużycia energii
+
+Należy mierzyć:
+
+- Czas treningu.
+- Zużycie CPU i GPU.
+- Wykorzystanie RAM i VRAM.
+- Zużycie energii w kWh.
+- Liczbę rekomendacji generowanych na jednostkę energii.
+- Jakość rekomendacji.
+
+Pozwoli to porównywać modele nie tylko pod względem skuteczności, ale również kosztów energetycznych.
+
+## 7. Plan wdrożenia i optymalizacji energetycznej
+
+**Etap 1:** Przygotowanie danych i prostego systemu bazowego.
+
+**Etap 2:** Implementacja filtrowania współpracującego i opartego na treści.
+
+**Etap 3:** Dodanie rankingu rekomendacji.
+
+**Etap 4:** Ocena jakości za pomocą Precision@10 i NDCG@10.
+
+**Etap 5:** Pomiar czasu obliczeń oraz zużycia energii.
+
+**Etap 6:** Dodanie cache, ograniczenie liczby kandydatów i optymalizacja częstotliwości treningu.
+
+**Etap 7:** Porównanie jakości i zużycia energii przed optymalizacją oraz po niej.
+
+## Podsumowanie
+
+Zaprojektowany system rekomendacji filmów wykorzystuje podejście hybrydowe, łączące filtrowanie współpracujące, analizę cech filmów oraz ranking.
+
+Podstawową metryką jakości będzie Precision@10, uzupełniona o NDCG@10 i wskaźniki biznesowe.
+
+Architektura obejmuje przygotowanie danych, generowanie kandydatów, ranking, REST API oraz zbieranie informacji zwrotnej.
+
+Zgodnie z podejściem Green AI system powinien ograniczać liczbę zbędnych obliczeń, wykorzystywać cache, odpowiednio dobierać sprzęt i monitorować zużycie energii.
+
+Ostateczny wybór algorytmów i parametrów powinien wynikać z pomiarów jakości rekomendacji oraz kosztów obliczeniowych.
