@@ -1,0 +1,421 @@
+# Lekcja 1 – Zadanie 11
+## Design case: wykrywanie fraudu w transakcjach kartą kredytową
+
+### 1. Opis problemu
+
+Bank chce automatycznie wykrywać oszukańcze transakcje kartami kredytowymi (fraud detection).
+
+Dane wejściowe:
+
+- Liczba transakcji: 10 000 000 dziennie.
+- Udział oszustw: około 0,1%.
+- Liczba oszustw: około 10 000 dziennie.
+- Liczba legalnych transakcji: około 9 990 000 dziennie.
+- Dostępne cechy: kwota transakcji, lokalizacja, czas, typ sklepu oraz historia klienta.
+
+Głównym celem jest wykrywanie możliwie dużej liczby oszustw przy jednoczesnym ograniczeniu fałszywych alarmów, kosztów operacyjnych i zużycia energii.
+
+System powinien działać niemal w czasie rzeczywistym, aby umożliwić reakcję jeszcze podczas autoryzacji transakcji.
+
+### 2. Jaki typ zadania Machine Learning?
+
+Jest to przede wszystkim problem klasyfikacji binarnej (binary classification).
+
+Model przypisuje każdej transakcji jedną z dwóch klas:
+
+- 0 – transakcja legalna,
+- 1 – transakcja oszukańcza (fraud).
+
+W praktyce model powinien zwracać również wynik punktowy, np. prawdopodobieństwo oszustwa od 0 do 1.
+
+Na podstawie tego wyniku bank podejmuje odpowiednią decyzję.
+
+Przykładowa polityka decyzyjna:
+
+- Niskie ryzyko – zaakceptowanie transakcji.
+- Średnie ryzyko – dodatkowa weryfikacja klienta.
+- Wysokie ryzyko – wstrzymanie transakcji i skierowanie do kontroli.
+
+Progi ryzyka należy ustalić na podstawie danych, kosztów błędów i wymagań banku, a nie przyjmować arbitralnie.
+
+### 3. Supervised czy unsupervised learning?
+
+Podstawowym podejściem będzie supervised learning, czyli uczenie nadzorowane.
+
+Uzasadnienie:
+
+Bank może dysponować historycznymi transakcjami, dla których ustalono, czy były legalne, czy oszukańcze.
+
+Przykładowe etykiety:
+
+- 0 – legalna transakcja,
+- 1 – potwierdzony fraud.
+
+Model uczy się zależności między cechami transakcji a jej etykietą.
+
+Możliwe algorytmy:
+
+1. Logistic Regression – prosty i szybki model bazowy.
+2. Random Forest – wykrywa nieliniowe zależności.
+3. Gradient Boosting, np. LightGBM lub XGBoost – dobry kandydat do danych tabelarycznych.
+
+Uzupełnieniem może być unsupervised learning, czyli uczenie nienadzorowane.
+
+Przykładowe metody:
+
+- Isolation Forest,
+- wykrywanie anomalii,
+- analiza nietypowych zachowań klientów.
+
+Metody nienadzorowane mogą pomagać w wykrywaniu nowych schematów oszustw, których nie było w danych treningowych.
+
+Rekomendacja:
+
+Zastosować podejście hybrydowe:
+
+- główny klasyfikator nadzorowany,
+- dodatkowy moduł wykrywania anomalii,
+- reguły bezpieczeństwa banku,
+- kontrola analityków w przypadkach wymagających wyjaśnienia.
+
+### 4. Architektura proponowanego systemu
+
+Proponowany przepływ danych:
+
+TRANSAKCJA KARTĄ
+       |
+       v
+SYSTEM AUTORYZACYJNY BANKU
+       |
+       v
+POBRANIE CECH TRANSAKCJI
+       |
+       v
+WSTĘPNE REGUŁY BEZPIECZEŃSTWA
+       |
+       v
+MODEL MACHINE LEARNING
+       |
+       v
+OCENA RYZYKA FRAUDU
+       |
+       v
+SILNIK DECYZYJNY
+       |
+       +--> Niskie ryzyko: akceptacja
+       |
+       +--> Średnie ryzyko: dodatkowa weryfikacja
+       |
+       +--> Wysokie ryzyko: wstrzymanie i kontrola
+       |
+       v
+ZAPIS WYNIKU I MONITORING
+
+System składa się z następujących elementów:
+
+A. Warstwa przyjmowania transakcji
+
+Odbiera informacje o płatności z systemu bankowego.
+
+B. Warstwa przygotowania cech
+
+Przetwarza dane wejściowe i oblicza dodatkowe cechy.
+
+Przykłady:
+
+- Kwota transakcji w stosunku do typowych wydatków klienta.
+- Liczba transakcji wykonanych w ostatnich 5 minutach.
+- Odległość od lokalizacji poprzedniej transakcji.
+- Nietypowa godzina płatności.
+- Nowy lub nietypowy rodzaj sklepu.
+- Częstotliwość odrzuconych transakcji.
+- Zmiana zachowania klienta względem historii.
+
+Wszystkie cechy muszą być dostępne w chwili podejmowania decyzji, bez wykorzystywania informacji z przyszłości.
+
+C. Warstwa modeli ML
+
+Główny model klasyfikacyjny oblicza wynik ryzyka.
+
+Dodatkowy model wykrywania anomalii może sygnalizować nietypowe przypadki.
+
+D. Silnik decyzyjny
+
+Łączy wynik modelu, reguły bankowe i ustalone progi ryzyka.
+
+E. Warstwa monitoringu
+
+Zapisuje wyniki, mierzy skuteczność, wykrywa zmiany rozkładu danych i umożliwia późniejsze trenowanie modeli.
+
+### 5. Najważniejsze wyzwanie: niezbalansowane dane
+
+Fraud stanowi zaledwie 0,1% wszystkich transakcji.
+
+Oznacza to, że na 10 000 transakcji przypada średnio:
+
+- 9 990 transakcji legalnych,
+- 10 transakcji oszukańczych.
+
+Model, który zawsze przewiduje transakcję legalną, osiągnąłby accuracy na poziomie 99,9%.
+
+Jednocześnie nie wykryłby ani jednego oszustwa.
+
+Dlatego sama accuracy jest niewystarczającą metryką.
+
+Możliwe rozwiązania problemu niezbalansowanych danych:
+
+1. Zastosowanie wag klas (class weights), zwiększających znaczenie fraudów podczas uczenia.
+2. Oversampling klasy mniejszościowej w zbiorze treningowym.
+3. Undersampling części transakcji legalnych, z zachowaniem reprezentatywności danych.
+4. Testowanie metod takich jak SMOTE wyłącznie na danych treningowych, z ostrożnością ze względu na specyfikę transakcji.
+5. Dobór progu klasyfikacji na podstawie precision, recall i kosztów biznesowych.
+6. Wykorzystanie modeli i funkcji straty uwzględniających niezbalansowanie klas.
+
+Należy zachować rzeczywisty udział fraudów w zbiorze testowym, aby ocena odpowiadała warunkom produkcyjnym.
+
+### 6. Inne wyzwania i sposoby rozwiązania
+
+A. Fałszywe alarmy
+
+Model może uznać legalną transakcję za oszustwo.
+
+Skutki:
+
+- niezadowolenie klienta,
+- zablokowanie prawidłowej płatności,
+- dodatkowe koszty obsługi.
+
+Rozwiązanie:
+
+Odpowiednio dobrać progi ryzyka i stosować dodatkową weryfikację zamiast automatycznego blokowania wszystkich podejrzanych transakcji.
+
+B. Niewykryte oszustwa
+
+Model może zaakceptować transakcję oszukańczą.
+
+Skutki:
+
+- straty finansowe,
+- reklamacje,
+- utrata zaufania klientów.
+
+Rozwiązanie:
+
+Monitorować recall oraz wartość finansową niewykrytych oszustw.
+
+C. Zmieniające się metody oszustw
+
+Przestępcy dostosowują swoje działania do zabezpieczeń banków.
+
+Rozwiązanie:
+
+Regularnie monitorować data drift i concept drift, aktualizować modele oraz wykorzystywać analizę anomalii.
+
+D. Opóźnione etykiety
+
+Potwierdzenie oszustwa może pojawić się dopiero po pewnym czasie, np. po reklamacji klienta.
+
+Rozwiązanie:
+
+Oddzielać transakcje potwierdzone od przypadków nierozstrzygniętych oraz uwzględniać opóźnienia podczas przygotowania danych treningowych.
+
+E. Bezpieczeństwo i prywatność
+
+System przetwarza wrażliwe informacje finansowe.
+
+Rozwiązanie:
+
+Stosować szyfrowanie, kontrolę dostępu, minimalizację danych, rejestrowanie operacji oraz odpowiednie procedury ochrony danych.
+
+### 7. Jak oceniać skuteczność modelu?
+
+Podstawą oceny będzie confusion matrix, czyli macierz pomyłek.
+
+Wyróżniamy:
+
+- TP (True Positive) – poprawnie wykryty fraud.
+- TN (True Negative) – poprawnie rozpoznana legalna transakcja.
+- FP (False Positive) – legalna transakcja błędnie uznana za fraud.
+- FN (False Negative) – fraud niewykryty przez model.
+
+Najważniejsze metryki:
+
+A. Precision
+
+Precision = TP / (TP + FP)
+
+Informuje, jaki odsetek transakcji oznaczonych jako fraud rzeczywiście był oszustwem.
+
+Wysokie precision ogranicza liczbę fałszywych alarmów.
+
+B. Recall
+
+Recall = TP / (TP + FN)
+
+Informuje, jaki odsetek rzeczywistych oszustw został wykryty.
+
+Wysokie recall zmniejsza liczbę przeoczonych fraudów.
+
+C. F1-score
+
+F1 = 2 * Precision * Recall / (Precision + Recall)
+
+Łączy precision i recall w jedną miarę.
+
+D. PR-AUC
+
+Pole pod krzywą Precision-Recall.
+
+Jest szczególnie przydatne przy silnie niezbalansowanych danych.
+
+E. ROC-AUC
+
+Pozwala ocenić zdolność modelu do rozróżniania klas, ale przy bardzo rzadkich fraudach może dawać zbyt optymistyczny obraz użyteczności systemu.
+
+F. Metryki biznesowe
+
+Należy również mierzyć:
+
+- wartość wykrytych oszustw,
+- wartość strat z niewykrytych oszustw,
+- liczbę fałszywie zablokowanych płatności,
+- koszt dodatkowych weryfikacji,
+- średni czas podjęcia decyzji.
+
+### 8. Przykład oceny modelu
+
+Załóżmy, że analizujemy 1 000 000 transakcji, z czego 1 000 to fraudy.
+
+Przykładowy model wykrywa 900 oszustw, ale jednocześnie błędnie oznacza 1 800 legalnych transakcji jako fraud.
+
+Macierz pomyłek:
+
+- TP = 900
+- FN = 100
+- FP = 1 800
+- TN = 997 200
+
+Obliczenia:
+
+Precision = 900 / (900 + 1800) = 33,33%
+
+Recall = 900 / (900 + 100) = 90%
+
+F1-score = 2 * 0,3333 * 0,9 / (0,3333 + 0,9) = około 48,65%
+
+Accuracy = (900 + 997200) / 1000000 = 99,81%
+
+Wniosek:
+
+Pomimo accuracy na poziomie 99,81% aż dwie trzecie alarmów okazują się fałszywe.
+
+Pokazuje to, dlaczego w wykrywaniu fraudów należy analizować przede wszystkim precision, recall, PR-AUC oraz koszty biznesowe.
+
+### 9. Jak zapewnić energooszczędność systemu?
+
+System obsługuje 10 milionów transakcji dziennie.
+
+Średnie obciążenie wynosi:
+
+10 000 000 / 86 400 = około 116 transakcji na sekundę.
+
+W rzeczywistości występują jednak szczyty ruchu, dlatego system musi obsługiwać znacznie większe chwilowe obciążenie.
+
+Proponowane rozwiązania:
+
+A. Lekkie modele ML
+
+W pierwszej kolejności należy przetestować Logistic Regression i modele drzewiaste, np. LightGBM.
+
+Dla wielu problemów tabelarycznych nie jest konieczne stosowanie dużych sieci neuronowych.
+
+B. Architektura wieloetapowa
+
+Proste reguły i lekki model oceniają wszystkie transakcje.
+
+Bardziej kosztowny model uruchamiany jest tylko dla wybranych, trudnych przypadków.
+
+Ważne, aby etap wstępny nie odrzucał przypadków wysokiego ryzyka bez odpowiedniej kontroli jakości.
+
+C. Przetwarzanie na CPU
+
+Lekkie modele tabelaryczne często mogą działać efektywnie na procesorach CPU, bez konieczności używania GPU przy każdej transakcji.
+
+D. Buforowanie cech
+
+Często wykorzystywane informacje o historii klienta mogą być przechowywane w szybkiej pamięci podręcznej.
+
+Pozwala to ograniczyć powtarzanie kosztownych zapytań do baz danych.
+
+E. Aktualizacja cech przyrostowo
+
+Zamiast ponownie analizować całą historię klienta, system aktualizuje liczniki i statystyki na bieżąco.
+
+F. Rozdzielenie uczenia od predykcji
+
+Trenowanie modeli odbywa się okresowo poza ścieżką autoryzacji.
+
+Podczas obsługi transakcji system wykonuje tylko szybkie predykcje.
+
+G. Monitoring zużycia energii
+
+Należy mierzyć:
+
+- zużycie energii w Wh na milion transakcji,
+- średni i maksymalny czas predykcji,
+- wykorzystanie CPU i pamięci,
+- koszt infrastruktury,
+- skuteczność wykrywania fraudów.
+
+Optymalizacja energetyczna nie może prowadzić do nieakceptowalnego pogorszenia bezpieczeństwa.
+
+### 10. Walidacja i wdrożenie systemu
+
+Dane należy dzielić chronologicznie:
+
+- starsze transakcje – zbiór treningowy,
+- późniejsze transakcje – zbiór walidacyjny,
+- najnowsze transakcje – zbiór testowy.
+
+Takie podejście lepiej odzwierciedla działanie modelu na przyszłych transakcjach.
+
+Należy zapobiegać wyciekowi informacji (data leakage), np. użyciu danych o reklamacji, które nie były znane w momencie autoryzacji.
+
+Proponowany proces wdrożenia:
+
+1. Przygotowanie danych i ich anonimizacja lub pseudonimizacja.
+2. Trenowanie modelu bazowego Logistic Regression.
+3. Porównanie z modelem LightGBM lub XGBoost.
+4. Ocena precision, recall, PR-AUC i kosztów biznesowych.
+5. Kalibracja wyników ryzyka i dobór progów decyzyjnych.
+6. Testy opóźnień i obciążenia infrastruktury.
+7. Uruchomienie w trybie shadow mode, bez wpływu na decyzje banku.
+8. Stopniowe wdrażanie po zatwierdzeniu wyników.
+9. Stały monitoring skuteczności, błędów i zmian danych.
+10. Okresowa aktualizacja modelu oraz możliwość powrotu do poprzedniej wersji.
+
+### 11. Ostateczna rekomendacja
+
+Rekomenduję system hybrydowy, którego głównym elementem jest nadzorowany model klasyfikacji binarnej, np. LightGBM.
+
+Uzupełnieniem powinny być:
+
+- proste reguły bezpieczeństwa,
+- moduł wykrywania anomalii,
+- silnik decyzyjny z kilkoma poziomami ryzyka,
+- dodatkowa weryfikacja podejrzanych transakcji,
+- monitoring skuteczności i energooszczędności.
+
+Najważniejsze kryteria sukcesu:
+
+1. Wysoki recall – wykrywanie dużej części oszustw.
+2. Akceptowalne precision – ograniczenie fałszywych alarmów.
+3. Niski czas odpowiedzi – możliwość działania podczas autoryzacji.
+4. Skalowalność – obsługa 10 milionów transakcji dziennie i szczytów ruchu.
+5. Niskie zużycie energii – bez utraty wymaganego poziomu bezpieczeństwa.
+
+Wniosek końcowy:
+
+Wykrywanie fraudów jest problemem klasyfikacji binarnej z bardzo silnie niezbalansowanymi danymi. Najlepsze rozwiązanie powinno łączyć skuteczny model nadzorowany, wykrywanie anomalii, reguły bankowe i odpowiednią architekturę produkcyjną.
+
+Sama accuracy nie wystarcza do oceny takiego systemu. Kluczowe są precision, recall, PR-AUC, rzeczywiste koszty błędów oraz szybkość i efektywność energetyczna całego rozwiązania.
