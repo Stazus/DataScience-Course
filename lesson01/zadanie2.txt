@@ -1,0 +1,21 @@
+Zadanie 2 - Rodzaje uczenia
+
+1. Segmentacja klientów sklepu (brak danych o grupach)
+Typ: uczenie nienadzorowane (unsupervised learning).
+Uzasadnienie: Nie znamy wcześniej grup klientów. Algorytm sam odkrywa podobieństwa między klientami i tworzy segmenty na podstawie ich cech oraz zachowań.
+Dlaczego inne podejścia są gorsze: Uczenie nadzorowane i półnadzorowane wymagają przynajmniej częściowo oznaczonych danych. Uczenie ze wzmocnieniem dotyczy podejmowania decyzji na podstawie nagród, a nie samego grupowania.
+
+2. Klasyfikacja zdjęć kotów i psów (10 000 opisanych zdjęć)
+Typ: uczenie nadzorowane (supervised learning).
+Uzasadnienie: Dysponujemy zdjęciami z etykietami kot lub pies. Model uczy się na przykładach z poprawnymi odpowiedziami, aby klasyfikować nowe zdjęcia.
+Dlaczego inne podejścia są gorsze: Uczenie nienadzorowane nie wykorzystuje dostępnych etykiet. Uczenie półnadzorowane nie jest potrzebne, ponieważ dane są opisane. Uczenie ze wzmocnieniem nie jest naturalnym wyborem do klasyfikacji gotowych zdjęć.
+
+3. Nauczenie robota chodzenia
+Typ: uczenie ze wzmocnieniem (reinforcement learning).
+Uzasadnienie: Robot uczy się poprzez wykonywanie działań i otrzymywanie nagród za utrzymanie równowagi oraz przemieszczanie się, a kar za upadki. Stopniowo doskonali sposób chodzenia.
+Dlaczego inne podejścia są gorsze: Uczenie nadzorowane wymagałoby przykładów poprawnych działań. Uczenie nienadzorowane i półnadzorowane nie rozwiązują bezpośrednio problemu uczenia sekwencji działań na podstawie nagród.
+
+4. Rozpoznawanie twarzy (1 000 opisanych i 100 000 nieopisanych zdjęć)
+Typ: uczenie półnadzorowane (semi-supervised learning).
+Uzasadnienie: Mamy niewielką liczbę zdjęć z etykietami oraz bardzo dużą liczbę zdjęć bez etykiet. Model może wykorzystać oba zbiory, aby poprawić rozpoznawanie twarzy.
+Dlaczego inne podejścia są gorsze: Uczenie nadzorowane wykorzystałoby głównie 1 000 opisanych zdjęć, pomijając potencjał pozostałych danych. Uczenie nienadzorowane nie korzysta bezpośrednio z dostępnych etykiet. Uczenie ze wzmocnieniem nie jest odpowiednim podejściem do tego zadania klasyfikacyjnego.
