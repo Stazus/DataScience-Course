@@ -1,0 +1,42 @@
+Zadanie 4 - Analiza case study: spam filter
+
+1. Jakie dane potrzebujesz do treningu modelu?
+
+Potrzebujemy zbioru historycznych wiadomości e-mail, które zostały oznaczone jako spam lub nie-spam. Dane powinny zawierać treść wiadomości, temat, informacje o nadawcy oraz poprawną etykietę klasy. Zbiór powinien być zróżnicowany i reprezentować rzeczywiste wiadomości. Należy podzielić go na dane treningowe, walidacyjne i testowe, unikając przenikania tych samych lub niemal identycznych wiadomości między zbiorami. Trzeba także chronić dane osobowe użytkowników.
+
+2. Jaki typ zadania ML to jest?
+
+Jest to klasyfikacja binarna (binary classification).
+Model przypisuje każdą wiadomość do jednej z dwóch klas: spam albo nie-spam.
+Przykładowy wynik: spam.
+
+3. Jakie podejście do uczenia zastosujesz?
+
+Zastosujemy uczenie nadzorowane (supervised learning), ponieważ dysponujemy wiadomościami z przypisanymi etykietami. Model nauczy się rozpoznawać wzorce występujące w spamie i zwykłych wiadomościach, a następnie będzie klasyfikował nowe e-maile.
+
+4. Jakie cechy (features) e-maila mogą być użyteczne?
+
+- Słowa i wyrażenia występujące w treści oraz temacie wiadomości.
+- Adres i domena nadawcy.
+- Liczba oraz rodzaj linków w wiadomości.
+- Obecność i rodzaj załączników.
+- Długość wiadomości.
+- Liczba znaków specjalnych i wykrzykników.
+- Udział wielkich liter w tekście.
+- Występowanie podejrzanych fraz, np. 'wygrałeś nagrodę'.
+
+Tekst można przekształcić na cechy liczbowe, np. za pomocą TF-IDF, aby model mógł go analizować.
+
+5. Jak ocenisz, czy model działa dobrze?
+
+Sprawdzimy skuteczność modelu na danych testowych, których nie widział podczas treningu. Wykorzystamy następujące metryki:
+
+- Accuracy (dokładność): odsetek wszystkich poprawnie sklasyfikowanych wiadomości.
+- Precision (precyzja dla spamu): jaki odsetek wiadomości oznaczonych jako spam rzeczywiście jest spamem.
+- Recall (czułość dla spamu): jaki odsetek rzeczywistych wiadomości spamowych model wykrył.
+- F1-score: miara łącząca precision i recall.
+- Macierz pomyłek: pokazuje poprawne klasyfikacje oraz oba rodzaje błędów.
+
+Szczególnie ważne jest ograniczenie sytuacji, w której prawidłowa wiadomość trafia do spamu (false positive), ponieważ użytkownik może przez to stracić ważną korespondencję. Należy też sprawdzać, ile spamu model przepuszcza (false negative).
+
+Przykładowy wynik oceny: precision = 97%, recall = 94%, F1-score około 95,5%. Są to wartości przykładowe, a nie wyniki rzeczywiście wytrenowanego modelu.
