@@ -1,0 +1,172 @@
+# Lekcja 1 – Zadanie 20
+## Future of Green AI – Jak będzie wyglądać Green AI w 2030 roku?
+
+**Rodzaj pracy:** esej analityczny z elementami prognozy technologicznej
+**Perspektywa:** stan wiedzy w 2026 roku i przewidywania do 2030 roku
+
+### 1. Wprowadzenie
+
+Sztuczna inteligencja rozwija się niezwykle szybko. Coraz większe modele językowe, systemy rozpoznawania obrazów i rozwiązania autonomiczne oferują nowe możliwości, ale wymagają również energii, infrastruktury obliczeniowej i zasobów naturalnych. W odpowiedzi na te wyzwania rozwija się Green AI, czyli podejście do sztucznej inteligencji uwzględniające efektywność energetyczną, koszty obliczeń i wpływ środowiskowy.
+
+Według raportu *Energy and AI* Międzynarodowej Agencji Energetycznej (IEA) z 2025 roku centra danych zużyły w 2024 roku około 415 TWh energii elektrycznej. W scenariuszu bazowym zapotrzebowanie może wzrosnąć do około 945 TWh w 2030 roku. Są to dane dotyczące wszystkich centrów danych, a nie wyłącznie AI. Rozwój sztucznej inteligencji stanowi jednak istotny czynnik tego wzrostu [1].
+
+Moim zdaniem do 2030 roku Green AI przestanie być dodatkową inicjatywą ekologiczną, a stanie się jednym z podstawowych kryteriów projektowania i oceny systemów Machine Learning.
+
+### 2. Efektywność energetyczna modeli ML
+
+Pierwszym kierunkiem rozwoju będzie poprawa efektywności algorytmów. Dotychczas wiele przełomów osiągano przez zwiększanie liczby parametrów, rozmiaru zbiorów danych i nakładów obliczeniowych. Takie podejście bywa skuteczne, ale nie zawsze jest ekonomicznie i środowiskowo uzasadnione.
+
+Autorzy publikacji *Green AI* zwrócili uwagę, że badania powinny uwzględniać nie tylko jakość predykcji, lecz także koszty obliczeniowe [2].
+
+Do 2030 roku przewiduję szersze wykorzystanie kwantyzacji, przycinania sieci neuronowych (pruning), destylacji wiedzy (knowledge distillation), transfer learning i efektywnych architektur modeli.
+
+Coraz większą rolę będą odgrywać małe modele wyspecjalizowane w konkretnych zadaniach. Zamiast uruchamiać ogromny model do każdej operacji, przedsiębiorstwa będą częściej wykorzystywać rozwiązania dopasowane do rzeczywistej złożoności problemu.
+
+Ważnym trendem stanie się również dynamiczne przydzielanie zasobów. Proste zapytania będą obsługiwane przez lżejsze modele, natomiast trudniejsze przez bardziej zaawansowane systemy.
+
+### 3. Nowe technologie obliczeniowe
+
+Drugim kierunkiem będą innowacje sprzętowe.
+
+Specjalizowane akceleratory AI mogą wykonywać określone operacje efektywniej niż uniwersalne procesory. Do 2030 roku prawdopodobnie wzrośnie znaczenie układów projektowanych pod konkretne typy obliczeń.
+
+Interesującą technologią są również procesory neuromorficzne, inspirowane sposobem działania biologicznych sieci neuronowych. Wykorzystują one między innymi przetwarzanie zdarzeniowe, które w wybranych zastosowaniach może ograniczać liczbę niepotrzebnych operacji.
+
+Potencjalne zastosowania obejmują robotykę, czujniki i urządzenia Edge AI.
+
+Komputery kwantowe stanowią kolejną możliwość rozwoju. Mogą w przyszłości wspierać określone problemy optymalizacyjne lub symulacyjne, jednak nie ma podstaw, aby zakładać, że do 2030 roku zastąpią klasyczne procesory w większości zastosowań Machine Learning.
+
+Co więcej, efektywność środowiskowa nowych technologii musi uwzględniać całe urządzenie, w tym chłodzenie, produkcję i infrastrukturę pomocniczą.
+
+### 4. Regulacje prawne i ślad węglowy AI
+
+Trzecim ważnym trendem będzie wzrost znaczenia regulacji oraz obowiązków dokumentacyjnych.
+
+Unijny AI Act przewiduje obowiązki dokumentowania znanego lub szacowanego zużycia energii przez modele sztucznej inteligencji ogólnego przeznaczenia, w zakresie określonym przepisami [3].
+
+Komisja Europejska prowadzi również prace dotyczące metod pomiaru efektywności energetycznej AI oraz potencjalnych rozwiązań służących porównywaniu wpływu środowiskowego systemów [4].
+
+Przewiduję, że do 2030 roku raportowanie zużycia energii, emisji CO2e i wykorzystania zasobów będzie coraz częściej wymagane przez klientów, inwestorów i instytucje publiczne.
+
+Nie oznacza to jednak, że istnieje już jeden obowiązkowy, uniwersalny certyfikat ekologiczny dla wszystkich modeli AI.
+
+Istotne będzie opracowanie porównywalnych metod pomiaru, uwzględniających trening, inferencję, infrastrukturę oraz cykl życia sprzętu.
+
+### 5. Innowacje a ochrona środowiska
+
+Rozwój Green AI wymaga rozwiązania ważnego konfliktu: większa dokładność modelu często oznacza większy koszt obliczeniowy.
+
+Przykładowo model osiągający 99% accuracy może zużywać wielokrotnie więcej energii niż model osiągający 97%.
+
+Czy dodatkowa dokładność uzasadnia taki koszt?
+
+Odpowiedź zależy od zastosowania.
+
+W diagnostyce medycznej niewielka poprawa wykrywania groźnej choroby może przynosić znaczącą korzyść społeczną. Natomiast w systemie rekomendacji reklam podobny wzrost dokładności niekoniecznie uzasadnia wielokrotnie większe zużycie energii.
+
+Dlatego przyszłe systemy powinny być oceniane wielokryterialnie, uwzględniając jakość, bezpieczeństwo, energię, emisje i koszty.
+
+Należy także pamiętać o efekcie odbicia (rebound effect). Tańsze i bardziej efektywne obliczenia mogą zwiększyć liczbę zastosowań AI, przez co całkowite zużycie energii nadal będzie rosło.
+
+Efektywność pojedynczej operacji nie gwarantuje więc zmniejszenia globalnego śladu środowiskowego.
+
+### 6. Przełomowe projekty Green AI
+
+Przykładem praktycznego wykorzystania sztucznej inteligencji do oszczędzania energii jest projekt Google DeepMind dotyczący chłodzenia centrów danych.
+
+W 2016 roku firma poinformowała o ograniczeniu energii wykorzystywanej do chłodzenia nawet o 40% w testowanym zastosowaniu [5].
+
+To pokazuje, że AI może nie tylko zużywać energię, ale również pomagać ją oszczędzać.
+
+Drugim ważnym obszarem są inteligentne sieci elektroenergetyczne. Modele ML mogą prognozować produkcję energii z wiatru i słońca, przewidywać zapotrzebowanie oraz wspierać zarządzanie magazynami energii.
+
+Trzecim obszarem są inteligentne budynki. Systemy analizujące pogodę, obecność użytkowników i zużycie energii mogą pomagać optymalizować ogrzewanie, wentylację i klimatyzację.
+
+Czwartym kierunkiem jest monitoring środowiska z wykorzystaniem danych satelitarnych. Machine Learning może wspierać wykrywanie wylesiania, pożarów i zmian pokrycia terenu.
+
+W każdym przypadku konieczne jest jednak sprawdzenie rzeczywistego wpływu projektu. Samo wykorzystanie AI w ekologicznej dziedzinie nie oznacza automatycznie dodatniego bilansu środowiskowego.
+
+### 7. Rola Data Scientist w 2030 roku
+
+Do 2030 roku rola Data Scientist prawdopodobnie stanie się bardziej interdyscyplinarna.
+
+Specjalista nie będzie odpowiadał wyłącznie za przygotowanie danych i maksymalizowanie accuracy. Coraz częściej będzie musiał również analizować zużycie zasobów, koszty infrastruktury i wpływ środowiskowy.
+
+Podstawowymi kompetencjami staną się:
+
+- porównywanie modeli pod względem jakości i energii,
+- dobór odpowiednio małych architektur,
+- optymalizacja treningu i inferencji,
+- monitorowanie zużycia CPU i GPU,
+- interpretacja emisji CO2e,
+- projektowanie wiarygodnych eksperymentów,
+- dokumentowanie kompromisów technologicznych.
+
+Ważna będzie znajomość narzędzi takich jak CodeCarbon, które pomagają szacować emisje związane z obliczeniami [6].
+
+Data Scientist powinien także rozumieć, że najbardziej zaawansowany model nie zawsze jest najlepszym rozwiązaniem biznesowym.
+
+### 8. Rekomendacje dla obecnych Data Scientists
+
+Już dzisiaj warto przyjąć kilka zasad.
+
+Po pierwsze, należy rozpoczynać od prostego modelu bazowego, na przykład regresji logistycznej lub modelu drzewiastego.
+
+Po drugie, trzeba mierzyć nie tylko accuracy, ale również czas treningu, zużycie pamięci i energię na predykcję.
+
+Po trzecie, należy ograniczać niepotrzebne eksperymenty i stosować early stopping oraz efektywne strojenie hiperparametrów.
+
+Po czwarte, warto wykorzystywać gotowe modele i transfer learning, gdy jest to uzasadnione.
+
+Po piąte, należy uwzględniać cały cykl życia rozwiązania, ponieważ często wielokrotnie wykonywana inferencja może generować większe koszty niż pojedynczy trening.
+
+Po szóste, trzeba oceniać rzeczywiste korzyści środowiskowe projektów i unikać nieuzasadnionych deklaracji ekologicznych.
+
+### 9. Moja wizja Green AI w 2030 roku
+
+Przewiduję trzy możliwe scenariusze.
+
+W scenariuszu optymistycznym postęp algorytmiczny, efektywny sprzęt i rozwój niskoemisyjnej energetyki pozwolą znacząco ograniczyć wpływ środowiskowy pojedynczych zastosowań AI.
+
+W scenariuszu umiarkowanym efektywność obliczeń poprawi się, ale całkowite zapotrzebowanie na energię nadal będzie rosło wskutek coraz szerszego wykorzystania sztucznej inteligencji.
+
+W scenariuszu pesymistycznym rozwój dużych modeli wyprzedzi możliwości infrastruktury energetycznej, a korzyści z optymalizacji zostaną zniwelowane przez wzrost skali obliczeń.
+
+Za najbardziej prawdopodobny uważam scenariusz umiarkowany, chociaż rzeczywisty rozwój będzie zależał od technologii, regulacji, kosztów energii i decyzji przedsiębiorstw.
+
+### 10. Zakończenie
+
+Green AI w 2030 roku będzie prawdopodobnie oznaczać zmianę sposobu myślenia o jakości sztucznej inteligencji.
+
+Sukces modelu nie będzie oceniany wyłącznie przez accuracy, liczbę parametrów czy pozycję w benchmarkach. Coraz większego znaczenia nabiorą energia potrzebna do uzyskania wyniku, emisje, koszty infrastruktury oraz rzeczywista wartość społeczna.
+
+Najważniejszym zadaniem nie będzie całkowite ograniczenie rozwoju AI, lecz projektowanie systemów, których korzyści uzasadniają zużywane zasoby.
+
+Moim zdaniem przyszłość należy do rozwiązań, które łączą wysoką jakość z odpowiedzialnością środowiskową.
+
+**Najlepsza sztuczna inteligencja 2030 roku nie musi być największa. Powinna być wystarczająco skuteczna, bezpieczna, dostępna i możliwie efektywna energetycznie.**
+
+---
+
+## Bibliografia
+
+[1] International Energy Agency (2025). *Energy and AI*.
+https://www.iea.org/reports/energy-and-ai
+
+[2] Schwartz, R., Dodge, J., Smith, N. A., Etzioni, O. (2020). *Green AI*. Communications of the ACM.
+https://cacm.acm.org/magazines/2020/12/248800-green-ai/fulltext
+
+[3] Unia Europejska (2024). *Rozporządzenie (UE) 2024/1689 – AI Act*.
+https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+
+[4] Komisja Europejska (2026). *Targeted consultation on measuring energy consumption and emissions of AI models and systems*.
+https://digital-strategy.ec.europa.eu/en/consultations/targeted-consultation-measuring-energy-consumption-and-emissions-ai-models-and-systems
+
+[5] Google DeepMind (2016). *DeepMind AI Reduces Google Data Centre Cooling Bill by 40%*.
+https://deepmind.google/discover/blog/deepmind-ai-reduces-google-data-centre-cooling-bill-by-40/
+
+[6] CodeCarbon. *Documentation*.
+https://docs.codecarbon.io/
+
+[7] Strubell, E., Ganesh, A., McCallum, A. (2019). *Energy and Policy Considerations for Deep Learning in NLP*. ACL.
+https://aclanthology.org/P19-1355/
