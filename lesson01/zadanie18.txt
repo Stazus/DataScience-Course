@@ -1,0 +1,1131 @@
+# Lekcja 1 – Zadanie 18
+## Ethical AI + Green AI – system wspomagania diagnostyki medycznej na podstawie obrazów RTG
+
+### 1. Cel projektu
+
+Szpital planuje stworzenie systemu Machine Learning wspomagającego diagnostykę chorób na podstawie obrazów rentgenowskich (RTG).
+
+Celem projektu jest zaprojektowanie rozwiązania, które będzie:
+
+- skuteczne diagnostycznie,
+- bezpieczne dla pacjentów,
+- zgodne z zasadami etyki medycznej,
+- sprawiedliwe wobec różnych grup pacjentów,
+- zgodne z wymaganiami ochrony danych,
+- energooszczędne,
+- przejrzyste i możliwe do audytowania.
+
+System ma wspierać lekarzy, a nie samodzielnie zastępować ich decyzje kliniczne.
+
+Najważniejsze pytanie projektowe:
+
+Jak znaleźć odpowiedni kompromis między jakością diagnostyczną, bezpieczeństwem pacjentów, zużyciem energii i kosztami infrastruktury?
+
+### 2. Definicja problemu Machine Learning
+
+Rozważamy system analizujący zdjęcia RTG klatki piersiowej.
+
+Przykładowym zadaniem może być wykrywanie zmian sugerujących zapalenie płuc.
+
+Jest to zadanie:
+
+- Computer Vision,
+- Medical Image Analysis,
+- Supervised Learning,
+- Binary Classification.
+
+Przykładowe klasy:
+
+0 – brak zmian sugerujących analizowaną chorobę.
+
+1 – obecność zmian sugerujących analizowaną chorobę.
+
+W praktyce system może wymagać wielu klas, lokalizacji zmian i oceny niepewności.
+
+Ważne:
+
+Wynik modelu nie jest samodzielną diagnozą kliniczną.
+
+Interpretacja obrazu RTG powinna uwzględniać również objawy, historię choroby, badania i ocenę lekarza.
+
+### 3. Proponowane modele
+
+Możliwe architektury:
+
+- ResNet,
+- DenseNet,
+- EfficientNet,
+- MobileNet,
+- Vision Transformer.
+
+Proponuję porównać dwa warianty.
+
+Model A:
+
+Lekki model CNN, np. EfficientNet lub MobileNet.
+
+Model B:
+
+Większy model, np. rozbudowana sieć CNN albo Vision Transformer.
+
+Oba modele powinny być oceniane na tych samych danych i przy porównywalnych warunkach eksperymentalnych.
+
+Nie należy zakładać, że większy model zawsze będzie dokładniejszy.
+
+### 4. Architektura systemu
+
+Proponowany schemat:
+
+             +--------------------------+
+             |       APARAT RTG         |
+             +------------+-------------+
+                          |
+                          v
+             +--------------------------+
+             | SYSTEM PACS / DICOM      |
+             +------------+-------------+
+                          |
+                          v
+             +--------------------------+
+             | KONTROLA DOSTĘPU         |
+             | I BEZPIECZNA TRANSMISJA  |
+             +------------+-------------+
+                          |
+                          v
+             +--------------------------+
+             | WALIDACJA JAKOŚCI OBRAZU |
+             +------------+-------------+
+                          |
+                          v
+             +--------------------------+
+             | MODEL ML                 |
+             | ANALIZA OBRAZU RTG       |
+             +------------+-------------+
+                          |
+                          v
+             +--------------------------+
+             | WYNIK + NIEPEWNOŚĆ       |
+             | + KONTROLA JAKOŚCI       |
+             +------------+-------------+
+                          |
+                          v
+             +--------------------------+
+             | LEKARZ / RADIOLOG        |
+             | WERYFIKACJA WYNIKU       |
+             +------------+-------------+
+                          |
+                          v
+             +--------------------------+
+             | DECYZJA KLINICZNA        |
+             +------------+-------------+
+                          |
+                          v
+             +--------------------------+
+             | AUDYT I MONITORING       |
+             +--------------------------+
+
+Dodatkowe moduły:
+
+- monitorowanie jakości modeli,
+- analiza błędów,
+- kontrola uprzedzeń,
+- monitoring energii,
+- zarządzanie wersjami modeli,
+- zarządzanie incydentami,
+- zabezpieczenia danych medycznych.
+
+### 5. Aspekty etyczne
+
+Najważniejsza zasada:
+
+Bezpieczeństwo pacjenta ma pierwszeństwo przed oszczędnością energii i kosztów.
+
+System powinien spełniać następujące wymagania:
+
+1. Nie może zastępować oceny lekarza bez odpowiednich podstaw klinicznych i regulacyjnych.
+2. Powinien jasno przedstawiać ograniczenia.
+3. Powinien informować o niepewności predykcji.
+4. Powinien umożliwiać audyt decyzji.
+5. Powinien być testowany na reprezentatywnych danych.
+6. Powinien posiadać procedury reagowania na błędy.
+7. Powinien chronić dane pacjentów.
+8. Powinien być monitorowany po wdrożeniu.
+
+### 6. Co się stanie, jeśli model się pomyli?
+
+Wyróżniamy dwa szczególnie ważne rodzaje błędów.
+
+#### 6.1. False Negative – wynik fałszywie ujemny
+
+Model nie wykrywa choroby, mimo że pacjent jest chory.
+
+Potencjalne konsekwencje:
+
+- opóźnienie rozpoznania,
+- opóźnienie leczenia,
+- pogorszenie stanu zdrowia,
+- fałszywe poczucie bezpieczeństwa.
+
+W systemach przesiewowych taki błąd może być szczególnie niebezpieczny.
+
+#### 6.2. False Positive – wynik fałszywie dodatni
+
+Model sugeruje chorobę u pacjenta, który jej nie ma.
+
+Potencjalne konsekwencje:
+
+- niepotrzebny stres,
+- dodatkowe badania,
+- niepotrzebne koszty,
+- ryzyko nieuzasadnionych interwencji.
+
+Oba typy błędów mają znaczenie, ale ich konsekwencje zależą od konkretnej choroby i zastosowania klinicznego.
+
+### 7. Dlaczego accuracy nie wystarcza?
+
+Accuracy określa udział poprawnych predykcji.
+
+Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+Gdzie:
+
+TP – True Positive.
+
+TN – True Negative.
+
+FP – False Positive.
+
+FN – False Negative.
+
+Model może osiągać wysoką accuracy, a jednocześnie pomijać wielu chorych pacjentów.
+
+Przykład hipotetyczny:
+
+Wśród 10 000 pacjentów choruje 100 osób.
+
+Model zawsze przewiduje brak choroby.
+
+Poprawnie klasyfikuje 9900 zdrowych pacjentów.
+
+Accuracy:
+
+9900 / 10000 = 99%.
+
+Jednak:
+
+Recall dla chorych = 0%.
+
+Model nie wykrywa ani jednego chorego pacjenta.
+
+Wniosek:
+
+Wysoka accuracy nie oznacza automatycznie bezpieczeństwa diagnostycznego.
+
+### 8. Metryki kliniczne
+
+System powinien być oceniany przede wszystkim na podstawie metryk odpowiednich dla zastosowania klinicznego.
+
+#### Sensitivity / Recall
+
+Sensitivity = TP / (TP + FN)
+
+Określa zdolność wykrywania chorych pacjentów.
+
+#### Specificity
+
+Specificity = TN / (TN + FP)
+
+Określa zdolność poprawnego rozpoznawania osób bez analizowanej choroby.
+
+#### Precision / PPV
+
+Precision = TP / (TP + FP)
+
+Określa, jaki odsetek dodatnich wyników modelu jest rzeczywiście prawidłowy.
+
+#### Negative Predictive Value
+
+NPV = TN / (TN + FN)
+
+Określa udział prawidłowych wyników ujemnych.
+
+#### Dodatkowe metryki
+
+- ROC-AUC,
+- PR-AUC,
+- F1-score,
+- kalibracja prawdopodobieństw,
+- czas uzyskania wyniku,
+- odsetek przypadków wymagających ręcznej weryfikacji.
+
+Wartości PPV i NPV zależą również od częstości występowania choroby w badanej populacji.
+
+### 9. Kto ponosi odpowiedzialność za błąd?
+
+Nie istnieje jedna uniwersalna odpowiedź.
+
+Odpowiedzialność zależy od:
+
+- sposobu zastosowania systemu,
+- obowiązujących przepisów,
+- statusu wyrobu medycznego,
+- zakresu obowiązków personelu,
+- przyczyn błędu,
+- sposobu wdrożenia,
+- umów i dokumentacji.
+
+Potencjalni uczestnicy odpowiedzialności:
+
+#### Producent systemu
+
+Odpowiada w odpowiednim zakresie za projektowanie, walidację, dokumentację i bezpieczeństwo produktu.
+
+#### Szpital
+
+Odpowiada w odpowiednim zakresie za organizację procesu, dobór rozwiązania, procedury, nadzór i bezpieczne wdrożenie.
+
+#### Lekarz
+
+Odpowiada za wykonywanie swoich obowiązków zawodowych i decyzje kliniczne w granicach właściwych przepisów i standardów.
+
+#### Zespół utrzymania systemu
+
+Odpowiada za zadania związane z bezpieczeństwem technicznym, aktualizacjami i monitorowaniem zgodnie z przydzielonymi obowiązkami.
+
+Ważne:
+
+Obecność człowieka w procesie nie zwalnia producenta ani organizacji z ich własnych obowiązków.
+
+Nie należy automatycznie przypisywać całej odpowiedzialności lekarzowi.
+
+### 10. Proponowane rozwiązania dotyczące odpowiedzialności
+
+1. Formalne określenie przeznaczenia systemu.
+2. Dokumentacja ograniczeń modelu.
+3. Zatwierdzony proces oceny klinicznej.
+4. Jasne procedury dla personelu.
+5. Rejestrowanie wersji modelu.
+6. Rejestrowanie istotnych wyników i działań.
+7. Procedura zgłaszania incydentów.
+8. Mechanizm wycofania wadliwej wersji.
+9. Nadzór po wdrożeniu.
+10. Regularne audyty.
+
+### 11. Trade-off Accuracy vs Energy
+
+Rozważamy dwa modele.
+
+Model A:
+
+Accuracy = 97%.
+
+Model B:
+
+Accuracy = 99%.
+
+Założenie:
+
+Model B zużywa 100 razy więcej energii niż model A.
+
+Pytanie:
+
+Czy poprawa dokładności o 2 punkty procentowe uzasadnia stukrotnie większe zużycie energii?
+
+Odpowiedź:
+
+Nie można tego rozstrzygnąć na podstawie samej accuracy.
+
+Należy zbadać, jakie błędy zostały wyeliminowane i jakie są ich konsekwencje kliniczne.
+
+### 12. Przykładowa analiza accuracy
+
+Przyjmijmy hipotetycznie:
+
+10 000 badań RTG.
+
+Model A:
+
+Accuracy 97%.
+
+Poprawne klasyfikacje:
+
+9700.
+
+Błędne klasyfikacje:
+
+300.
+
+Model B:
+
+Accuracy 99%.
+
+Poprawne klasyfikacje:
+
+9900.
+
+Błędne klasyfikacje:
+
+100.
+
+Różnica:
+
+200 mniej błędnych klasyfikacji.
+
+Jest to istotna różnica liczbowa.
+
+Nie wiemy jednak, ile z tych błędów stanowią False Negatives, a ile False Positives.
+
+### 13. Przykładowe zużycie energii
+
+Przyjmijmy hipotetycznie:
+
+Model A:
+
+0,1 Wh na jedno badanie.
+
+Model B:
+
+10 Wh na jedno badanie.
+
+Model B zużywa 100 razy więcej energii.
+
+Dla 10 000 badań:
+
+Model A:
+
+10 000 * 0,1 Wh = 1000 Wh = 1 kWh.
+
+Model B:
+
+10 000 * 10 Wh = 100 000 Wh = 100 kWh.
+
+Różnica:
+
+99 kWh.
+
+Dodatkowe 99 kWh pozwala w tym przykładzie uniknąć 200 błędnych klasyfikacji.
+
+Energia dodatkowa na jedną unikniętą błędną klasyfikację:
+
+99 kWh / 200 = 0,495 kWh.
+
+To tylko hipotetyczny wskaźnik.
+
+Nie oznacza, że każda uniknięta pomyłka ma taką samą wartość kliniczną.
+
+### 14. Przykład dwóch różnych scenariuszy klinicznych
+
+#### Scenariusz A
+
+Model B zmniejsza przede wszystkim liczbę False Positives.
+
+Korzyści:
+
+- mniej niepotrzebnych badań,
+- mniejszy stres pacjentów,
+- niższe koszty dalszej diagnostyki.
+
+Dodatkowa energia może być uzasadniona, ale wymaga analizy całkowitych kosztów i skutków.
+
+#### Scenariusz B
+
+Model B zmniejsza liczbę False Negatives w chorobie, której przeoczenie może prowadzić do ciężkich powikłań.
+
+Korzyści:
+
+- wcześniejsze wykrywanie choroby,
+- możliwość szybszego leczenia,
+- potencjalne ograniczenie ciężkich następstw zdrowotnych.
+
+W takim przypadku dodatkowe zużycie energii może być znacznie łatwiejsze do uzasadnienia.
+
+Nie oznacza to jednak automatycznej akceptacji modelu.
+
+Nadal potrzebna jest walidacja kliniczna.
+
+### 15. Koszt błędów diagnostycznych
+
+Można wprowadzić funkcję kosztu:
+
+L = C_FN * FN + C_FP * FP
+
+Gdzie:
+
+C_FN – koszt fałszywie ujemnego wyniku.
+
+C_FP – koszt fałszywie dodatniego wyniku.
+
+FN – liczba wyników fałszywie ujemnych.
+
+FP – liczba wyników fałszywie dodatnich.
+
+Koszty mogą obejmować:
+
+- konsekwencje zdrowotne,
+- koszty dalszych badań,
+- opóźnienia leczenia,
+- koszty organizacyjne.
+
+Nie wszystkie konsekwencje da się wiarygodnie sprowadzić do jednej wartości pieniężnej.
+
+Dlatego analiza kosztów powinna wspierać ocenę kliniczną, a nie zastępować jej.
+
+### 16. Fairness – sprawiedliwość modelu
+
+Model powinien działać bez nieuzasadnionych różnic jakości pomiędzy grupami pacjentów.
+
+Przykładowe grupy:
+
+- kobiety i mężczyźni,
+- osoby w różnych przedziałach wieku,
+- pacjenci z różnymi chorobami współistniejącymi,
+- pacjenci badani na różnych urządzeniach,
+- pacjenci z różnych placówek,
+- grupy demograficzne istotne dla populacji docelowej.
+
+Należy uwzględnić także różnice związane z warunkami wykonywania badań.
+
+### 17. Przykład problemu fairness
+
+Załóżmy hipotetycznie:
+
+Sensitivity modelu dla jednej grupy wynosi 95%.
+
+Sensitivity dla drugiej grupy wynosi 80%.
+
+Różnica:
+
+15 punktów procentowych.
+
+Oznacza to, że model może znacznie częściej pomijać chorobę w drugiej grupie.
+
+Nawet jeżeli globalna accuracy jest wysoka, system może być niebezpieczny dla części pacjentów.
+
+### 18. Źródła uprzedzeń
+
+#### Nierównowaga danych
+
+Jedna grupa jest znacznie słabiej reprezentowana w zbiorze treningowym.
+
+#### Różnice sprzętowe
+
+Zdjęcia z różnych aparatów RTG mogą mieć odmienne właściwości.
+
+#### Różnice kliniczne
+
+Niektóre choroby mogą manifestować się inaczej w różnych populacjach.
+
+#### Błędy etykiet
+
+Diagnozy używane jako etykiety mogą być niekompletne lub niejednoznaczne.
+
+#### Dataset Shift
+
+Dane szpitala mogą różnić się od danych użytych podczas treningu.
+
+#### Shortcut Learning
+
+Model może wykorzystywać niepożądane wskazówki, np. oznaczenia techniczne na obrazie, zamiast właściwych zmian chorobowych.
+
+### 19. Proponowane rozwiązania fairness
+
+1. Analiza reprezentatywności zbioru danych.
+2. Ocena sensitivity w poszczególnych grupach.
+3. Ocena specificity w poszczególnych grupach.
+4. Analiza kalibracji wyników.
+5. Walidacja na danych z różnych szpitali.
+6. Testy na różnych aparatach RTG.
+7. Monitorowanie jakości po wdrożeniu.
+8. Uzupełnianie danych z niedostatecznie reprezentowanych grup.
+9. Analiza błędów przez specjalistów.
+10. Dokumentowanie ograniczeń.
+
+Nie należy automatycznie wymuszać identycznych wartości wszystkich metryk, ponieważ mogą istnieć rzeczywiste różnice kliniczne.
+
+Celem jest wykrywanie i ograniczanie nieuzasadnionych różnic oraz zapewnienie bezpieczeństwa.
+
+### 20. Prywatność danych pacjentów
+
+Dane medyczne należą do szczególnie chronionych kategorii danych osobowych.
+
+System musi uwzględniać:
+
+- RODO,
+- przepisy dotyczące dokumentacji medycznej,
+- wymagania bezpieczeństwa informacji,
+- właściwe regulacje dotyczące wyrobów medycznych.
+
+Dane RTG mogą zawierać:
+
+- identyfikatory pacjenta,
+- informacje o badaniu,
+- metadane DICOM,
+- informacje o placówce,
+- daty badań.
+
+Dodatkowo pewne informacje mogą być widoczne bezpośrednio na obrazie.
+
+### 21. Anonimizacja i pseudonimizacja
+
+#### Anonimizacja
+
+Proces mający doprowadzić do sytuacji, w której identyfikacja osoby nie jest możliwa przy użyciu środków, których zastosowania można rozsądnie oczekiwać.
+
+Skuteczna anonimizacja wymaga oceny ryzyka ponownej identyfikacji.
+
+#### Pseudonimizacja
+
+Zastąpienie bezpośrednich identyfikatorów innymi oznaczeniami.
+
+Dane pseudonimizowane nadal mogą być danymi osobowymi.
+
+W projekcie należy stosować rozwiązania odpowiednie do celu i ryzyka przetwarzania.
+
+### 22. Proponowane środki ochrony danych
+
+1. Szyfrowanie danych podczas transmisji.
+2. Szyfrowanie danych w spoczynku.
+3. Kontrola dostępu oparta na rolach.
+4. Uwierzytelnianie wieloskładnikowe.
+5. Rejestrowanie dostępu do danych.
+6. Minimalizacja danych.
+7. Oddzielenie danych identyfikacyjnych od danych treningowych.
+8. Ograniczenie okresu przechowywania.
+9. Bezpieczne kopie zapasowe.
+10. Regularne testy bezpieczeństwa.
+11. Procedury reagowania na naruszenia.
+12. Ocena ryzyka ponownej identyfikacji.
+
+### 23. Federated Learning
+
+Jedną z możliwości jest Federated Learning.
+
+W tym podejściu szpitale mogą trenować lokalne modele bez centralnego gromadzenia wszystkich surowych obrazów.
+
+Schemat:
+
+         +--------------------+
+         | KOORDYNATOR UCZENIA|
+         +---------+----------+
+                   |
+        +----------+----------+
+        |          |          |
+        v          v          v
+   +---------+ +---------+ +---------+
+   |SZPITAL A| |SZPITAL B| |SZPITAL C|
+   +---------+ +---------+ +---------+
+        |          |          |
+        v          v          v
+   LOKALNE     LOKALNE     LOKALNE
+   DANE RTG    DANE RTG    DANE RTG
+
+Do koordynatora trafiają aktualizacje modelu, a niekoniecznie surowe obrazy.
+
+Jednak Federated Learning nie gwarantuje prywatności automatycznie.
+
+Aktualizacje mogą ujawniać informacje.
+
+Możliwe dodatkowe zabezpieczenia:
+
+- Secure Aggregation,
+- Differential Privacy,
+- kontrola dostępu,
+- audyt komunikacji.
+
+Federated Learning może także zwiększać koszty komunikacji i koordynacji.
+
+### 24. Green AI – dlaczego jest ważne w medycynie?
+
+Szpitale wykorzystują energię do wielu krytycznych procesów.
+
+System AI powinien ograniczać niepotrzebne zużycie zasobów, nie pogarszając bezpieczeństwa pacjentów.
+
+Cele Green AI:
+
+- mniejsze zużycie energii,
+- mniejsza emisja CO2e,
+- niższe koszty infrastruktury,
+- lepsze wykorzystanie sprzętu,
+- dłuższy okres użyteczności urządzeń.
+
+Najważniejsza zasada:
+
+Optymalizacja energetyczna nie może naruszać minimalnych wymagań bezpieczeństwa klinicznego.
+
+### 25. Najbardziej energochłonne etapy
+
+#### Trening modelu
+
+Może wymagać intensywnych obliczeń na GPU.
+
+#### Strojenie hiperparametrów
+
+Wiele eksperymentów może zużywać więcej energii niż pojedynczy trening.
+
+#### Inferencja
+
+Przy dużej liczbie badań łączny koszt predykcji może być znaczący.
+
+#### Przechowywanie danych
+
+Obrazy RTG zajmują przestrzeń dyskową.
+
+#### Transfer danych
+
+Przesyłanie dużych zbiorów obrazów generuje dodatkowe obciążenie infrastruktury.
+
+### 26. Metody optymalizacji Green AI
+
+#### Transfer Learning
+
+Wykorzystanie wcześniej wytrenowanych modeli.
+
+#### Model Compression
+
+Zmniejszanie rozmiaru modelu.
+
+#### Quantization
+
+Zmniejszanie precyzji obliczeń po sprawdzeniu wpływu na jakość.
+
+#### Knowledge Distillation
+
+Uczenie mniejszego modelu na podstawie większego.
+
+#### Pruning
+
+Usuwanie mniej istotnych elementów modelu.
+
+#### Early Stopping
+
+Zatrzymywanie treningu, gdy nie przynosi dalszej poprawy.
+
+#### Batch Processing
+
+Przetwarzanie wielu badań w paczkach, gdy jest to zgodne z wymaganiami czasowymi.
+
+#### Cache
+
+Unikanie niepotrzebnego ponownego analizowania identycznych danych.
+
+#### Odpowiednie skalowanie infrastruktury
+
+Dopasowanie zasobów do rzeczywistego obciążenia.
+
+### 27. Ograniczenia optymalizacji Green AI
+
+W medycynie nie każda optymalizacja jest akceptowalna.
+
+Przykłady:
+
+- nadmierna kompresja może obniżyć sensitivity,
+- zbyt mała rozdzielczość może ukryć drobne zmiany,
+- batching może zwiększyć czas oczekiwania,
+- zbyt agresywna kwantyzacja może zmienić predykcje,
+- wyłączanie zasobów może pogorszyć dostępność.
+
+Każda zmiana modelu powinna przejść odpowiednią walidację.
+
+### 28. Carbon Footprint
+
+Ślad węglowy zależy od:
+
+- zużytej energii,
+- emisyjności energii,
+- infrastruktury,
+- cyklu życia sprzętu.
+
+Uproszczony wzór:
+
+CO2e = E * EF
+
+Gdzie:
+
+E – energia w kWh.
+
+EF – współczynnik emisji w kg CO2e/kWh.
+
+Przykład hipotetyczny:
+
+Zużycie energii:
+
+1000 kWh.
+
+Przyjęty współczynnik emisji:
+
+0,5 kg CO2e/kWh.
+
+Wynik:
+
+1000 * 0,5 = 500 kg CO2e.
+
+To przykład rachunkowy.
+
+Rzeczywisty współczynnik zależy od miejsca, czasu i metody rozliczania emisji.
+
+### 29. Monitoring energii
+
+Można wykorzystać:
+
+- CodeCarbon,
+- liczniki energii serwerów,
+- narzędzia monitorowania CPU i GPU,
+- monitoring infrastruktury.
+
+Przykładowe metryki:
+
+- Wh na badanie RTG,
+- kWh na trening,
+- kWh miesięcznie,
+- czas inferencji,
+- zużycie pamięci,
+- emisja CO2e,
+- liczba badań na kWh.
+
+Należy oddzielnie raportować energię treningu, inferencji i pozostałej infrastruktury.
+
+### 30. Framework decyzyjny – kiedy trade-off jest akceptowalny?
+
+Proponuję wieloetapowy proces decyzyjny.
+
+#### Krok 1 – Bezpieczeństwo kliniczne
+
+Czy model spełnia wymagania dotyczące:
+
+- sensitivity,
+- specificity,
+- bezpieczeństwa,
+- czasu odpowiedzi,
+- jakości w populacji docelowej?
+
+Jeżeli nie, model nie powinien być wdrażany w danym zastosowaniu.
+
+#### Krok 2 – Fairness
+
+Czy model działa wystarczająco dobrze we wszystkich istotnych grupach pacjentów?
+
+Jeżeli nie, należy przeprowadzić dalszą analizę i ograniczyć ryzyko.
+
+#### Krok 3 – Prywatność
+
+Czy przetwarzanie danych jest zgodne z obowiązującymi wymaganiami?
+
+Jeżeli nie, należy poprawić rozwiązanie.
+
+#### Krok 4 – Ocena dodatkowej korzyści klinicznej
+
+Czy dokładniejszy model:
+
+- wykrywa więcej rzeczywistych przypadków choroby,
+- ogranicza niebezpieczne pomyłki,
+- poprawia decyzje kliniczne?
+
+Jeżeli poprawa accuracy nie daje istotnej korzyści klinicznej, dodatkowe zużycie energii może być nieuzasadnione.
+
+#### Krok 5 – Analiza energii i emisji
+
+Należy porównać:
+
+- kWh na badanie,
+- roczne zużycie energii,
+- emisję CO2e,
+- koszty infrastruktury.
+
+#### Krok 6 – Analiza alternatyw
+
+Czy istnieje rozwiązanie:
+
+- równie bezpieczne,
+- mniej energochłonne,
+- łatwiejsze do wdrożenia?
+
+Można sprawdzić kompresję, distillation i modele hybrydowe.
+
+#### Krok 7 – Decyzja interdyscyplinarna
+
+Decyzję powinien podejmować właściwy zespół obejmujący m.in.:
+
+- lekarzy,
+- specjalistów ML,
+- osoby odpowiedzialne za bezpieczeństwo,
+- osoby odpowiedzialne za ochronę danych,
+- zarządzających placówką.
+
+### 31. Schemat decyzyjny
+
+                 +-----------------------+
+                 | NOWY MODEL ML         |
+                 +-----------+-----------+
+                             |
+                             v
+                 +-----------------------+
+                 | WALIDACJA KLINICZNA   |
+                 +-----------+-----------+
+                             |
+                     +-------+-------+
+                     |               |
+                    NIE             TAK
+                     |               |
+                     v               v
+                ODRZUCENIE    +------------------+
+                              | FAIRNESS         |
+                              +--------+---------+
+                                       |
+                               +-------+-------+
+                               |               |
+                              NIE             TAK
+                               |               |
+                               v               v
+                           POPRAWA       +------------------+
+                                        | PRIVACY / SECURITY|
+                                        +--------+---------+
+                                                 |
+                                         +-------+-------+
+                                         |               |
+                                        NIE             TAK
+                                         |               |
+                                         v               v
+                                     POPRAWA      +------------------+
+                                                 | KORZYŚĆ KLINICZNA |
+                                                 +--------+---------+
+                                                          |
+                                                  +-------+-------+
+                                                  |               |
+                                             NIEWYSTARCZAJĄCA   ISTOTNA
+                                                  |               |
+                                                  v               v
+                                              ANALIZA       +----------------+
+                                              ALTERNATYW    | ENERGIA / CO2e  |
+                                                            +-------+--------+
+                                                                    |
+                                                                    v
+                                                            +----------------+
+                                                            | OCENA KORZYŚCI |
+                                                            | I KOSZTÓW      |
+                                                            +-------+--------+
+                                                                    |
+                                                                    v
+                                                            +----------------+
+                                                            | DECYZJA        |
+                                                            | WDROŻENIOWA    |
+                                                            +----------------+
+
+Schemat jest uproszczeniem procesu.
+
+W rzeczywistym wdrożeniu należy uwzględnić wymagane oceny regulacyjne i dokumentację.
+
+### 32. Proponowana macierz decyzyjna
+
+| Kryterium | Znaczenie | Warunek |
+|---|---|---|
+| Bezpieczeństwo kliniczne | Krytyczne | Musi być spełnione |
+| Sensitivity / Specificity | Krytyczne | Progi zależne od zastosowania |
+| Fairness | Krytyczne | Brak nieakceptowalnych różnic |
+| Privacy | Krytyczne | Zgodność z wymaganiami |
+| Bezpieczeństwo techniczne | Krytyczne | Musi być spełnione |
+| Korzyść kliniczna | Bardzo wysokie | Musi uzasadniać zastosowanie |
+| Zużycie energii | Ważne | Minimalizacja po spełnieniu wymagań |
+| Koszt infrastruktury | Ważne | Akceptowalny dla placówki |
+| Łatwość wdrożenia | Ważne | Zgodność z procesami szpitala |
+
+Kryteria krytyczne nie powinny być kompensowane oszczędnością energii.
+
+### 33. Analiza 97% vs 99% accuracy
+
+Pytanie:
+
+Czy 99% accuracy jest warte 100 razy większego zużycia energii niż 97%?
+
+#### Przypadek 1
+
+Model 99% accuracy znacząco ogranicza przeoczenia groźnej choroby.
+
+Wtedy dodatkowa energia może być uzasadniona.
+
+#### Przypadek 2
+
+Model 99% accuracy poprawia głównie klasyfikację przypadków mało istotnych klinicznie.
+
+Wtedy stukrotnie większe zużycie energii może być nieuzasadnione.
+
+#### Przypadek 3
+
+Model 99% accuracy działa gorzej dla części grup pacjentów.
+
+Wtedy globalna poprawa accuracy może ukrywać poważny problem etyczny.
+
+#### Przypadek 4
+
+Model 97% accuracy spełnia wszystkie wymagania kliniczne, a model 99% nie przynosi potwierdzonej dodatkowej korzyści.
+
+Wtedy bardziej energooszczędny model może być preferowany.
+
+### 34. Przykładowa strategia optymalizacji
+
+Etap 1:
+
+Trening większego modelu jako punktu odniesienia.
+
+Etap 2:
+
+Walidacja kliniczna.
+
+Etap 3:
+
+Knowledge Distillation do mniejszego modelu.
+
+Etap 4:
+
+Kwantyzacja i optymalizacja inferencji.
+
+Etap 5:
+
+Ponowna walidacja sensitivity, specificity i fairness.
+
+Etap 6:
+
+Pomiar energii.
+
+Etap 7:
+
+Wybór najlżejszego modelu spełniającego wymagania.
+
+### 35. Monitorowanie po wdrożeniu
+
+System powinien być monitorowany przez cały okres eksploatacji.
+
+Najważniejsze elementy:
+
+- analiza False Negatives,
+- analiza False Positives,
+- monitoring zmian populacji pacjentów,
+- analiza jakości dla różnych grup,
+- monitoring zmian sprzętu RTG,
+- kontrola kalibracji modelu,
+- rejestrowanie incydentów,
+- aktualizacja dokumentacji,
+- monitorowanie energii.
+
+W przypadku istotnego pogorszenia jakości należy uruchomić procedury bezpieczeństwa, włącznie z możliwością wstrzymania używania modelu.
+
+### 36. Wymagania regulacyjne
+
+System wspomagający diagnostykę medyczną może podlegać przepisom dotyczącym wyrobów medycznych, w tym rozporządzeniu MDR.
+
+Zastosowanie mogą mieć również odpowiednie przepisy AI Act, RODO oraz krajowe regulacje medyczne.
+
+Konkretne obowiązki zależą od przeznaczenia systemu, klasyfikacji regulacyjnej, roli podmiotów i harmonogramu stosowania przepisów.
+
+Przed wdrożeniem potrzebna jest specjalistyczna analiza regulacyjna.
+
+Samo osiągnięcie wysokiej accuracy nie oznacza dopuszczenia systemu do zastosowań klinicznych.
+
+### 37. Odpowiedzialna dokumentacja modelu
+
+Dla każdego modelu należy przygotować dokumentację zawierającą:
+
+1. Przeznaczenie systemu.
+2. Zakres zastosowania.
+3. Populację docelową.
+4. Źródła danych.
+5. Metody przygotowania danych.
+6. Architekturę modelu.
+7. Metryki jakości.
+8. Wyniki testów dla podgrup.
+9. Ograniczenia modelu.
+10. Znane ryzyka.
+11. Wyniki pomiarów energii.
+12. Procedury monitoringu.
+13. Wersję modelu.
+14. Procedury aktualizacji.
+15. Procedury reagowania na incydenty.
+
+### 38. Ostateczna rekomendacja
+
+Rekomenduję podejście:
+
+Safety First + Fairness + Privacy + Green AI.
+
+Kolejność decyzji:
+
+1. Zdefiniowanie celu klinicznego.
+2. Ustalenie minimalnych wymagań bezpieczeństwa.
+3. Walidacja modeli.
+4. Ocena fairness.
+5. Ocena prywatności i bezpieczeństwa danych.
+6. Analiza korzyści klinicznych.
+7. Pomiar energii i emisji.
+8. Optymalizacja modeli.
+9. Ponowna walidacja po optymalizacji.
+10. Decyzja wdrożeniowa.
+
+Najlepszy model nie musi mieć najwyższej accuracy.
+
+Najlepszy jest model, który w danym zastosowaniu:
+
+- spełnia wymagania kliniczne,
+- zapewnia odpowiednie bezpieczeństwo,
+- działa sprawiedliwie,
+- chroni dane,
+- jest możliwy do monitorowania,
+- zużywa możliwie mało energii.
+
+### 39. Podsumowanie
+
+Projekt systemu ML do analizy obrazów RTG wymaga uwzględnienia znacznie większej liczby czynników niż sama dokładność modelu.
+
+Najważniejsze wnioski:
+
+1. Błędy False Negative i False Positive mogą mieć różne konsekwencje kliniczne.
+
+2. Odpowiedzialność za system jest rozdzielona między odpowiednie podmioty zgodnie z ich rolami i obowiązującymi przepisami.
+
+3. Wysoka accuracy nie gwarantuje wysokiej sensitivity.
+
+4. Model powinien być oceniany osobno w istotnych grupach pacjentów.
+
+5. Dane medyczne wymagają szczególnej ochrony.
+
+6. Green AI pozwala ograniczać energię i emisję, ale nie kosztem bezpieczeństwa pacjentów.
+
+7. Poprawa accuracy z 97% do 99% może być warta stukrotnie większego zużycia energii, jeżeli daje istotną, potwierdzoną korzyść kliniczną.
+
+8. Jeżeli dodatkowa dokładność nie przynosi istotnej korzyści klinicznej, należy preferować rozwiązanie bardziej energooszczędne, pod warunkiem spełnienia wszystkich wymagań.
+
+9. Optymalizacja modeli musi być połączona z ponowną walidacją kliniczną.
+
+10. Ostateczna decyzja powinna uwzględniać bezpieczeństwo, fairness, prywatność, efektywność energetyczną i wymagania regulacyjne.
+
+Wniosek końcowy:
+
+W medycznym Machine Learning nie należy maksymalizować accuracy za wszelką cenę.
+
+Należy minimalizować ryzyko dla pacjentów, zapewniać odpowiedzialność i ochronę danych oraz ograniczać zużycie energii wszędzie tam, gdzie nie pogarsza to bezpieczeństwa i jakości klinicznej.
+
+### 40. Materiały referencyjne
+
+WHO – Ethics and Governance of Artificial Intelligence for Health:
+
+https://www.who.int/publications/i/item/9789240029200
+
+WHO – Regulatory Considerations on Artificial Intelligence for Health:
+
+https://www.who.int/publications/i/item/9789240078871
+
+RODO – Rozporządzenie (UE) 2016/679:
+
+https://eur-lex.europa.eu/eli/reg/2016/679/oj
+
+MDR – Rozporządzenie (UE) 2017/745:
+
+https://eur-lex.europa.eu/eli/reg/2017/745/oj
+
+AI Act – Rozporządzenie (UE) 2024/1689:
+
+https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+
+CodeCarbon:
+
+https://docs.codecarbon.io/
+
+Dokumentacja regulacyjna i wytyczne powinny być weryfikowane pod kątem aktualnego stanu prawnego oraz konkretnego zastosowania systemu.
