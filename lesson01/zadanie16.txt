@@ -1,0 +1,1291 @@
+# Lekcja 1 – Zadanie 16
+## Multi-Model System Design – kompleksowy system ML dla e-commerce
+
+### 1. Cel projektu
+
+Celem projektu jest zaprojektowanie kompleksowego systemu Machine Learning dla sklepu internetowego.
+
+System powinien realizować cztery funkcje:
+
+1. Klasyfikowanie zdjęć produktów.
+2. Generowanie opisów produktów.
+3. Rekomendowanie produktów użytkownikom.
+4. Wykrywanie podejrzanych i potencjalnie fałszywych recenzji.
+
+Każda funkcja wymaga innego rodzaju analizy danych i może korzystać z odrębnego modelu ML.
+
+Jednocześnie wszystkie komponenty powinny współpracować, korzystać ze wspólnych danych produktowych oraz umożliwiać kontrolę jakości i zużycia zasobów.
+
+Najważniejsze cele biznesowe:
+
+- automatyzacja zarządzania katalogiem produktów,
+- poprawa jakości opisów,
+- zwiększenie trafności rekomendacji,
+- ograniczenie nadużyć w recenzjach,
+- poprawa doświadczenia klientów,
+- ograniczenie kosztów operacyjnych,
+- zmniejszenie zużycia energii przez system AI.
+
+Proponowana architektura opiera się na niezależnych usługach ML połączonych wspólną warstwą danych, kolejką zadań i interfejsami API.
+
+### 2. Podział systemu na komponenty
+
+Projekt obejmuje cztery główne moduły ML.
+
+Moduł A – Image Classification.
+
+Zadanie: rozpoznawanie kategorii produktów na zdjęciach.
+
+Moduł B – Product Description Generation.
+
+Zadanie: automatyczne tworzenie opisów produktów.
+
+Moduł C – Recommendation System.
+
+Zadanie: dobieranie produktów do preferencji klientów.
+
+Moduł D – Fraudulent Review Detection.
+
+Zadanie: identyfikacja podejrzanych recenzji i nadużyć.
+
+Dodatkowo potrzebne są:
+
+- baza danych produktów,
+- baza użytkowników,
+- baza interakcji klientów,
+- baza recenzji,
+- magazyn zdjęć,
+- warstwa API,
+- kolejka zadań,
+- system monitoringu,
+- system kontroli jakości,
+- moduł pomiaru zużycia energii.
+
+### 3. Moduł A – klasyfikacja zdjęć produktów
+
+#### 3.1. Problem biznesowy
+
+Sklep otrzymuje zdjęcia nowych produktów.
+
+System powinien rozpoznać, co przedstawia zdjęcie.
+
+Przykładowe kategorie:
+
+- buty,
+- koszule,
+- spodnie,
+- kurtki,
+- torebki,
+- elektronika.
+
+Automatyczna klasyfikacja przyspiesza katalogowanie produktów.
+
+#### 3.2. Typ zadania ML
+
+Podstawowe zadanie:
+
+Image Classification, czyli klasyfikacja obrazów.
+
+Jeżeli produkt należy do jednej kategorii, stosujemy klasyfikację wieloklasową.
+
+Jeżeli jeden obraz może mieć kilka etykiet, np. koszula, odzież męska, kolor niebieski, można zastosować klasyfikację wieloetykietową.
+
+Jeżeli na zdjęciu znajduje się wiele produktów i trzeba wskazać ich położenie, potrzebne może być Object Detection.
+
+#### 3.3. Podejście do uczenia
+
+Główne podejście:
+
+Supervised Learning.
+
+Model uczy się na zdjęciach z przypisanymi kategoriami.
+
+Dodatkowo:
+
+Transfer Learning.
+
+Wykorzystujemy model wstępnie wytrenowany na dużym zbiorze obrazów.
+
+Jeżeli mamy dużo zdjęć bez etykiet, można zastosować Semi-Supervised Learning.
+
+#### 3.4. Proponowany model
+
+MobileNetV3 lub EfficientNet-B0.
+
+Uzasadnienie:
+
+- stosunkowo lekkie architektury,
+- możliwość wykorzystania Transfer Learning,
+- dobry punkt wyjścia do optymalizacji kosztów,
+- możliwość wdrożenia na ograniczonych zasobach.
+
+Ostateczny wybór zależy od jakości i pomiarów wydajności.
+
+#### 3.5. Dane wejściowe
+
+- zdjęcie produktu,
+- ewentualnie podstawowe metadane,
+- identyfikator produktu.
+
+#### 3.6. Dane wyjściowe
+
+Przykład:
+
+product_id = 12345
+
+category = "buty"
+
+confidence = 0.97
+
+Model może również zwracać kilka najbardziej prawdopodobnych kategorii.
+
+#### 3.7. Metryki
+
+- Accuracy.
+- Macro F1-score.
+- Precision.
+- Recall.
+- Confusion Matrix.
+- Czas predykcji.
+- Zużycie energii na zdjęcie.
+
+Przy niskiej pewności predykcji produkt powinien zostać skierowany do ręcznej weryfikacji.
+
+### 4. Moduł B – generowanie opisów produktów
+
+#### 4.1. Problem biznesowy
+
+Sklep chce automatycznie tworzyć opisy produktów.
+
+Przykład:
+
+Dane:
+
+- kategoria: buty,
+- marka: przykładowa,
+- kolor: czarny,
+- materiał: skóra,
+- przeznaczenie: obuwie codzienne.
+
+Wynik:
+
+"Czarne buty ze skóry, przeznaczone do codziennego użytkowania."
+
+Opis powinien być zgodny z rzeczywistymi cechami produktu.
+
+#### 4.2. Typ zadania ML
+
+Natural Language Generation (NLG).
+
+Jest to zadanie generowania tekstu.
+
+Jeżeli opis powstaje na podstawie zdjęcia, problem może mieć charakter multimodalny:
+
+Image-to-Text.
+
+Jeżeli opis powstaje z ustrukturyzowanych danych produktowych, można zastosować:
+
+Data-to-Text Generation.
+
+#### 4.3. Podejście do uczenia
+
+Możliwe podejścia:
+
+A. Supervised Fine-Tuning.
+
+Model uczy się na przykładach danych produktów i poprawnych opisów.
+
+B. Transfer Learning.
+
+Wykorzystujemy wcześniej wytrenowany model językowy.
+
+C. Prompting.
+
+Wykorzystujemy gotowy model generatywny i odpowiednio przygotowane instrukcje.
+
+D. Generowanie szablonowe.
+
+Dla prostych produktów można użyć reguł i szablonów bez uruchamiania dużego modelu.
+
+#### 4.4. Proponowany model
+
+Lekki model językowy dostosowany do języka polskiego albo gotowy model generatywny obsługujący język polski.
+
+W pierwszej wersji projektu rekomenduję podejście hybrydowe:
+
+- szablony dla prostych produktów,
+- model generatywny dla bardziej złożonych opisów.
+
+Pozwala to ograniczyć koszty i zużycie energii.
+
+#### 4.5. Dane wejściowe
+
+- identyfikator produktu,
+- kategoria,
+- marka,
+- kolor,
+- materiał,
+- rozmiar,
+- parametry techniczne,
+- inne zatwierdzone atrybuty,
+- opcjonalnie zdjęcie.
+
+#### 4.6. Dane wyjściowe
+
+- tytuł produktu,
+- krótki opis,
+- szczegółowy opis,
+- lista najważniejszych cech.
+
+#### 4.7. Kontrola jakości
+
+Najważniejsze ryzyko to generowanie nieprawdziwych informacji.
+
+Przykład:
+
+Model nie powinien dopisywać, że buty są wodoodporne, jeżeli nie wynika to z danych produktu.
+
+Rozwiązanie:
+
+1. Generowanie tylko na podstawie zweryfikowanych atrybutów.
+2. Sprawdzanie zgodności opisu z bazą produktów.
+3. Ograniczenie niepotwierdzonych twierdzeń.
+4. Ręczna akceptacja opisów wysokiego ryzyka.
+5. Możliwość poprawiania opisów przez administratora.
+
+#### 4.8. Metryki
+
+- zgodność faktograficzna z danymi produktu,
+- kompletność opisu,
+- czytelność języka,
+- ocena redaktora,
+- odsetek opisów wymagających poprawy,
+- czas generowania,
+- koszt i energia na opis.
+
+Automatyczne metryki tekstowe mogą być pomocnicze, ale nie zastępują kontroli zgodności z danymi.
+
+### 5. Moduł C – system rekomendacji
+
+#### 5.1. Problem biznesowy
+
+Sklep chce rekomendować użytkownikom produkty, które mogą ich zainteresować.
+
+Przykład:
+
+Klient często przegląda buty do biegania.
+
+System może zaproponować:
+
+- podobne modele obuwia,
+- inne produkty sportowe,
+- akcesoria związane z bieganiem.
+
+Rekomendacje powinny być trafne, różnorodne i zgodne z dostępnością produktów.
+
+#### 5.2. Typ zadania ML
+
+Recommendation System.
+
+Można go przedstawić jako:
+
+- ranking produktów,
+- przewidywanie zainteresowania,
+- przewidywanie prawdopodobieństwa zakupu.
+
+#### 5.3. Podejścia do uczenia
+
+A. Collaborative Filtering.
+
+Model wykorzystuje podobieństwa zachowań użytkowników.
+
+Przykład:
+
+Użytkownicy o podobnej historii zakupów często wybierają podobne produkty.
+
+B. Content-Based Filtering.
+
+Rekomendacje powstają na podstawie cech produktów.
+
+Przykład:
+
+Klient ogląda czarne buty sportowe.
+
+System proponuje podobne buty.
+
+C. Hybrid Recommendation.
+
+Łączy Collaborative Filtering i Content-Based Filtering.
+
+D. Learning to Rank.
+
+Model uczy się ustalać kolejność produktów na podstawie prawdopodobieństwa zainteresowania.
+
+#### 5.4. Proponowane rozwiązanie
+
+Rekomenduję hybrydowy system dwustopniowy.
+
+Etap 1 – Candidate Generation.
+
+Wybór kilkudziesięciu lub kilkuset potencjalnie interesujących produktów.
+
+Etap 2 – Ranking.
+
+Ustalenie kolejności rekomendacji.
+
+Do generowania kandydatów można wykorzystać:
+
+- podobieństwo produktów,
+- historię interakcji,
+- popularność produktów,
+- Collaborative Filtering.
+
+Do rankingu:
+
+- lekki model klasyfikacyjny,
+- model gradient boosting,
+- model Learning to Rank.
+
+#### 5.5. Dane wejściowe
+
+- historia przeglądania,
+- historia zakupów,
+- kliknięcia,
+- kategorie zainteresowań,
+- atrybuty produktów,
+- ceny,
+- dostępność.
+
+Dane użytkowników powinny być przetwarzane zgodnie z zasadą minimalizacji danych i obowiązującymi wymaganiami prywatności.
+
+#### 5.6. Dane wyjściowe
+
+Lista produktów uporządkowanych według przewidywanej trafności.
+
+Przykład:
+
+user_id = 500
+
+recommendations = [
+    12345,
+    12389,
+    12770
+]
+
+#### 5.7. Problem Cold Start
+
+Nowy użytkownik nie ma historii zachowań.
+
+Możliwe rozwiązania:
+
+- popularne produkty,
+- rekomendacje kontekstowe,
+- produkty z aktualnie przeglądanej kategorii,
+- krótkie pytania o preferencje.
+
+Nowy produkt również może nie mieć historii interakcji.
+
+Wtedy wykorzystujemy jego kategorię, opis i cechy wizualne.
+
+#### 5.8. Metryki
+
+- Precision@K.
+- Recall@K.
+- NDCG@K.
+- CTR.
+- Conversion Rate.
+- Revenue per Session.
+- Różnorodność rekomendacji.
+- Czas odpowiedzi.
+- Energia na 1 000 rekomendacji.
+
+Metryki biznesowe powinny być oceniane również w eksperymentach A/B.
+
+### 6. Moduł D – wykrywanie fałszywych recenzji
+
+#### 6.1. Problem biznesowy
+
+Sklep chce identyfikować podejrzane recenzje.
+
+Przykłady:
+
+- automatycznie generowane opinie,
+- masowe publikowanie podobnych tekstów,
+- recenzje pochodzące z powiązanych kont,
+- nietypowe serie ocen,
+- próby sztucznego zawyżania lub zaniżania oceny produktu.
+
+Celem nie jest automatyczne uznawanie każdej nietypowej recenzji za oszustwo.
+
+Model powinien identyfikować przypadki wymagające dalszej analizy.
+
+#### 6.2. Typy zadań ML
+
+A. Binary Classification.
+
+Klasyfikacja:
+
+- podejrzana,
+- niepodejrzana.
+
+B. Anomaly Detection.
+
+Wykrywanie nietypowych wzorców.
+
+C. Natural Language Processing.
+
+Analiza treści recenzji.
+
+D. Graph Analysis.
+
+Analiza powiązań między kontami, produktami i recenzjami.
+
+#### 6.3. Podejścia do uczenia
+
+A. Supervised Learning.
+
+Jeżeli dostępne są wiarygodne etykiety recenzji.
+
+B. Unsupervised Learning.
+
+Wykrywanie anomalii bez pełnego zbioru etykiet.
+
+C. Semi-Supervised Learning.
+
+Połączenie niewielkiego zbioru oznaczonych recenzji z dużym zbiorem nieoznaczonych.
+
+#### 6.4. Proponowane modele
+
+Warstwa pierwsza:
+
+- reguły wykrywające nietypowe wzorce,
+- analiza liczby recenzji,
+- analiza podobieństwa tekstów.
+
+Warstwa druga:
+
+- Logistic Regression,
+- LightGBM,
+- inny lekki model klasyfikacyjny.
+
+Warstwa trzecia:
+
+- model NLP dla trudniejszych przypadków.
+
+Dodatkowo:
+
+- Isolation Forest do wykrywania anomalii,
+- analiza grafowa dla powiązanych kont.
+
+#### 6.5. Dane wejściowe
+
+- tekst recenzji,
+- ocena produktu,
+- data publikacji,
+- historia konta,
+- częstotliwość dodawania recenzji,
+- podobieństwo do innych opinii,
+- potwierdzenie zakupu, jeśli dostępne,
+- sygnały o nietypowych powiązaniach.
+
+#### 6.6. Dane wyjściowe
+
+Przykład:
+
+review_id = 9876
+
+risk_score = 0.91
+
+decision = "manual_review"
+
+Wysoki wynik ryzyka nie stanowi dowodu oszustwa.
+
+Recenzja może zostać skierowana do moderatora.
+
+#### 6.7. Metryki
+
+- Precision.
+- Recall.
+- F1-score.
+- PR-AUC.
+- False Positive Rate.
+- Liczba błędnie zablokowanych recenzji.
+- Czas analizy.
+- Energia na 1 000 recenzji.
+
+Szczególnie ważne jest ograniczenie False Positives, aby nie karać uczciwych klientów.
+
+### 7. Jakie podejścia do uczenia wykorzystujemy?
+
+| Komponent | Typ zadania | Podejście |
+|---|---|---|
+| Klasyfikacja zdjęć | Image Classification | Supervised + Transfer Learning |
+| Generowanie opisów | Natural Language Generation | Transfer Learning + Prompting / Fine-Tuning |
+| Rekomendacje | Ranking / Recommendation | Collaborative + Content-Based + Supervised Ranking |
+| Fraudulent Reviews | Classification + Anomaly Detection + NLP | Supervised + Unsupervised / Semi-Supervised |
+
+System nie wykorzystuje jednej metody uczenia do wszystkich problemów.
+
+Każdy moduł powinien być dostosowany do rodzaju danych i celu biznesowego.
+
+### 8. Współpraca komponentów
+
+Najważniejszą cechą architektury jest współdzielenie informacji.
+
+#### 8.1. Klasyfikacja zdjęć i generowanie opisów
+
+Moduł klasyfikacji rozpoznaje kategorię produktu.
+
+Przykład:
+
+Zdjęcie -> "buty".
+
+Następnie system pobiera zatwierdzone atrybuty produktu z bazy.
+
+Generator opisu wykorzystuje:
+
+- kategorię,
+- markę,
+- kolor,
+- materiał,
+- inne potwierdzone dane.
+
+Wynik:
+
+Opis produktu.
+
+Ważne:
+
+Sama kategoria przewidziana ze zdjęcia nie wystarcza do tworzenia szczegółowego opisu.
+
+#### 8.2. Klasyfikacja zdjęć i rekomendacje
+
+Klasyfikator może dostarczać:
+
+- kategorię,
+- cechy wizualne,
+- wektor reprezentujący obraz.
+
+System rekomendacji wykorzystuje te informacje do wyszukiwania podobnych produktów.
+
+Jest to szczególnie przydatne przy nowych produktach.
+
+#### 8.3. Opisy produktów i rekomendacje
+
+Zatwierdzone opisy mogą służyć do tworzenia reprezentacji tekstowych produktów.
+
+Dzięki temu system rekomendacji może uwzględniać podobieństwo znaczeniowe.
+
+Przykład:
+
+Produkty opisane jako "buty do biegania" mogą zostać uznane za bardziej podobne niż produkty z różnych kategorii.
+
+#### 8.4. Recenzje i rekomendacje
+
+System wykrywania podejrzanych recenzji dostarcza sygnały o wiarygodności opinii.
+
+System rekomendacji może ograniczać wpływ recenzji o wysokim ryzyku manipulacji na agregowane oceny.
+
+Nie powinien jednak automatycznie usuwać recenzji wyłącznie na podstawie wyniku modelu.
+
+#### 8.5. Wspólna baza produktów
+
+Każdy moduł korzysta z identyfikatora produktu.
+
+Przykład:
+
+product_id = 12345.
+
+Umożliwia to łączenie:
+
+- zdjęć,
+- kategorii,
+- opisów,
+- interakcji,
+- recenzji,
+- rekomendacji.
+
+### 9. Diagram architektury systemu
+
+Proponowana architektura:
+
+                    +----------------------+
+                    |   SKLEP INTERNETOWY  |
+                    |  WWW / APLIKACJA     |
+                    +----------+-----------+
+                               |
+                               v
+                    +----------------------+
+                    |       API GATEWAY    |
+                    |   AUTH / RATE LIMIT  |
+                    +----------+-----------+
+                               |
+              +----------------+----------------+
+              |                                 |
+              v                                 v
+   +----------------------+          +----------------------+
+   |    BAZA PRODUKTÓW    |          |    ZDARZENIA         |
+   |  PostgreSQL          |          |  KLIKNIĘCIA / OPINIE |
+   +----------+-----------+          +----------+-----------+
+              |                                 |
+              v                                 v
+   +----------------------+          +----------------------+
+   | KOLEJKA ZADAŃ        |          |   PIPELINE DANYCH    |
+   | ASYNCHRONICZNYCH     |          |   WALIDACJA / ETL    |
+   +----------+-----------+          +----------+-----------+
+              |                                 |
+      +-------+-------+                 +-------+-------+
+      |               |                 |               |
+      v               v                 v               v
++-------------+ +-------------+  +-------------+ +-------------+
+| MODUŁ A     | | MODUŁ B     |  | MODUŁ C     | | MODUŁ D     |
+| KLASYFIKACJA| | GENEROWANIE |  | REKOMENDACJE| | FRAUD REVIEW|
+| OBRAZÓW     | | OPISÓW      |  |             | | DETECTION   |
++------+------+ +------+------+  +------+------+ +------+------+
+       |               |                |               |
+       +---------------+----------------+---------------+
+                               |
+                               v
+                    +----------------------+
+                    | WSPÓLNA WARSTWA      |
+                    | CECH / WYNIKÓW ML    |
+                    +----------+-----------+
+                               |
+                               v
+                    +----------------------+
+                    | KONTROLA JAKOŚCI     |
+                    | I MODERACJA          |
+                    +----------+-----------+
+                               |
+                               v
+                    +----------------------+
+                    | AKTUALIZACJA DANYCH  |
+                    | PRODUKTÓW I WYNIKÓW  |
+                    +----------+-----------+
+                               |
+                               v
+                    +----------------------+
+                    | MONITORING           |
+                    | JAKOŚĆ / KOSZT / CO2 |
+                    +----------------------+
+
+Diagram przedstawia logiczne komponenty, a nie wszystkie fizyczne połączenia sieciowe.
+
+W praktyce system rekomendacji obsługuje również żądania online przez API.
+
+Modele klasyfikacji zdjęć i generowania opisów mogą działać asynchronicznie podczas dodawania produktów.
+
+Moduł wykrywania podejrzanych recenzji może analizować nowe opinie po ich zapisaniu.
+
+### 10. Architektura przepływu danych
+
+#### A. Dodanie nowego produktu
+
+1. Sprzedawca dodaje produkt.
+2. Zdjęcie trafia do magazynu plików.
+3. Dane produktu trafiają do PostgreSQL.
+4. Kolejka uruchamia klasyfikację zdjęcia.
+5. Wynik jest zapisywany wraz z poziomem pewności.
+6. System pobiera zweryfikowane atrybuty.
+7. Generator tworzy opis.
+8. Opis jest sprawdzany i zatwierdzany.
+9. Produkt staje się dostępny w katalogu.
+10. Dane produktu trafiają do systemu rekomendacji.
+
+#### B. Przeglądanie sklepu
+
+1. Klient otwiera stronę.
+2. API pobiera dane użytkownika i kontekst.
+3. Moduł rekomendacji wybiera kandydatów.
+4. Model rankingowy ustala kolejność.
+5. API zwraca rekomendowane produkty.
+6. Interakcje użytkownika są zapisywane.
+7. Dane mogą zostać wykorzystane do przyszłego treningu.
+
+#### C. Dodanie recenzji
+
+1. Użytkownik publikuje recenzję.
+2. Recenzja trafia do bazy.
+3. Uruchamiana jest analiza ryzyka.
+4. Reguły i modele ML oceniają recenzję.
+5. Wynik jest zapisywany.
+6. Podejrzane przypadki trafiają do moderatora.
+7. Wynik moderacji może zasilić przyszły zbiór treningowy.
+
+### 11. Wspólna infrastruktura techniczna
+
+Proponowane technologie:
+
+Backend:
+
+- Python.
+- Django REST Framework lub FastAPI.
+
+Baza danych:
+
+- PostgreSQL.
+
+Magazyn zdjęć:
+
+- Object Storage, np. rozwiązanie zgodne z S3.
+
+Kolejka zadań:
+
+- Celery.
+- Redis lub RabbitMQ jako broker.
+
+Machine Learning:
+
+- PyTorch.
+- scikit-learn.
+- LightGBM.
+- biblioteki do przetwarzania tekstu.
+
+Konteneryzacja:
+
+- Docker.
+- Docker Compose dla środowiska deweloperskiego.
+
+Monitoring:
+
+- Prometheus.
+- Grafana.
+- logowanie wyników modeli.
+
+Dobór technologii powinien zależeć od skali projektu i możliwości zespołu.
+
+Nie wszystkie narzędzia są konieczne w pierwszej wersji systemu.
+
+### 12. Podział na zadania online i offline
+
+Kluczową decyzją architektoniczną jest rozdzielenie przetwarzania online i offline.
+
+#### Offline / asynchronicznie
+
+- klasyfikacja nowych zdjęć,
+- generowanie opisów,
+- aktualizacja reprezentacji produktów,
+- trening modeli,
+- analiza historycznych recenzji,
+- przygotowanie kandydatów do rekomendacji.
+
+#### Online
+
+- zwracanie rekomendacji,
+- pobieranie zatwierdzonych opisów,
+- pobieranie kategorii,
+- wyświetlanie ocen,
+- przyjmowanie recenzji.
+
+Wykrywanie fraudu może działać w trybie asynchronicznym, a w przypadkach wymagających natychmiastowej ochrony także w ograniczonym trybie online.
+
+Takie rozdzielenie zmniejsza opóźnienia i pozwala lepiej wykorzystywać zasoby.
+
+### 13. Które komponenty zużywają najwięcej energii?
+
+Zużycie energii zależy od:
+
+- wielkości modeli,
+- liczby predykcji,
+- częstotliwości treningu,
+- rodzaju sprzętu,
+- wielkości danych,
+- sposobu wdrożenia.
+
+Nie można jednoznacznie wskazać najbardziej energochłonnego modułu bez pomiarów.
+
+Można jednak określić prawdopodobne źródła kosztów.
+
+#### A. Generowanie opisów
+
+Duże modele generatywne mogą wymagać znacznych zasobów.
+
+Koszt zależy od:
+
+- liczby generowanych tokenów,
+- rozmiaru modelu,
+- liczby produktów,
+- częstotliwości aktualizacji opisów.
+
+#### B. Klasyfikacja obrazów
+
+Modele CNN wymagają obliczeń na obrazach.
+
+Koszt zależy od:
+
+- rozdzielczości zdjęć,
+- architektury,
+- liczby zdjęć,
+- częstotliwości trenowania.
+
+#### C. Rekomendacje
+
+Nawet lekki model może zużywać dużo energii, jeżeli obsługuje miliony żądań.
+
+Ważna jest całkowita liczba predykcji.
+
+#### D. Wykrywanie fraudu
+
+Koszt zależy od złożoności analizy tekstu i zachowań.
+
+Lekkie reguły są zwykle tańsze niż uruchamianie dużego modelu językowego dla każdej recenzji.
+
+### 14. Przykładowa analiza zużycia zasobów
+
+Poniższe wartości są hipotetyczne.
+
+Nie stanowią rzeczywistych pomiarów.
+
+Założenia dzienne:
+
+- 10 000 nowych zdjęć produktów,
+- 10 000 generowanych opisów,
+- 1 000 000 żądań rekomendacji,
+- 50 000 nowych recenzji.
+
+Przykładowe zużycie energii:
+
+| Komponent | Liczba operacji/dzień | Energia na operację | Energia dzienna |
+|---|---:|---:|---:|
+| Klasyfikacja zdjęć | 10 000 | 0,02 Wh | 200 Wh |
+| Generowanie opisów | 10 000 | 0,20 Wh | 2 000 Wh |
+| Rekomendacje | 1 000 000 | 0,001 Wh | 1 000 Wh |
+| Analiza recenzji | 50 000 | 0,01 Wh | 500 Wh |
+
+Suma:
+
+200 + 2 000 + 1 000 + 500 = 3 700 Wh.
+
+3 700 Wh = 3,7 kWh dziennie.
+
+W tym przykładzie:
+
+- generowanie opisów odpowiada za około 54,1% energii,
+- rekomendacje za około 27,0%,
+- analiza recenzji za około 13,5%,
+- klasyfikacja zdjęć za około 5,4%.
+
+Wartości są wyłącznie ilustracją metody obliczania.
+
+Nie obejmują wszystkich kosztów infrastruktury, przechowywania danych, sieci ani treningu modeli.
+
+### 15. Energia treningu i inferencji
+
+Należy oddzielić:
+
+A. Training.
+
+Energia zużywana podczas uczenia i aktualizacji modeli.
+
+B. Inference.
+
+Energia zużywana podczas generowania predykcji.
+
+Przykład:
+
+Model może wymagać kosztownego treningu raz na miesiąc, ale bardzo tanich predykcji.
+
+Inny model może być tani w treningu, lecz kosztowny przy milionach żądań.
+
+Dlatego należy mierzyć całkowity koszt eksploatacji:
+
+E_total = E_training + E_inference + E_infrastructure
+
+Gdzie:
+
+E_training – energia treningu w wybranym okresie.
+
+E_inference – energia predykcji.
+
+E_infrastructure – dodatkowe zużycie infrastruktury.
+
+W praktyce należy zadbać, aby te kategorie nie były liczone podwójnie.
+
+### 16. Green AI – optymalizacja klasyfikacji zdjęć
+
+Proponowane działania:
+
+1. Wykorzystanie Transfer Learning.
+2. Wybór lekkiego modelu, np. MobileNetV3.
+3. Ograniczenie rozdzielczości obrazów do potrzeb zadania.
+4. Przetwarzanie zdjęć w paczkach.
+5. Unikanie ponownej klasyfikacji niezmienionych zdjęć.
+6. Buforowanie wyników.
+7. Wczesne zatrzymanie treningu.
+8. Kwantyzacja modelu po sprawdzeniu wpływu na jakość.
+
+Dodatkowo:
+
+Można przechowywać wektory cech obrazów i wykorzystywać je w systemie rekomendacji.
+
+Pozwala to uniknąć wielokrotnego obliczania podobnych reprezentacji.
+
+### 17. Green AI – optymalizacja generowania opisów
+
+Proponowane działania:
+
+1. Szablony dla prostych produktów.
+2. Mały model językowy dla typowych opisów.
+3. Większy model tylko dla trudniejszych przypadków.
+4. Ograniczenie długości generowanego tekstu.
+5. Generowanie opisu tylko po zmianie istotnych danych.
+6. Przechowywanie zatwierdzonych opisów.
+7. Grupowanie zadań generowania.
+8. Kontrola liczby ponownych prób.
+
+Przykład:
+
+Produkt posiada komplet podstawowych atrybutów.
+
+System generuje opis szablonowy.
+
+Produkt jest nietypowy i wymaga bardziej rozbudowanego opisu.
+
+System uruchamia model generatywny.
+
+Takie podejście pozwala ograniczyć liczbę kosztownych wywołań.
+
+### 18. Green AI – optymalizacja rekomendacji
+
+Proponowane działania:
+
+1. Dwustopniowa architektura Candidate Generation + Ranking.
+2. Wstępne obliczanie podobieństw produktów.
+3. Buforowanie popularnych rekomendacji.
+4. Ograniczenie liczby kandydatów.
+5. Wykorzystanie lekkiego modelu rankingowego.
+6. Aktualizowanie rekomendacji tylko wtedy, gdy jest to potrzebne.
+7. Optymalizacja zapytań do bazy danych.
+8. Unikanie uruchamiania ciężkich modeli przy każdym odświeżeniu strony.
+
+Dodatkowo:
+
+Dla anonimowych użytkowników można stosować rekomendacje kontekstowe i popularne produkty.
+
+Zmniejsza to konieczność wykonywania kosztownej personalizacji.
+
+### 19. Green AI – optymalizacja wykrywania fraudu
+
+Proponowana architektura kaskadowa.
+
+Etap 1:
+
+Proste reguły.
+
+Etap 2:
+
+Lekki klasyfikator.
+
+Etap 3:
+
+Bardziej złożony model NLP tylko dla przypadków niejednoznacznych.
+
+Etap 4:
+
+Ręczna moderacja przypadków wysokiego ryzyka.
+
+Zalety:
+
+- ograniczenie liczby wywołań ciężkich modeli,
+- niższe koszty,
+- możliwość kontroli decyzji,
+- mniejsze zużycie energii.
+
+Należy jednak mierzyć skuteczność całej kaskady.
+
+Zbyt agresywne filtrowanie na pierwszym etapie może prowadzić do pomijania nadużyć.
+
+### 20. Przykładowy efekt optymalizacji Green AI
+
+Przyjmijmy hipotetyczny scenariusz.
+
+Energia przed optymalizacją:
+
+3,7 kWh dziennie.
+
+Po wdrożeniu:
+
+- szablonów opisów,
+- cache rekomendacji,
+- lekkich klasyfikatorów,
+- przetwarzania wsadowego,
+
+energia spada do:
+
+2,2 kWh dziennie.
+
+Oszczędność:
+
+3,7 - 2,2 = 1,5 kWh dziennie.
+
+Oszczędność procentowa:
+
+(1,5 / 3,7) * 100% = około 40,54%.
+
+W skali roku:
+
+1,5 kWh * 365 = 547,5 kWh.
+
+To przykładowe oszacowanie, a nie wynik rzeczywistego wdrożenia.
+
+Należy również sprawdzić, czy optymalizacje nie obniżają jakości usług.
+
+### 21. Monitoring zużycia zasobów
+
+System powinien zbierać informacje o:
+
+- czasie pracy CPU,
+- wykorzystaniu GPU,
+- zużyciu RAM,
+- liczbie predykcji,
+- czasie odpowiedzi,
+- energii na operację,
+- kosztach infrastruktury,
+- błędach modeli.
+
+Przykładowe wskaźniki:
+
+Wh / 1 000 klasyfikacji zdjęć.
+
+Wh / 1 000 wygenerowanych opisów.
+
+Wh / 1 000 rekomendacji.
+
+Wh / 1 000 analiz recenzji.
+
+kWh / dzień.
+
+kWh / miesiąc.
+
+W przypadku emisji CO₂e należy dodatkowo uwzględnić emisyjność wykorzystywanej energii.
+
+### 22. Metryki biznesowe i techniczne
+
+| Komponent | Metryka jakości | Metryka biznesowa | Metryka energetyczna |
+|---|---|---|---|
+| Klasyfikacja zdjęć | Macro F1 | Czas katalogowania | Wh / 1 000 zdjęć |
+| Generowanie opisów | Zgodność faktograficzna | Koszt przygotowania opisów | Wh / 1 000 opisów |
+| Rekomendacje | NDCG@K | CTR / konwersja | Wh / 1 000 żądań |
+| Fraud Detection | Precision / Recall / PR-AUC | Liczba wykrytych nadużyć | Wh / 1 000 recenzji |
+
+Dodatkowo należy monitorować:
+
+- dostępność usług,
+- opóźnienia API,
+- odsetek błędów,
+- aktualność modeli,
+- jakość danych.
+
+### 23. Bezpieczeństwo i prywatność
+
+System przetwarza dane produktów i klientów.
+
+Najważniejsze zasady:
+
+1. Minimalizacja danych osobowych.
+2. Kontrola dostępu do danych.
+3. Szyfrowanie komunikacji.
+4. Bezpieczne przechowywanie informacji.
+5. Rejestrowanie istotnych operacji.
+6. Ograniczenie dostępu modeli do niepotrzebnych danych.
+7. Możliwość zgłoszenia błędnej decyzji.
+8. Kontrola jakości wygenerowanych opisów.
+9. Nadzór nad moderacją recenzji.
+
+Wykrywanie fraudu powinno być traktowane jako ocena ryzyka, a nie automatyczne stwierdzenie winy użytkownika.
+
+### 24. Ryzyka projektu
+
+#### A. Błędy klasyfikacji zdjęć
+
+Model może przypisać produkt do niewłaściwej kategorii.
+
+Rozwiązanie:
+
+Kontrola pewności, ręczna weryfikacja i monitoring.
+
+#### B. Nieprawdziwe opisy
+
+Model generatywny może dopisać cechy nieobecne w danych.
+
+Rozwiązanie:
+
+Generowanie na podstawie zweryfikowanych atrybutów.
+
+#### C. Nietrafne rekomendacje
+
+Model może nadmiernie promować popularne produkty.
+
+Rozwiązanie:
+
+Kontrola różnorodności, eksperymenty A/B i analiza Cold Start.
+
+#### D. Błędne oznaczanie recenzji
+
+Uczciwe opinie mogą zostać uznane za podejrzane.
+
+Rozwiązanie:
+
+Ręczna moderacja, analiza False Positives i możliwość odwołania.
+
+#### E. Wysokie zużycie zasobów
+
+Zbyt duże modele mogą zwiększać koszty.
+
+Rozwiązanie:
+
+Monitoring, cache, batching i wybór lżejszych architektur.
+
+#### F. Niespójność danych między modułami
+
+Różne usługi mogą korzystać z nieaktualnych informacji.
+
+Rozwiązanie:
+
+Wspólne identyfikatory, wersjonowanie danych i kontrola przepływu zdarzeń.
+
+### 25. Plan wdrożenia
+
+#### Etap 1 – Analiza wymagań
+
+- Zdefiniowanie kategorii produktów.
+- Ustalenie sposobu tworzenia opisów.
+- Analiza dostępnych danych użytkowników.
+- Zdefiniowanie podejrzanych zachowań w recenzjach.
+
+#### Etap 2 – Infrastruktura danych
+
+- PostgreSQL.
+- Magazyn zdjęć.
+- API.
+- Kolejka zadań.
+- Monitoring.
+
+#### Etap 3 – Klasyfikacja zdjęć
+
+- Przygotowanie danych.
+- Transfer Learning.
+- Walidacja.
+- Wdrożenie modelu.
+
+#### Etap 4 – Generowanie opisów
+
+- Szablony.
+- Model generatywny.
+- Kontrola zgodności.
+- Proces zatwierdzania.
+
+#### Etap 5 – Rekomendacje
+
+- Baseline popularności.
+- Content-Based Filtering.
+- Collaborative Filtering.
+- Ranking.
+- Testy A/B.
+
+#### Etap 6 – Fraud Detection
+
+- Reguły.
+- Model klasyfikacyjny.
+- Anomaly Detection.
+- Moderacja.
+
+#### Etap 7 – Integracja
+
+- Połączenie usług przez API.
+- Wspólne identyfikatory.
+- Kolejka zdarzeń.
+- Kontrola spójności danych.
+
+#### Etap 8 – Green AI
+
+- Pomiar energii.
+- Profilowanie kosztów.
+- Optymalizacja modeli.
+- Cache.
+- Batching.
+- Kontrola wpływu na jakość.
+
+#### Etap 9 – Monitoring i rozwój
+
+- Monitorowanie jakości.
+- Analiza błędów.
+- Aktualizacje modeli.
+- Kontrola kosztów.
+- Rozwój funkcjonalności.
+
+### 26. Rekomendowana architektura MVP
+
+W pierwszej wersji nie trzeba wdrażać wszystkich zaawansowanych modeli.
+
+Proponowane MVP:
+
+1. Django REST Framework jako backend.
+2. PostgreSQL jako baza danych.
+3. Celery jako kolejka zadań.
+4. MobileNetV3 do klasyfikacji zdjęć.
+5. Szablony oraz mały model generatywny do opisów.
+6. Content-Based Filtering do rekomendacji.
+7. Reguły i lekki klasyfikator do recenzji.
+8. Docker Compose do uruchamiania środowiska.
+9. Podstawowy monitoring jakości i kosztów.
+
+Następnie można rozwijać:
+
+- bardziej zaawansowany ranking,
+- Collaborative Filtering,
+- multimodalne reprezentacje produktów,
+- modele NLP do analizy recenzji,
+- automatyczne skalowanie usług.
+
+Takie podejście ogranicza koszty początkowe i umożliwia stopniową walidację korzyści.
+
+### 27. Podsumowanie
+
+System e-commerce powinien wykorzystywać kilka wyspecjalizowanych modeli ML.
+
+Klasyfikacja zdjęć:
+
+Supervised Learning + Transfer Learning.
+
+Generowanie opisów:
+
+Natural Language Generation + Transfer Learning.
+
+Rekomendacje:
+
+Hybrid Recommendation + Ranking.
+
+Wykrywanie podejrzanych recenzji:
+
+Classification + Anomaly Detection + NLP.
+
+Modele współpracują przez wspólną bazę produktów, warstwę danych i API.
+
+Największe potencjalne źródła kosztów to:
+
+- generowanie tekstu,
+- częste wykonywanie rekomendacji,
+- przetwarzanie dużej liczby obrazów,
+- złożona analiza recenzji.
+
+Green AI można realizować poprzez:
+
+- lekkie modele,
+- szablony,
+- cache,
+- batching,
+- kwantyzację,
+- przetwarzanie asynchroniczne,
+- ograniczanie niepotrzebnych predykcji,
+- monitorowanie energii.
+
+W przedstawionym hipotetycznym przykładzie optymalizacja zmniejsza dzienne zużycie energii z 3,7 kWh do 2,2 kWh, czyli o około 40,5%.
+
+Wartość ta wymaga potwierdzenia pomiarami.
+
+Wniosek końcowy:
+
+Najbardziej racjonalna architektura to modułowy system ML, w którym każdy model odpowiada za określone zadanie, a wspólna infrastruktura zapewnia współpracę komponentów.
+
+Takie rozwiązanie umożliwia rozwój systemu, kontrolę jakości oraz ograniczanie kosztów i zużycia energii bez konieczności stosowania jednego dużego modelu do wszystkich problemów.
