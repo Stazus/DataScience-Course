@@ -1,0 +1,6 @@
+﻿Feature,Google Colab,Jupyter Local
+Koszt,"Darmowy plan, płatne opcje","Darmowy, koszt własnego sprzętu"
+Dostęp do GPU,"GPU w chmurze, zależnie od dostępności",Zależy od sprzętu i konfiguracji
+Praca offline,Zasadniczo wymaga internetu,Tak
+Limity czasowe,Ograniczenia czasu sesji,Brak limitu narzuconego przez usługę
+Kontrola środowiska,Ograniczona przez platformę,Pełna kontrola lokalna
