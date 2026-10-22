@@ -4,3 +4,6 @@
 # Pliki tymczasowe Pythona
 __pycache__/
 *.py[cod]
+
+# Raporty środowiska generowane w zadaniu 11
+/reports/
