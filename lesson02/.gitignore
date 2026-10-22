@@ -1,0 +1,6 @@
+# Automatyczne kopie notatników Jupyter
+.ipynb_checkpoints/
+
+# Pliki tymczasowe Pythona
+__pycache__/
+*.py[cod]
