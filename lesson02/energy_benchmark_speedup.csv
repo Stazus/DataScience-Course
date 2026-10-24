@@ -1,0 +1,11 @@
+category,first_operation,second_operation,speedup
+Kwadraty liczb,Python - kwadraty liczb,NumPy - kwadraty liczb,37.505054273191
+Pandas,Pandas - iterrows,Pandas - wektoryzacja,4374.7052622302945
+Wykres liniowy,Matplotlib - wykres liniowy,Plotly - wykres liniowy,5.219030923455048
+Trenowanie ML,Scikit-learn - trenowanie,XGBoost - trenowanie,1.043403520629504
+Sumowanie,Python - sumowanie liczb,NumPy - sumowanie liczb,11.788888606615657
+Srednia,Python - srednia liczb,NumPy - srednia liczb,14.391847494917194
+Maksimum,Python - maksimum,NumPy - maksimum,28.48211323770629
+Minimum,Python - minimum,NumPy - minimum,23.76510205197598
+Odchylenie standardowe,Python - odchylenie standardowe,NumPy - odchylenie standardowe,24.257244532171658
+Filtrowanie,Python - filtrowanie,NumPy - filtrowanie,23.750098675139274
