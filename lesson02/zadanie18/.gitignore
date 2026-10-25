@@ -1,0 +1,19 @@
+# Srodowiska wirtualne
+venv39/
+venv311/
+
+# Pliki tymczasowe Pythona
+__pycache__/
+*.pyc
+
+# Metadane Windows
+*:Zone.Identifier
+
+# Wyniki generowane automatycznie
+result_*.json
+test_notebook_executed.ipynb
+test_notebook_python39.ipynb
+test_notebook_python311.ipynb
+
+# Pliki tymczasowe Jupyter
+.ipynb_checkpoints/
