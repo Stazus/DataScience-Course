@@ -21,7 +21,7 @@ W ramach lekcji wykonano 20 zadań praktycznych.
 7. Edycja dokumentacji bezpośrednio na GitHub.
 8. Porównywanie zmian za pomocą git diff.
 9. Git Flow – gałęzie feature, develop i main.
-10. Praca z repozytorium zdalnym i współpraca.
+10. Rozwiązywanie konfliktów podczas scalania gałęzi.
 
 ## Główne repozytoria
 
@@ -31,9 +31,9 @@ W ramach lekcji wykonano 20 zadań praktycznych.
 
 ## Zadania 11–20 – Zaawansowane Git i GitHub
 
-11. Współpraca zespołowa i Pull Request.
-12. Rozwiązywanie konfliktów podczas scalania.
-13. Praktyczne wykorzystanie gałęzi Git.
+11. Praca z remote branches – synchronizacja zmian między dwoma klonami repozytorium.
+12. Pull Request przez GitHub – code review i scalanie zmian.
+13. Kompletny projekt ML z Git Flow – gałęzie, Pull Requests i release v1.0.
 14. Git Squash – łączenie commitów.
 15. GitHub Actions – automatyzacja CI.
 16. Monorepo – organizacja wielu projektów.
