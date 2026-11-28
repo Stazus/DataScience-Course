@@ -1,7 +1,7 @@
 """Create articles table
 
 Revision ID: 01afd42d00b3
-Revises: 
+Revises:
 Create Date: 2026-11-28 08:32:52.853848
 
 """
